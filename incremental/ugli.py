@@ -1,4 +1,4 @@
-##0,1 (,2,3,4,5,6,7,8,9) to buy stuff, arrows to move
+##0,1,2,3(,4,5,6,7,8,9) to buy stuff, arrows to move
 import pygame as pg
 import random as r
 pg.init()
@@ -40,7 +40,10 @@ arrowfacep = 10
 derpbits = 0
 derpchance = 5
 derpbots = 0
-facebirds = 0
+dgoo = 0
+stuffers = 0
+dwalls = 0
+asdf = 0
 class Player(pg.sprite.Sprite):
     def __init__(self,x,y):
         pg.sprite.Sprite.__init__(self)
@@ -117,6 +120,14 @@ while do:
                 derpbits -= 1
                 arrowfaces -= 10
                 derpbots += 1
+            elif event.key == pg.K_2 and derpbots >= 2 and derpbits >= 2:
+                derpbots -= 2
+                derpbits -= 2
+                stuffers += 1
+            elif event.key == pg.K_3 and asdf >= 2 and dgoo >= 5:
+                asdf -= 2
+                dgoo -= 2
+                dwalls += 1
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -142,8 +153,9 @@ while do:
         screen.blit(ptext,ptext_rect)
         screen.blit(text,text_rect)
         pg.display.update()
-    thingies += 0.001*arrowfaces
-    facebirds += 0.001*derpbots
+    thingies += 0.1/60*arrowfaces
+    dgoo += 0.05/60*derpbots
+    asdf += 0.05/60*stuffers
     stick += 1
     if stick >= sspawn:
         stars.add(Star(r.randint(0,screenw-120),r.randint(0,screenh-148)))
@@ -171,13 +183,22 @@ while do:
         screen.blit(text,text_rect)
     if derpbots > 0:
         score = ("derpbots: " + str(derpbots) +
-                 " D-goo: " + str(round(facebirds)))
+                 " D-goo: " + str(round(dgoo)) +
+                 " stuffers: " + str(stuffers))
         text = font.render(score, True, (255,0,255))
         text_rect = text.get_rect()
         text_rect.centerx = screen.get_rect().centerx
         text_rect.y = 50
         screen.blit(text,text_rect)
-    player.update(mup,mdown, mleft, mright)
+    if asdf > 0:
+        score = ("ASDF: " + str(round(asdf)) +
+                 " D-walls: " + str(round(dwalls)))
+        text = font.render(score, True, (255,255,0))
+        text_rect = text.get_rect()
+        text_rect.centerx = screen.get_rect().centerx
+        text_rect.y = 70
+        screen.blit(text,text_rect)
+    player.update(mup, mdown, mleft, mright)
     player.draw(screen)
     stars.update()
     stars.draw(screen)
