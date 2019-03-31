@@ -88,6 +88,16 @@ class Thing(pg.sprite.Sprite):
             self.rect.y = int(self.y)
         else:
             self.yvel = -self.yvel*speedf
+def reset():
+    global starseaten, lifes, gameover, hullmyts, stars, thingy, blub
+    gameover = False
+    screen.fill((0, 0, 0))
+    starseaten = 0
+    lifes = 5
+    time = 600
+    thingy.empty()
+    stars.empty()
+    blub.empty()
 hullmyts = Player(screenw/2,screenh/2)
 player.add(hullmyts)
 stars.add(Thing(r.randint(10,screenw-90),r.randint(10,screenh-90),0,0, star))
@@ -111,16 +121,7 @@ while do:
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
-                potatoeseaten = 0
-                lifes = 5
-                tick = 0
-                time = 600
-                stimer = False
-                player.empty()
-                stars.empty()
-                hullmyts = Player(screenw/2,screenh/2)
-                player.add(hullmyts)
-                stars.add(Thing(r.randint(10,screenw-30),r.randint(10,screenh-90),0,0, star))
+                reset()
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -138,6 +139,8 @@ while do:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_p:
                     pause = False
+                if event.key == pg.K_r:
+                    reset()
         pd = "PAUSED"
         ptext = dfont.render(pd, True, (127,127,127))
         ptext_rect = ptext.get_rect()
@@ -164,17 +167,7 @@ while do:
                 do = False
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_r:
-                    gameover = False
-                    potatoeseaten = 0
-                    lifes = 5
-                    tick = 0
-                    time = 0
-                    player.empty()
-                    stars.empty()
-                    hullmyts = Player(screenw/2,screenh/2)
-                    player.add(hullmyts)
-                    stars.add(Star(r.randint(10,screenw-90),
-                                   r.randint(10,screenh-90),0,0, star))
+                    reset()
     screen.fill((0,0,0))
     score = ("Stars Eaten: " + str(starseaten) + " Lives: " + str(lifes) +
             " Time: " + str(time//60) + " Stars: " + str(len(stars)))
@@ -185,7 +178,7 @@ while do:
     screen.blit(text,text_rect)
     player.update(mup,mdown, mleft, mright)
     player.draw(screen)
-    stars.update()
+    stars.update(True, True)
     stars.draw(screen)
     thingy.update(False,  True)
     thingy.draw(screen)
@@ -224,6 +217,9 @@ while do:
     bcol = pg.sprite.groupcollide(blub, stars, False, True)
     for s in bcol.keys():
         if len(bcol[s]) > 0:
+            bob = Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
+                       r.randint(-10,10),r.randint(-10,10), thing)
+            thingy.add(bob)
             blub.add(Thing(s.rect.x,s.rect.y,r.randint(-1,1),r.randint(-1,1), blu))
     if len(stars) > 0:
         time -= 1
@@ -233,12 +229,14 @@ while do:
         tick = 0
         stars.add(Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
                        0,0, star))
+    thingy.empty()  ###############ASFDSFADFASDFADFADdsfasdf
     if len(thingy) == 0:
         bob = Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
                        r.randint(-10,10),r.randint(-10,10), thing)
         thingy.add(bob)
     if len(blub) == 0:
         blub.add(Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),0,0, blu))
+    #blub.empty()    #######################SAedfasdfadsasddsfsd
     if time == time-22:
         time = 600
         lifes -= 1
