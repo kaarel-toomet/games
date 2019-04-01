@@ -1,5 +1,6 @@
 
-### WIP
+
+### slightly less WIP
 
 import pygame as pg
 import random as r
@@ -36,7 +37,8 @@ class Button(pg.sprite.Sprite):
         text_rect.centerx = self.rect.x+60
         text_rect.centery = self.rect.y+30
         screen.blit(text,text_rect)
-button.add(Button(screenw/4, screenh/4, "dig"))
+db = Button(screenw/4, screenh/4, "dig")
+button.add(db)
 def reset():
     stuff = 0
 while do:
@@ -75,6 +77,10 @@ while do:
         screen.blit(ptext,ptext_rect)
         screen.blit(text,text_rect)
         pg.display.update()
+    if clik:
+        if db.rect.collidepoint(mc):
+            stuff += 1
+    clik = False
     mc = pg.mouse.get_pos()
     screen.fill((0,0,0))
     score = ("stuff: " + str(stuff))
