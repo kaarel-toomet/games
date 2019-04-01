@@ -19,28 +19,39 @@ font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
 pause = False
-stuff = 0
+paper = 0
+tpaper = 0
+water = 0
+ppumps = 0
 clik = False
+unl = 0
 mc = pg.mouse.get_pos()
 button = pg.sprite.Group()
 class Button(pg.sprite.Sprite):
-    def __init__(self,x,y, txt):
+    def __init__(self,x,y, txt, txt2, font):
         pg.sprite.Sprite.__init__(self)
         self.image = btn
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.txt = txt
+        self.txt2 = txt2
+        self.font = font
     def update(self):
-        text = pfont.render(self.txt, True, (0,0,0))
+        text = self.font.render(self.txt, True, (64,64,64))
         text_rect = text.get_rect()
         text_rect.centerx = self.rect.x+60
-        text_rect.centery = self.rect.y+30
+        text_rect.centery = self.rect.y+20
         screen.blit(text,text_rect)
-db = Button(screenw/4, screenh/4, "dig")
+        text = self.font.render(self.txt2, True, (64,64,64))
+        text_rect = text.get_rect()
+        text_rect.centerx = self.rect.x+60
+        text_rect.centery = self.rect.y+40
+        screen.blit(text,text_rect)
+db = Button(screenw/4, screenh/4, "cheeseburger", "+1 paper", pg.font.SysFont("Times", 21))
 button.add(db)
 def reset():
-    stuff = 0
+    paper = 0
 while do:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -79,19 +90,54 @@ while do:
         pg.display.update()
     if clik:
         if db.rect.collidepoint(mc):
-            stuff += 1
+            paper += 1
+        try:
+            if rb.rect.collidepoint(mc) and paper >= 10:
+                tpaper += 1
+                paper -= 10
+        except:
+            pass
+        try:
+            if pb.rect.collidepoint(mc) and tpaper >= 10:
+                tpaper -= 10
+                ppumps += 1
+        except:
+            pass
     clik = False
-    mc = pg.mouse.get_pos()
-    screen.fill((0,0,0))
-    score = ("stuff: " + str(stuff))
+    if paper >= 10 and unl == 0:
+        unl = 1
+        rb = Button(screenw/4, screenh/4+60, "upgrade paper", "-10 p +1 tp", pg.font.SysFont("Times", 21))
+        button.add(rb)
+    if tpaper >= 10 and unl == 1:
+        unl = 2
+        pb = Button(screenw/4, screenh/4+120, "make paper pump", "-10 tp +1 pp", pg.font.SysFont("Times", 21))
+        button.add(pb)
+    water += 0.5/60*ppumps
+    score = ("paper (p): " + str(paper))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 10
     screen.blit(text,text_rect)
+    score = ("thick paper (tp): " + str(tpaper))
+    text = font.render(score, True, (255,255,255))
+    text_rect = text.get_rect()
+    text_rect.centerx = screen.get_rect().centerx
+    text_rect.y = 30
+    if unl >= 1:
+        screen.blit(text,text_rect)
+    score = ("paper pumps (pp): " + str(ppumps) + "  water: " + str(round(water,1)))
+    text = font.render(score, True, (255,255,255))
+    text_rect = text.get_rect()
+    text_rect.centerx = screen.get_rect().centerx
+    text_rect.y = 50
+    if unl >= 2:
+        screen.blit(text,text_rect)
+    mc = pg.mouse.get_pos()
     button.draw(screen)
     button.update()
     pg.display.update()
+    screen.fill((0,0,0))
     timer.tick(60)
 
 pg.quit()
