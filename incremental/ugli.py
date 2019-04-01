@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#
 ##0,1,2,3(,4,5,6,7,8,9) to buy stuff, arrows to move
 import pygame as pg
 import random as r
