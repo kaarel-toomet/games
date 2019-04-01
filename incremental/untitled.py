@@ -22,7 +22,10 @@ pause = False
 paper = 0
 tpaper = 0
 water = 0
+wfilters = 0
+wwater = 0
 ppumps = 0
+pplvl = 0
 clik = False
 unl = 0
 mc = pg.mouse.get_pos()
@@ -103,6 +106,21 @@ while do:
                 ppumps += 1
         except:
             pass
+        try:
+            if cb.rect.collidepoint(mc) and tpaper >= 1 and paper >= 3:
+                tpaper -= 1
+                paper -= 3
+                wfilters += 1
+        except:
+            pass
+        try:
+            if ub.rect.collidepoint(mc) and wfilters >= 5 and tpaper >= 2:
+                wfilters -= 5
+                tpaper -= 2
+                pplvl = 1
+                button.remove(ub)
+        except:
+            pass
     clik = False
     if paper >= 10 and unl == 0:
         unl = 1
@@ -110,9 +128,17 @@ while do:
         button.add(rb)
     if tpaper >= 10 and unl == 1:
         unl = 2
-        pb = Button(screenw/4, screenh/4+120, "make paper pump", "-10 tp +1 pp", pg.font.SysFont("Times", 21))
+        pb = Button(screenw/4, screenh/4+120, "make paper pump", "-10 tp +1 pp", pg.font.SysFont("Times", 16))
         button.add(pb)
+    if ppumps >= 3 and unl == 2:
+        unl = 3
+        cb = Button(screenw/4, screenh/4+180, "make weird filter", "-1 tp -3 p +1 wf", pg.font.SysFont("Times", 16))
+        button.add(cb)
+        ub = Button(screenw/4, screenh/4+240, "upgrade pumps", "-5 wf -2 tp", pg.font.SysFont("Times", 18))
+        button.add(ub)
     water += 0.5/60*ppumps
+    if pplvl == 1:
+        wwater += 0.1/60*ppumps
     score = ("paper (p): " + str(paper))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
@@ -123,15 +149,22 @@ while do:
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
-    text_rect.y = 30
+    text_rect.y = 40
     if unl >= 1:
         screen.blit(text,text_rect)
     score = ("paper pumps (pp): " + str(ppumps) + "  water: " + str(round(water,1)))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
-    text_rect.y = 50
+    text_rect.y = 70
     if unl >= 2:
+        screen.blit(text,text_rect)
+    score = ("weird filters (wf): " + str(wfilters) + "  weird water (ww): " + str(round(wwater,1)))
+    text = font.render(score, True, (255,255,255))
+    text_rect = text.get_rect()
+    text_rect.centerx = screen.get_rect().centerx
+    text_rect.y = 100
+    if unl >= 3:
         screen.blit(text,text_rect)
     mc = pg.mouse.get_pos()
     button.draw(screen)
