@@ -24,6 +24,7 @@ tpaper = 0
 water = 0
 wfilters = 0
 wwater = 0
+wpaper = 0
 ppumps = 0
 pplvl = 0
 clik = False
@@ -101,8 +102,8 @@ while do:
         except:
             pass
         try:
-            if pb.rect.collidepoint(mc) and tpaper >= 10:
-                tpaper -= 10
+            if pb.rect.collidepoint(mc) and tpaper >= 3:
+                tpaper -= 3
                 ppumps += 1
         except:
             pass
@@ -121,12 +122,19 @@ while do:
                 button.remove(ub)
         except:
             pass
+        try:
+            if wb.rect.collidepoint(mc) and wwater >= 2 and paper >= 2:
+                wwater -= 2
+                paper -= 2
+                wpaper += 1
+        except:
+            pass
     clik = False
     if paper >= 10 and unl == 0:
         unl = 1
         rb = Button(screenw/4, screenh/4+60, "upgrade paper", "-10 p +1 tp", pg.font.SysFont("Times", 21))
         button.add(rb)
-    if tpaper >= 10 and unl == 1:
+    if tpaper >= 2 and unl == 1:
         unl = 2
         pb = Button(screenw/4, screenh/4+120, "make paper pump", "-10 tp +1 pp", pg.font.SysFont("Times", 16))
         button.add(pb)
@@ -136,6 +144,10 @@ while do:
         button.add(cb)
         ub = Button(screenw/4, screenh/4+240, "upgrade pumps", "-5 wf -2 tp", pg.font.SysFont("Times", 18))
         button.add(ub)
+    if wwater >= 1 and unl == 3:
+        unl = 4
+        wb = Button(screenw/4, screenh/4+240, "make weird paper", "-2 p -2 ww +1 wp", pg.font.SysFont("Times", 16))
+        button.add(wb)
     water += 0.5/60*ppumps
     if pplvl == 1:
         wwater += 0.1/60*ppumps
@@ -165,6 +177,13 @@ while do:
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 100
     if unl >= 3:
+        screen.blit(text,text_rect)
+    score = ("weird paper (w): " + str(wpaper))
+    text = font.render(score, True, (255,255,255))
+    text_rect = text.get_rect()
+    text_rect.centerx = screen.get_rect().centerx
+    text_rect.y = 130
+    if unl >= 4:
         screen.blit(text,text_rect)
     mc = pg.mouse.get_pos()
     button.draw(screen)
