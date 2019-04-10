@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 import pygame as pg
 import random as r
 pg.init()
 pg.mixer.init()
-pic = pg.image.load("hullmyts.png")
+pic = pg.image.load("../data/hullmyts.png")
 pew = pg.image.load("pew.png")
 pg.font
 screen = pg.display.set_mode((0,0), pg.RESIZABLE)
