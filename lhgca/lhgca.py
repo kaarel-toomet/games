@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pygame as pg
 import random as r
+import numpy as np
 pg.init()
 pg.mixer.init()
 pic = pg.image.load("../data/hullmyts.png")
@@ -61,20 +62,27 @@ class Player(pg.sprite.Sprite):
             self.rect.x -= dist
         if mright and right:
             self.rect.x += dist
+    def xy(self, w):
+        if w == 0:
+            return self.rect.x
+        else:
+            return self.rect.y
 class bullet(pg.sprite.Sprite):
-    def __init__(self, x, y, xvel, yvel):
+    def __init__(self, x, vel):
         pg.sprite.Sprite.__init__(self)
         self.image = pew
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.xvel = xvel
-        self.yvel = yvel
+        self.rect.x = x[0]
+        self.rect.y = x[1]
+        self.x = x
+        self.vel = vel
     def update(self):
-        self.rect.x += self.xvel
-        self.rect.y += self.yvel
-        if self.rect.y <= 0 or self.rect.y >= screenh-120 or self.rect.x <= 0 or self.rect.x >= screenw-148:
+        self.x[0] += self.vel[0]
+        self.x[1] += self.vel[1]
+        if self.x[1] <= 0 or self.x[1] >= screenh-30 or self.x[0] <= 0 or self.x[0] >= screenw-148:
             pews.remove(self)
+        self.rect.x = self.x[0]
+        self.rect.y = self.x[1]
 def reset():
     lifes = 5
     player.empty()
@@ -109,7 +117,7 @@ while do:
             elif event.key == pg.K_RIGHT:
                 mright = False
         elif event.type == pg.MOUSEBUTTONDOWN:
-            pews.add(bullet(200, 200, 5, 5))
+            pews.add(bullet(np.array([hullmyts.xy(0),hullmyts.xy(456436458765)]), np.array([4,4])))
     while pause:
         for event in pg.event.get():
             if event.type == pg.QUIT:
