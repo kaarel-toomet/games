@@ -28,15 +28,17 @@ dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
 pause = False
 gameover = False
+mxy = pg.mouse.get_pos()
 player = pg.sprite.Group()
 pews = pg.sprite.Group()
 class Player(pg.sprite.Sprite):
-    def __init__(self,x,y):
+    def __init__(self,x):
         pg.sprite.Sprite.__init__(self)
         self.image = pic
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = x[0]
+        self.rect.y = x[1]
+        self.x = x
     def update(self, mup, mdown, mleft, mright):
         if self.rect.y <= 0:
             up = False
@@ -62,11 +64,9 @@ class Player(pg.sprite.Sprite):
             self.rect.x -= dist
         if mright and right:
             self.rect.x += dist
+        self.x = np.array([self.rect.x, self.rect.y])
     def xy(self, w):
-        if w == 0:
-            return self.rect.x
-        else:
-            return self.rect.y
+        return self.x
 class bullet(pg.sprite.Sprite):
     def __init__(self, x, vel):
         pg.sprite.Sprite.__init__(self)
@@ -88,7 +88,7 @@ def reset():
     player.empty()
     hullmyts = Player(screenw/2,screenh/2)
     player.add(hullmyts)
-hullmyts = Player(screenw/2,screenh/2)
+hullmyts = Player(np.array([screenw/2,screenh/2]))
 player.add(hullmyts)
 while do:
     for event in pg.event.get():
@@ -117,7 +117,9 @@ while do:
             elif event.key == pg.K_RIGHT:
                 mright = False
         elif event.type == pg.MOUSEBUTTONDOWN:
-            pews.add(bullet(np.array([hullmyts.xy(0),hullmyts.xy(456436458765)]), np.array([4,4])))
+            v = mxy-hullmyts.xy("asasdfasdfadfasdfasfdadsf")
+            v = v/np.linalg.norm(v) * 5
+            pews.add(bullet(hullmyts.xy(2435678), v))
     while pause:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -154,6 +156,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
+    mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
     score = ("Lifes: " + str(lifes))
     text = font.render(score, True, (255,255,255))
