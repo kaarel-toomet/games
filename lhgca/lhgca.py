@@ -51,6 +51,8 @@ utick = 0
 umax = 120
 points = 0
 sr = 150
+ptick = 0
+pmax = 20
 ## direction vectors
 eUp = np.array([0, -1], dtype='float')*dist
 eDown = np.array([0, 1], dtype='float')*dist
@@ -147,27 +149,27 @@ while do:
         if event.type == pg.QUIT:
             do = False
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP:
-                mup = True
-            elif event.key == pg.K_DOWN:
-                mdown = True
-            elif event.key == pg.K_LEFT:
+            if event.key == pg.K_a:
                 mleft = True
-            elif event.key == pg.K_RIGHT:
+            elif event.key == pg.K_d:
                 mright = True
+            elif event.key == pg.K_s:
+                mdown = True
+            if event.key == pg.K_w:
+                mup = True
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
                 reset()
         elif event.type == pg.KEYUP:
-            if event.key == pg.K_UP:
-                mup = False
-            elif event.key == pg.K_DOWN:
-                mdown = False
-            elif event.key == pg.K_LEFT:
+            if event.key == pg.K_a:
                 mleft = False
-            elif event.key == pg.K_RIGHT:
+            elif event.key == pg.K_s:
+                mdown = False
+            elif event.key == pg.K_d:
                 mright = False
+            if event.key == pg.K_w:
+                mup = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             click = True
         elif event.type == pg.MOUSEBUTTONUP:
@@ -216,9 +218,12 @@ while do:
         lifes -= 1
         ugly.remove(ccol)
     if click:
-        v = mxy-(hullmyts.xy("asasdfasdfadfasdfasfdadsf")+np.array([64,64]))
-        v = v/np.linalg.norm(v) * 12   #dasdf########3243412dsfdsfasdaf
-        pews.add(bullet(hullmyts.xy(2435678), v))
+        if ptick >= pmax:
+            ptick = 0
+            v = mxy-(hullmyts.xy("asasdfasdfadfasdfasfdadsf")+np.array([64,64]))
+            v = v/np.linalg.norm(v) * 12   #dasdf########3243412dsfdsfasdaf
+            pews.add(bullet(hullmyts.xy(2435678), v))
+    ptick += 1
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
     score = ("Lifes: " + str(lifes) + " Points: " + str(points))
