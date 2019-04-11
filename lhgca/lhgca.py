@@ -6,6 +6,7 @@ pg.init()
 pg.mixer.init()
 pic = pg.image.load("../data/hullmyts.png")
 pew = pg.image.load("pew.png")
+ugl = pg.image.load("ugly.png")
 pg.font
 screen = pg.display.set_mode((0,0), pg.RESIZABLE)
 screenw = screen.get_width()
@@ -28,9 +29,13 @@ dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
 pause = False
 gameover = False
+utick = 0
+umax = 120
+points = 0
 mxy = pg.mouse.get_pos()
 player = pg.sprite.Group()
 pews = pg.sprite.Group()
+ugly = pg.sprite.Group()
 class Player(pg.sprite.Sprite):
     def __init__(self,x):
         pg.sprite.Sprite.__init__(self)
@@ -66,7 +71,7 @@ class Player(pg.sprite.Sprite):
             self.rect.x += dist
         self.x = np.array([self.rect.x, self.rect.y])
     def xy(self, w):
-        return self.x
+        return self.x + np.array([34,44])
 class bullet(pg.sprite.Sprite):
     def __init__(self, x, vel):
         pg.sprite.Sprite.__init__(self)
@@ -78,15 +83,35 @@ class bullet(pg.sprite.Sprite):
         self.vel = vel.astype('float')
     def update(self):
         self.x += self.vel
+        if self.x[1] <= 0 or self.x[1] >= screenh-30 or self.x[0] <= 0 or self.x[0] >= screenw-90:
+            pews.remove(self)
+        self.rect.x = int(round(self.x[0]))
+        self.rect.y = int(round(self.x[1]))
+class Ugly(pg.sprite.Sprite):
+    def __init__(self, x, vel):
+        pg.sprite.Sprite.__init__(self)
+        self.image = ugl
+        self.rect = self.image.get_rect()
+        self.rect.x = int(round(x[0]))
+        self.rect.y = int(round(x[1]))
+        self.x = x.astype('float')
+        self.vel = vel.astype('float')
+    def update(self):
+        self.x += self.vel
         if self.x[1] <= 0 or self.x[1] >= screenh-30 or self.x[0] <= 0 or self.x[0] >= screenw-148:
             pews.remove(self)
         self.rect.x = int(round(self.x[0]))
         self.rect.y = int(round(self.x[1]))
+        self.vel += np.array([r.uniform(-1,1),r.uniform(-1,1)])
 def reset():
+    global hullmyts, lifes, points
     lifes = 5
     player.empty()
-    hullmyts = Player(screenw/2,screenh/2)
+    hullmyts = Player(np.array([screenw/2,screenh/2]))
     player.add(hullmyts)
+    points = 0
+    pews.empty()
+    ugly.empty()
 hullmyts = Player(np.array([screenw/2,screenh/2]))
 player.add(hullmyts)
 while do:
@@ -116,8 +141,8 @@ while do:
             elif event.key == pg.K_RIGHT:
                 mright = False
         elif event.type == pg.MOUSEBUTTONDOWN:
-            v = mxy-hullmyts.xy("asasdfasdfadfasdfasfdadsf")
-            v = v/np.linalg.norm(v) * 5
+            v = mxy-(hullmyts.xy("asasdfasdfadfasdfasfdadsf")+np.array([64,64]))
+            v = v/np.linalg.norm(v) * 21
             pews.add(bullet(hullmyts.xy(2435678), v))
     while pause:
         for event in pg.event.get():
@@ -136,7 +161,6 @@ while do:
         screen.blit(text,text_rect)
         pg.display.update()
     if lifes == 0:
-        blap.play()
         uded = "GAME OVER"
         dtext = dfont.render(uded, True, (255,0,0))
         dtext_rect = dtext.get_rect()
@@ -155,18 +179,36 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
+    mcol = pg.sprite.groupcollide(pews, ugly,True, True)
+    for s in mcol.keys():
+        if len(mcol[s]) > 0:
+            points += 1
+    ccol = pg.sprite.spritecollide(hullmyts,ugly,False)
+    if len(ccol) > 0:
+        lifes -= 1
+        ugly.remove(ccol)
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
-    score = ("Lifes: " + str(lifes))
+    score = ("Lifes: " + str(lifes) + " Points: " + str(points))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 10
     screen.blit(text,text_rect)
+    utick += 1
+    if utick >= umax:
+        utick = 0
+        umax = r.uniform(0,120)
+        ugly.add(Ugly(np.array([r.uniform(10, screenw-90),
+                    r.uniform(10, screenh-50)]),
+                    np.array([r.uniform(-3,3),
+                    r.uniform(-3,3)])))
     player.update(mup,mdown, mleft, mright)
     player.draw(screen)
     pews.update()
     pews.draw(screen)
+    ugly.update()
+    ugly.draw(screen)
     pg.display.update()
     timer.tick(60)
 
