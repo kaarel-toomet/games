@@ -36,9 +36,9 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = pic
         self.rect = self.image.get_rect()
-        self.rect.x = x[0]
-        self.rect.y = x[1]
-        self.x = x
+        self.rect.x = int(round(x[0]))
+        self.rect.y = int(round(x[1]))
+        self.x = x.astype('float')
     def update(self, mup, mdown, mleft, mright):
         if self.rect.y <= 0:
             up = False
@@ -72,17 +72,16 @@ class bullet(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = pew
         self.rect = self.image.get_rect()
-        self.rect.x = x[0]
-        self.rect.y = x[1]
-        self.x = x
-        self.vel = vel
+        self.rect.x = int(round(x[0]))
+        self.rect.y = int(round(x[1]))
+        self.x = x.astype('float')
+        self.vel = vel.astype('float')
     def update(self):
-        self.x[0] += self.vel[0]
-        self.x[1] += self.vel[1]
+        self.x += self.vel
         if self.x[1] <= 0 or self.x[1] >= screenh-30 or self.x[0] <= 0 or self.x[0] >= screenw-148:
             pews.remove(self)
-        self.rect.x = self.x[0]
-        self.rect.y = self.x[1]
+        self.rect.x = int(round(self.x[0]))
+        self.rect.y = int(round(self.x[1]))
 def reset():
     lifes = 5
     player.empty()
