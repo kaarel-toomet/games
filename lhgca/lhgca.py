@@ -51,6 +51,12 @@ utick = 0
 umax = 120
 points = 0
 sr = 150
+## direction vectors
+eUp = np.array([0, -1], dtype='float')*dist
+eDown = np.array([0, 1], dtype='float')*dist
+eLeft = np.array([-1, 0], dtype='float')*dist
+eRight = np.array([1, 0], dtype='float')*dist
+##
 mxy = pg.mouse.get_pos()
 player = pg.sprite.Group()
 pews = pg.sprite.Group()
@@ -62,6 +68,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = int(round(x[0]))
         self.rect.y = int(round(x[1]))
+        # location as float
         self.x = x.astype('float')
     def update(self, mup, mdown, mleft, mright):
         if self.rect.y <= 0:
@@ -81,14 +88,15 @@ class Player(pg.sprite.Sprite):
         else:
             right = True
         if mup and up:
-            self.rect.y -= dist 
+            self.x += eUp
         if mdown and down:
-            self.rect.y += dist
+            self.x += eDown
         if mleft and left:
-            self.rect.x -= dist
+            self.x += eLeft
         if mright and right:
-            self.rect.x += dist
-        self.x = np.array([self.rect.x, self.rect.y])
+            self.x += eRight
+        self.rect.x = int(round(self.x[0]))
+        self.rect.y = int(round(self.x[1]))
     def xy(self, w):
         return self.x + np.array([34,44])
 class bullet(pg.sprite.Sprite):
