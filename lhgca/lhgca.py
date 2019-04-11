@@ -139,7 +139,7 @@ class Ugly(pg.sprite.Sprite):
         self.rect.y = int(round(self.x[1]))
         self.vel += np.random.normal(scale=0.2, size=2)
         drift = chx - self.x
-        self.vel += drift/np.linalg.norm(chx)*0.08
+        self.vel += drift/np.linalg.norm(drift)*0.08
 def reset():
     global hullmyts, lifes, points
     lifes = 5
