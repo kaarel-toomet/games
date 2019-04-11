@@ -98,7 +98,10 @@ class Player(pg.sprite.Sprite):
             self.x += eRight
         self.rect.x = int(round(self.x[0]))
         self.rect.y = int(round(self.x[1]))
-    def xy(self, w):
+    def xy(self):
+        """
+        return crazy hat's center coordinates
+        """
         return self.x + np.array([34,44])
 class bullet(pg.sprite.Sprite):
     def __init__(self, x, vel):
@@ -124,13 +127,19 @@ class Ugly(pg.sprite.Sprite):
         self.rect.y = int(round(x[1]))
         self.x = x.astype('float')
         self.vel = vel.astype('float')
-    def update(self):
+    def update(self, chx):
+        """
+        update pews
+        chx: crzy hat's location
+        """
         self.x += self.vel
         if self.x[1] <= 0 or self.x[1] >= screenh-30 or self.x[0] <= 0 or self.x[0] >= screenw-148:
             pews.remove(self)
         self.rect.x = int(round(self.x[0]))
         self.rect.y = int(round(self.x[1]))
-        self.vel += np.array([r.uniform(-1,1),r.uniform(-1,1)])
+        self.vel += np.random.normal(scale=0.2, size=2)
+        drift = chx - self.x
+        self.vel += drift/np.linalg.norm(drift)*0.08
 def reset():
     global hullmyts, lifes, points
     lifes = 5
@@ -216,9 +225,9 @@ while do:
         lifes -= 1
         ugly.remove(ccol)
     if click:
-        v = mxy-(hullmyts.xy("asasdfasdfadfasdfasfdadsf")+np.array([64,64]))
+        v = mxy-(hullmyts.xy() + np.array([64,64]))
         v = v/np.linalg.norm(v) * 12   #dasdf########3243412dsfdsfasdaf
-        pews.add(bullet(hullmyts.xy(2435678), v))
+        pews.add(bullet(hullmyts.xy(), v))
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
     score = ("Lifes: " + str(lifes) + " Points: " + str(points))
@@ -228,11 +237,12 @@ while do:
     text_rect.y = 10
     screen.blit(text,text_rect)
     utick += 1
+    ## Spawn pews
     if utick >= umax:
         utick = 0
         umax = r.uniform(0,90)
         tx = np.array([r.uniform(10, screenw-90),r.uniform(10, screenh-50)])
-        hx = hullmyts.xy(True)
+        hx = hullmyts.xy()
         # ensure uglies will not be created closer than sr to the crazy hat
         if np.linalg.norm(hx-tx) > sr:
             ugly.add(Ugly(tx,np.array([0,0])))
@@ -240,7 +250,7 @@ while do:
     player.draw(screen)
     pews.update()
     pews.draw(screen)
-    ugly.update()
+    ugly.update(hullmyts.xy())
     ugly.draw(screen)
     pg.display.update()
     timer.tick(60)
