@@ -32,6 +32,7 @@ gameover = False
 utick = 0
 umax = 120
 points = 0
+sr = 150
 mxy = pg.mouse.get_pos()
 player = pg.sprite.Group()
 pews = pg.sprite.Group()
@@ -198,11 +199,12 @@ while do:
     utick += 1
     if utick >= umax:
         utick = 0
-        umax = r.uniform(0,120)
-        ugly.add(Ugly(np.array([r.uniform(10, screenw-90),
-                    r.uniform(10, screenh-50)]),
-                    np.array([r.uniform(-3,3),
-                    r.uniform(-3,3)])))
+        umax = r.uniform(0,90)
+        tx = np.array([r.uniform(10, screenw-90),r.uniform(10, screenh-50)])
+        hx = hullmyts.xy(True)
+        # ensure uglies will not be created closer than sr to the crazy hat
+        if np.linalg.norm(hx-tx) > sr:
+            ugly.add(Ugly(tx,np.array([0,0])))
     player.update(mup,mdown, mleft, mright)
     player.draw(screen)
     pews.update()
