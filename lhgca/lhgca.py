@@ -28,7 +28,7 @@ if sys.platform == 'linux':
 if not xdotool:
     screen = pg.display.set_mode((0,0), pg.RESIZABLE)
     screenw, screenh = pg.display.get_surface().get_size()
-pg.display.set_caption("Crazy Hat Hunting")
+pg.display.set_caption("Crazy Hat Hunasdfadsfaertaerfdsakjdgfksahfsadsdfasdf")
 
 do = True
 dist = 5
@@ -51,6 +51,7 @@ utick = 0
 umax = 120
 points = 0
 sr = 150
+click = False
 mxy = pg.mouse.get_pos()
 player = pg.sprite.Group()
 pews = pg.sprite.Group()
@@ -160,9 +161,9 @@ while do:
             elif event.key == pg.K_RIGHT:
                 mright = False
         elif event.type == pg.MOUSEBUTTONDOWN:
-            v = mxy-(hullmyts.xy("asasdfasdfadfasdfasfdadsf")+np.array([64,64]))
-            v = v/np.linalg.norm(v) * 21
-            pews.add(bullet(hullmyts.xy(2435678), v))
+            click = True
+        elif event.type == pg.MOUSEBUTTONUP:
+            click = False
     while pause:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -206,6 +207,10 @@ while do:
     if len(ccol) > 0:
         lifes -= 1
         ugly.remove(ccol)
+    if click:
+        v = mxy-(hullmyts.xy("asasdfasdfadfasdfasfdadsf")+np.array([64,64]))
+        v = v/np.linalg.norm(v) * 12   #dasdf########3243412dsfdsfasdaf
+        pews.add(bullet(hullmyts.xy(2435678), v))
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
     score = ("Lifes: " + str(lifes) + " Points: " + str(points))
