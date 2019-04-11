@@ -130,7 +130,7 @@ class Ugly(pg.sprite.Sprite):
             pews.remove(self)
         self.rect.x = int(round(self.x[0]))
         self.rect.y = int(round(self.x[1]))
-        self.vel += np.array([r.uniform(-1,1),r.uniform(-1,1)])
+        self.vel += np.random.normal(scale=0.2, size=2)
 def reset():
     global hullmyts, lifes, points
     lifes = 5
@@ -228,6 +228,7 @@ while do:
     text_rect.y = 10
     screen.blit(text,text_rect)
     utick += 1
+    ## Spawn pews
     if utick >= umax:
         utick = 0
         umax = r.uniform(0,90)
