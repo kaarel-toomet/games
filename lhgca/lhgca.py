@@ -41,7 +41,7 @@ mdown = False
 mleft = False
 mright = False
 timer = pg.time.Clock()
-lifes = 5
+lifes = 10
 font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
@@ -141,10 +141,10 @@ class Ugly(pg.sprite.Sprite):
         self.rect.y = int(round(self.x[1]))
         self.vel += np.random.normal(scale=0.2, size=2)
         drift = chx - self.x
-        self.vel += drift/np.linalg.norm(drift)*0.1
+        self.vel += drift/np.linalg.norm(drift)*0.5
 def reset():
     global hullmyts, lifes, points
-    lifes = 5
+    lifes = 10
     player.empty()
     hullmyts = Player(np.array([screenw/2,screenh/2]))
     player.add(hullmyts)
@@ -230,9 +230,9 @@ while do:
         if ptick >= pmax:
             ptick = 0
             v = mxy-(hullmyts.xy()+np.array([64,64]))
-            v = v/np.linalg.norm(v) * 12   #dasdf########3243412dsfdsfasdaf
+            v = v/np.linalg.norm(v) * 100 + np.array([r.uniform(-3,3),r.uniform(-3,3)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
-    ptick += 9999999999999999999
+    ptick += 52342
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
     score = ("Lifes: " + str(lifes) + " Points: " + str(points))
