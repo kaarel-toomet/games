@@ -10,6 +10,9 @@ pg.mixer.init()
 pic = pg.image.load("../data/hullmyts.png")
 pew = pg.image.load("pew.png")
 ugl = pg.image.load("ugly.png")
+pop = pg.mixer.Sound("pop.wav")
+blip = pg.mixer.Sound("blip.wav")
+blap = pg.mixer.Sound("blap.wav")
 
 ## figure out the screen size
 ## The standard get_size() gives wrong results on multi-monitor setup
@@ -209,6 +212,7 @@ while do:
         screen.blit(text,text_rect)
         pg.display.update()
         gameover = True
+        blap.play()
     while gameover:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -222,10 +226,12 @@ while do:
     for s in mcol.keys():
         if len(mcol[s]) > 0:
             points += 1
+            pop.play()
     ccol = pg.sprite.spritecollide(hullmyts,ugly,False)
     if len(ccol) > 0:
         lifes -= 1
         ugly.remove(ccol)
+        blip.play()
     if click:
         if ptick >= pmax:
             ptick = 0
