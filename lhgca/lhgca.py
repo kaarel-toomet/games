@@ -53,10 +53,12 @@ gameover = False
 utick = 0
 umax = 120
 points = 0
-sr = 150
+sr = 250
 ptick = 0
 pmax = 20
 lvl = 0
+vf = 0.02
+sf = 3
 ## direction vectors
 eUp = np.array([0, -1], dtype='float')*dist
 eDown = np.array([0, 1], dtype='float')*dist
@@ -145,7 +147,7 @@ class Ugly(pg.sprite.Sprite):
         self.rect.y = int(round(self.x[1]))
         self.vel += np.random.normal(scale=0.2, size=2)
         drift = chx - self.x
-        self.vel += drift/np.linalg.norm(drift)*lvl/50
+        self.vel += drift/np.linalg.norm(drift)*lvl*vf
 def reset():
     global hullmyts, lifes, points
     lifes = 10
@@ -237,7 +239,7 @@ while do:
         if ptick >= pmax:
             ptick = 0
             v = mxy-(hullmyts.xy()+np.array([64,64]))
-            v = v/np.linalg.norm(v) * 54 + np.array([r.uniform(-0,0),r.uniform(-0,0)])  #dasdf########3243412dsfdsfasdaf
+            v = v/np.linalg.norm(v) * 54 + np.array([r.uniform(-5,5),r.uniform(-5,5)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
             pews.add(bullet(hullmyts.xy(), -v))
     ptick += 52342
@@ -252,10 +254,10 @@ while do:
     screen.blit(text,text_rect)
     utick += 1
     lvl = int(points/10)
-    ## Spawn pews
+    ## Spawn ugly blobs of doom
     if utick >= umax:
         utick = 0
-        umax = r.uniform(0,90)
+        umax = r.uniform(0,100-(sf*lvl))
         tx = np.array([r.uniform(10, screenw-90),r.uniform(10, screenh-50)])
         hx = hullmyts.xy()
         # ensure uglies will not be created closer than sr to the crazy hat
