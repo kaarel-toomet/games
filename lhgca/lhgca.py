@@ -56,6 +56,7 @@ points = 0
 sr = 150
 ptick = 0
 pmax = 20
+lvl = 0
 ## direction vectors
 eUp = np.array([0, -1], dtype='float')*dist
 eDown = np.array([0, 1], dtype='float')*dist
@@ -144,7 +145,7 @@ class Ugly(pg.sprite.Sprite):
         self.rect.y = int(round(self.x[1]))
         self.vel += np.random.normal(scale=0.2, size=2)
         drift = chx - self.x
-        self.vel += drift/np.linalg.norm(drift)*0.5
+        self.vel += drift/np.linalg.norm(drift)*lvl/50
 def reset():
     global hullmyts, lifes, points
     lifes = 10
@@ -236,18 +237,21 @@ while do:
         if ptick >= pmax:
             ptick = 0
             v = mxy-(hullmyts.xy()+np.array([64,64]))
-            v = v/np.linalg.norm(v) * 100 + np.array([r.uniform(-3,3),r.uniform(-3,3)])  #dasdf########3243412dsfdsfasdaf
+            v = v/np.linalg.norm(v) * 54 + np.array([r.uniform(-0,0),r.uniform(-0,0)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
+            pews.add(bullet(hullmyts.xy(), -v))
     ptick += 52342
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
-    score = ("Lifes: " + str(lifes) + " Points: " + str(points))
+    score = ("Lifes: " + str(lifes) + " Points: " + str(points) + " level: " +
+             str(lvl))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 10
     screen.blit(text,text_rect)
     utick += 1
+    lvl = int(points/10)
     ## Spawn pews
     if utick >= umax:
         utick = 0
