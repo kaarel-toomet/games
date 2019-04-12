@@ -59,6 +59,7 @@ pmax = 20
 lvl = 0
 vf = 0.02
 sf = 3
+s = 0
 ## direction vectors
 eUp = np.array([0, -1], dtype='float')*dist
 eDown = np.array([0, 1], dtype='float')*dist
@@ -176,6 +177,11 @@ while do:
                 pause = True
             elif event.key == pg.K_r:
                 reset()
+            elif event.key == pg.K_SPACE and s >= 20:
+                s -= 20
+                for x in range(100):
+                    v = np.array([r.uniform(-100,100), r.uniform(-100,100)])
+                    pews.add(bullet(hullmyts.xy(), v))
         elif event.type == pg.KEYUP:
             if event.key == pg.K_a:
                 mleft = False
@@ -226,9 +232,10 @@ while do:
                     gameover = False
                     reset()
     mcol = pg.sprite.groupcollide(pews, ugly,True, True)
-    for s in mcol.keys():
-        if len(mcol[s]) > 0:
+    for c in mcol.keys():
+        if len(mcol[c]) > 0:
             points += 1
+            s += r.randint(1,5)
             pop.play()
     ccol = pg.sprite.spritecollide(hullmyts,ugly,False)
     if len(ccol) > 0:
@@ -239,14 +246,15 @@ while do:
         if ptick >= pmax:
             ptick = 0
             v = mxy-(hullmyts.xy()+np.array([64,64]))
-            v = v/np.linalg.norm(v) * 54 + np.array([r.uniform(-5,5),r.uniform(-5,5)])  #dasdf########3243412dsfdsfasdaf
+            v = v/np.linalg.norm(v) * 54 + np.array([r.normalvariate(3,3),r.normalvariate(3,3)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
             pews.add(bullet(hullmyts.xy(), -v))
+    print(s)
     ptick += 52342
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
     score = ("Lifes: " + str(lifes) + " Points: " + str(points) + " level: " +
-             str(lvl))
+             str(lvl) + " s: " + str(s))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
