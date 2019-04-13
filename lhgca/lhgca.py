@@ -5,6 +5,8 @@ import numpy as np
 import subprocess
 import sys
 
+import startmenu
+
 pg.init()
 pg.mixer.init()
 pic = pg.image.load("../data/hullmyts.png")
@@ -32,6 +34,9 @@ if not xdotool:
     screen = pg.display.set_mode((0,0), pg.RESIZABLE)
     screenw, screenh = pg.display.get_surface().get_size()
 pg.display.set_caption("Crazy Hat Hunasdfadsfaertaerfdsakjdgfksahfsadsdfasdf")
+
+explosion = startmenu.startMenu()
+print("explosion type", explosion)
 
 do = True
 dist = 5
