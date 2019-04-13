@@ -9,8 +9,8 @@ def startMenu():
         nonlocal toggledButton
         toggledButton = name
     def on_ok_clicked(button):
-        print("OK")
         win.destroy()
+        # have to destroy window, main_quit() does not do it
         Gtk.main_quit()
     toggledButton = "dense"
     ##

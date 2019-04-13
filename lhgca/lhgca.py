@@ -35,8 +35,18 @@ if not xdotool:
     screenw, screenh = pg.display.get_surface().get_size()
 pg.display.set_caption("Crazy Hat Hunasdfadsfaertaerfdsakjdgfksahfsadsdfasdf")
 
-explosion = startmenu.startMenu()
-print("explosion type", explosion)
+## select explosion type
+explosionType = startmenu.startMenu()
+def denseBullet():
+    v = np.random.normal(0, 100, size=2)
+    return v
+def shellBullet():
+    v = np.random.uniform(50,55, size=2)
+    return v
+if explosionType == "shell":
+    explosionBullet = shellBullet
+else:
+    explosionBullet = denseBullet
 
 do = True
 dist = 5
@@ -192,7 +202,7 @@ while do:
             elif event.key == pg.K_SPACE and s >= 20:
                 s -= 20
                 for x in range(1000):
-                    v = np.random.normal(0, 100, size=2)
+                    v = explosionBullet()
                     pews.add(bullet(hullmyts.xy(), v))
         elif event.type == pg.KEYUP:
             if event.key == pg.K_a:
