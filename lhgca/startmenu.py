@@ -8,6 +8,9 @@ def startMenu():
     def on_button_toggled(button, name):
         nonlocal toggledButton
         toggledButton = name
+    def on_ok_clicked(button):
+        print("OK")
+        Gtk.main_quit()
     toggledButton = "dense"
     ##
     win = Gtk.Window(title="Explosion type")
@@ -24,6 +27,10 @@ def startMenu():
     button2.connect("toggled", on_button_toggled, "shell")
     hbox.pack_start(button2, False, False, 0)
 
+    button = Gtk.Button.new_with_label("OK")
+    button.connect("clicked", on_ok_clicked)
+    hbox.pack_start(button, True, True, 0)
+    
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
     ##
