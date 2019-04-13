@@ -5,6 +5,8 @@ import numpy as np
 import subprocess
 import sys
 
+import startmenu
+
 pg.init()
 pg.mixer.init()
 pic = pg.image.load("../data/hullmyts.png")
@@ -32,6 +34,23 @@ if not xdotool:
     screen = pg.display.set_mode((0,0), pg.RESIZABLE)
     screenw, screenh = pg.display.get_surface().get_size()
 pg.display.set_caption("Crazy Hat Hunasdfadsfaertaerfdsakjdgfksahfsadsdfasdf")
+
+## select explosion type
+explosionType = startmenu.startMenu()
+def denseBullet():
+    v = np.random.normal(0, 100, size=2)
+    return v
+def shellBullet():
+    angle = np.random.uniform(0, 2*np.pi)
+    speed = np.random.uniform(25, 30)
+    v = speed*np.array([np.cos(angle), np.sin(angle)])
+    return v
+if explosionType == "shell":
+    explosionBullet = shellBullet
+    nExplosionBullets = 250
+else:
+    explosionBullet = denseBullet
+    nExplosionBullets = 1000
 
 do = True
 dist = 5
@@ -186,8 +205,8 @@ while do:
                 reset()
             elif event.key == pg.K_SPACE and s >= 20:
                 s -= 20
-                for x in range(1000):
-                    v = np.random.normal(0, 100, size=2)
+                for x in range(nExplosionBullets):
+                    v = explosionBullet()
                     pews.add(bullet(hullmyts.xy(), v))
         elif event.type == pg.KEYUP:
             if event.key == pg.K_a:
