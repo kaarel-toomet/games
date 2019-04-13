@@ -179,8 +179,8 @@ while do:
                 reset()
             elif event.key == pg.K_SPACE and s >= 20:
                 s -= 20
-                for x in range(100):
-                    v = np.array([r.uniform(-100,100), r.uniform(-100,100)])
+                for x in range(1000):
+                    v = np.array([r.normalvariate(0,100), r.normalvariate(0,100)])
                     pews.add(bullet(hullmyts.xy(), v))
         elif event.type == pg.KEYUP:
             if event.key == pg.K_a:
@@ -211,6 +211,7 @@ while do:
         screen.blit(ptext,ptext_rect)
         screen.blit(text,text_rect)
         pg.display.update()
+        timer.tick(20)
     if lifes == 0:
         uded = "GAME OVER"
         dtext = dfont.render(uded, True, (255,0,0))
@@ -231,6 +232,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
+        timer.tick(20)
     mcol = pg.sprite.groupcollide(pews, ugly,True, True)
     for c in mcol.keys():
         if len(mcol[c]) > 0:
@@ -246,7 +248,7 @@ while do:
         if ptick >= pmax:
             ptick = 0
             v = mxy-(hullmyts.xy()+np.array([64,64]))
-            v = v/np.linalg.norm(v) * 54 + np.array([r.normalvariate(3,3),r.normalvariate(3,3)])  #dasdf########3243412dsfdsfasdaf
+            v = v/np.linalg.norm(v) * 54 + np.array([r.normalvariate(0,3),r.normalvariate(0,3)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
             pews.add(bullet(hullmyts.xy(), -v))
     print(s)
