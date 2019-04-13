@@ -3,19 +3,20 @@ import numpy as np
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
-    
+
 def startMenu():
     def on_button_toggled(button, name):
         nonlocal toggledButton
         toggledButton = name
     def on_ok_clicked(button):
         print("OK")
+        win.destroy()
         Gtk.main_quit()
     toggledButton = "dense"
     ##
     win = Gtk.Window(title="Explosion type")
-    win.set_border_width(10)
-    hbox = Gtk.Box(spacing=6)
+    win.set_border_width(20)
+    hbox = Gtk.Box(spacing=10)
     win.add(hbox)
 
     button1 = Gtk.RadioButton.new_with_label_from_widget(None, "Dense")
