@@ -158,6 +158,13 @@ def reset():
     points = 0
     pews.empty()
     ugly.empty()
+def rtxt(x,y,txt,color,size):
+    font = pg.font.SysFont("Times", size)
+    text = font.render(txt, True, color)
+    text_rect = text.get_rect()
+    text_rect.centerx = x
+    text_rect.centery = y
+    screen.blit(text,text_rect)
 hullmyts = Player(np.array([screenw/2,screenh/2]))
 player.add(hullmyts)
 while do:
@@ -180,7 +187,7 @@ while do:
             elif event.key == pg.K_SPACE and s >= 20:
                 s -= 20
                 for x in range(1000):
-                    v = np.array([r.normalvariate(0,100), r.normalvariate(0,100)])
+                    v = np.random.normal(0, 100, size=2)
                     pews.add(bullet(hullmyts.xy(), v))
         elif event.type == pg.KEYUP:
             if event.key == pg.K_a:
@@ -204,22 +211,11 @@ while do:
                 if event.key == pg.K_p:
                     pause = False
         pd = "PAUSED"
-        ptext = dfont.render(pd, True, (127,127,127))
-        ptext_rect = ptext.get_rect()
-        ptext_rect.centerx = screen.get_rect().centerx
-        ptext_rect.y = 50
-        screen.blit(ptext,ptext_rect)
-        screen.blit(text,text_rect)
+        rtxt(screenw/2, 50,"PAUSED",(128,128,128), 30)
         pg.display.update()
         timer.tick(20)
     if lifes == 0:
-        uded = "GAME OVER"
-        dtext = dfont.render(uded, True, (255,0,0))
-        dtext_rect = dtext.get_rect()
-        dtext_rect.centerx = screen.get_rect().centerx
-        dtext_rect.y = 30
-        screen.blit(dtext,dtext_rect)
-        screen.blit(text,text_rect)
+        rtxt(screenw/2, 50,"GAME OVER",(255,0,0), 50)
         pg.display.update()
         gameover = True
         blap.play()
@@ -248,20 +244,14 @@ while do:
         if ptick >= pmax:
             ptick = 0
             v = mxy-(hullmyts.xy()+np.array([64,64]))
-            v = v/np.linalg.norm(v) * 54 + np.array([r.normalvariate(0,3),r.normalvariate(0,3)])  #dasdf########3243412dsfdsfasdaf
+            v = v/np.linalg.norm(v) * 24 + np.array([r.normalvariate(0,3),r.normalvariate(0,3)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
             pews.add(bullet(hullmyts.xy(), -v))
-    print(s)
-    ptick += 52342
+    ptick += 23434
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
-    score = ("Lifes: " + str(lifes) + " Points: " + str(points) + " level: " +
-             str(lvl) + " s: " + str(s))
-    text = font.render(score, True, (255,255,255))
-    text_rect = text.get_rect()
-    text_rect.centerx = screen.get_rect().centerx
-    text_rect.y = 10
-    screen.blit(text,text_rect)
+    rtxt(screenw/2, 20, "Lifes: " + str(lifes) + " Points: " + str(points) + " level: " +
+            str(lvl) + " s: " + str(s),(255,255,255), 24)
     utick += 1
     lvl = int(points/10)
     ## Spawn ugly blobs of doom
@@ -273,12 +263,12 @@ while do:
         # ensure uglies will not be created closer than sr to the crazy hat
         if np.linalg.norm(hx-tx) > sr:
             ugly.add(Ugly(tx,np.array([0,0])))
-    player.update(mup,mdown, mleft, mright)
-    player.draw(screen)
     pews.update()
     pews.draw(screen)
     ugly.update(hullmyts.xy())
     ugly.draw(screen)
+    player.update(mup,mdown, mleft, mright)
+    player.draw(screen)
     pg.display.update()
     timer.tick(60)
 
