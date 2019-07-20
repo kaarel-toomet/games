@@ -1,5 +1,18 @@
+#!/usr/bin/env python3
+import argparse
 import pygame as pg
 import random as r
+
+## command line arguments
+parser = argparse.ArgumentParser(description='Help the crazy hat to avoid being steamrolled by stars!')
+parser.add_argument('--debug', '-d', type=int, default=0,
+                    help='''
+debug mode.  different number for different debug effects.  0: game mode (default)
+                    ''')
+args = parser.parse_args()
+debug_code = args.debug
+
+## init
 pg.init()
 pg.mixer.init()
 pic = pg.image.load("minihullmyts.png")
@@ -9,7 +22,7 @@ pg.font
 screen = pg.display.set_mode((0,0), pg.RESIZABLE)
 screenw = screen.get_width()
 screenh = screen.get_height()
-pg.display.set_caption("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiyuituituit")
+pg.display.set_caption("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaiyuituituit")
 do = True
 dist = 5
 up = True
@@ -23,10 +36,23 @@ mright = False
 timer = pg.time.Clock()
 lifes = 5
 points = 0
-d = 0
-lvl = 0
-nextlvl = 600
-vel = 1
+## debug-dependent setup
+## potentially add more stuff here, e.g. how velocity depends on level
+## you can also add more debug codes
+if debug_code == 0:
+    def nextThreshold(distance, velocity):
+        lvlLength = 60*60*velocity
+        return distance + lvlLength
+else:
+    def nextThreshold(distance, velocity):
+        lvlLength = 600
+        return distance + lvlLength
+distance = 0  # distance covered so far
+lvl = 0  # game level
+vel = 1  # scroll speed
+threshold = nextThreshold(0, vel)  # next level threshold
+
+## Screen initialization
 font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
@@ -157,18 +183,23 @@ while do:
     if len(pcol) > 0:
         points += 1
         ystars.remove(pcol)
+    ## increase distance and compute new level, speed
+    distance += vel
+    if distance > threshold:
+        lvl += 1
+        threshold = nextThreshold(distance, vel)
+        vel = lvl+1
+    ## update display
     screen.fill((0,0,0))
-    score = ("Lifes: " + str(lifes) + " Points: " + str(points) + " Distance: " + str(d) + " Level: " + str(lvl))
+    score = ("Lifes: " + str(lifes) +
+             " Points: " + str(points) +
+             " Distance: " + str(distance) +
+             " Level: " + str(lvl))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 10
     screen.blit(text,text_rect)
-    d += vel
-    if d >= nextlvl:
-        nextlvl += nextlvl
-        lvl += 1
-    vel = lvl+1
     player.update(mup,mdown, mleft, mright)
     player.draw(screen)
     stars.update(vel)
@@ -176,6 +207,7 @@ while do:
     ystars.update(vel)
     ystars.draw(screen)
     pg.display.update()
+    ##
     timer.tick(60)
 
 pg.quit()
