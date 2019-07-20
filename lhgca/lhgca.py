@@ -251,7 +251,6 @@ while do:
             v = v/np.linalg.norm(v) * 54 + np.array([r.normalvariate(0,3),r.normalvariate(0,3)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
             pews.add(bullet(hullmyts.xy(), -v))
-    print(s)
     ptick += 52342
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
