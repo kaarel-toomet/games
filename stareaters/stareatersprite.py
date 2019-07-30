@@ -72,6 +72,17 @@ class Star(pg.sprite.Sprite):
             self.yvel = -self.yvel
         self.rect.x += self.xvel
         self.rect.y += self.yvel
+def reset():
+    global hullmyts, starseaten, lifes, tick, time
+    starseaten = 0
+    lifes = 5
+    tick = 0
+    time = 600
+    player.empty()
+    stars.empty()
+    hullmyts = Player(screenw/2,screenh/2)
+    player.add(hullmyts)
+    stars.add(Star(r.randint(10,screenw-30),r.randint(10,screenh-30),0,0))
 hullmyts = Player(screenw/2,screenh/2)
 player.add(hullmyts)
 stars.add(Star(r.randint(10,screenw-30),r.randint(10,screenh-30),0,0))
@@ -91,16 +102,7 @@ while do:
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
-                potatoeseaten = 0
-                lifes = 5
-                tick = 0
-                time = 600
-                stimer = False
-                player.empty()
-                stars.empty()
-                hullmyts = Player(screenw/2,screenh/2)
-                player.add(hullmyts)
-                stars.add(Star(r.randint(10,screenw-30),r.randint(10,screenh-30),0,0))
+                reset()
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -144,17 +146,7 @@ while do:
                 do = False
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_r:
-                    gameover = False
-                    potatoeseaten = 0
-                    lifes = 5
-                    tick = 0
-                    time = 0
-                    player.empty()
-                    stars.empty()
-                    hullmyts = Player(screenw/2,screenh/2)
-                    player.add(hullmyts)
-                    stars.add(Star(r.randint(10,screenw-30),
-                                   r.randint(10,screenh-30),0,0))
+                    reset()
     screen.fill((0,0,0))
     score = ("Stars Eaten: " + str(starseaten) + " Lives: " + str(lifes) +
             " Time: " + str(time//60))
