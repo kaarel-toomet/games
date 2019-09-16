@@ -53,6 +53,7 @@ screenh = screen.get_height()
 ## load config and all that
 blocks1.loadBlocks(f)
 pic = pg.transform.scale(pg.image.load("pic.png"),(f,f))
+kutt = pg.transform.scale(pg.image.load("person.png"),(f,f))
 home = pg.transform.scale(pg.image.load("home.png"),(f,f))
 ##
 bgColor = (64,64,64)
@@ -66,6 +67,7 @@ def screenCoords(x, y):
 ##
 screenBuffer = pg.Surface(size=(4*screenw, 4*screenh))
 screenBuffer.fill(bgColor)
+m8Buffer = pg.Surface([4*screenw, 4*screenh], pg.SRCALPHA, 32)
 # this is the buffer where movement-related drawing is done,
 # afterwards it is copied to the screen
 do = True
@@ -92,9 +94,10 @@ bb=1
 seehome = 1
 gmod = 0
 gmods = {0:"creative",1:"survival"}
-items = {0:"h", 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
+items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
 oitems = items
 player = pg.sprite.Group()
+kutid = pg.sprite.Group()
 ##
 s = files1.loadWorld()
 if s is not None:
@@ -125,20 +128,26 @@ else:
     noisemap = np.zeros((worldHeight, worldWidth))
     for x in range(worldWidth):
         for y in range(worldHeight):
-            noisemap[y,x] = noise.pnoise2(100, 100, 6, 0.5, 2, 1024, 1024, base=0)
+            noisemap[y,x] = noise.snoise2(x/50, y/50, 20, 0.5, 2, 1024, 1024, 0,)
 ##    iGround = int((1 - groundLevel)*worldHeight)
 ##    world[iGround] = 1
 ##    world[iGround+1:] = 1
     for x in range(worldWidth):
         for y in range(worldHeight):
-##            #print(noisemap[y,x])
-##            if noisemap[y,x] < -0.05:
-##                world[y,x] = 0
-##            elif noisemap[y,x] < 0:
-##                world[y,x] = 1
-##            elif noisemap[y,x] > 1:
-##                world[y,x] = 2
-            world[y,x] = r.randint(0,r.randint(1,r.randint(2,3)))
+            #print(noisemap[y,x])
+            if noisemap[y,x] < -0.3:
+                world[y,x] = 7
+            elif noisemap[y,x] < -0.05:
+                world[y,x] = 0
+            elif noisemap[y,x] < 0:
+                world[y,x] = 1
+            elif noisemap[y,x] < 0.3:
+                world[y,x] = 2
+            elif noisemap[y,x] < 0.4:
+                world[y,x] = 3
+            elif noisemap[y,x] < 11:
+                world[y,x] = 4
+            #world[y,x] = r.randint(0,r.randint(1,r.randint(2,3)))
     ## where crzy hat has her home:
     homeX = int(worldWidth/2)
     homeY = int(worldHeight/2)
@@ -189,6 +198,23 @@ class Player(pg.sprite.Sprite):
         self.rect.x, self.rect.y = screenCoords(self.x, self.y)
     def getxy(self):
         return(self.x,self.y)
+class Tüüp(pg.sprite.Sprite):
+    def __init__(self,x,y):
+        global f
+        pg.sprite.Sprite.__init__(self)
+        self.image = kutt
+        self.rect = self.image.get_rect()
+        self.x=x
+        self.y=y
+        self.rect.x = x*f
+        self.rect.y = y*f
+    def update(self):
+        global f
+        if r.randint(0,0) == 0:
+            self.x += r.randint(-1,1)
+            self.y += r.randint(-1,1)
+        self.rect.x = self.x*f
+        self.rect.y = self.y*f
 def reset():
     global hullmyts
     lifes = 5
@@ -272,7 +298,7 @@ while do:
                 homeY = hullmyts.getxy()[1]
             elif event.key == pg.K_RIGHTBRACKET and bb < blocks1.BLOCK_END:
                 bb += 1
-            elif event.key == pg.K_LEFTBRACKET and bb > 1:
+            elif event.key == pg.K_LEFTBRACKET and bb > 0:
                 bb -= 1
             elif event.key == pg.K_x:
                 seehome = 1-seehome
@@ -287,6 +313,8 @@ while do:
                 gmod = 1-gmod
             elif event.key == pg.K_t:
                 title = True
+            elif event.key == pg.K_o:
+                kutid.add(Tüüp(hullmyts.getxy()[0],hullmyts.getxy()[1]))
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -334,6 +362,8 @@ while do:
                     ## ---------- screen udpate ----------
     screen.fill(bgColor)
     screen.blit(screenBuffer, (sx,sy))
+    screen.blit(m8Buffer, (sx,sy))
+    m8Buffer.fill((0,0,0,0))
     if seehome == 1:
         screen.blit(home, screenCoords(homeX,homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenw,30))
@@ -345,6 +375,8 @@ while do:
     screen.blit(text,text_rect)
     player.update(mup,mdown, mleft, mright)
     player.draw(screen)
+    kutid.update()
+    kutid.draw(m8Buffer)
     pg.display.update()
     ##
     mup = False

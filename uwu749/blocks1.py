@@ -3,15 +3,17 @@ import pygame as pg
 
 SEA = 0
 SAND = 1
-GRASS = 2
+MURU = 2
 KIVI = 3
-TEE = 4
-KAST = 5
-BLOCK_END = 5
+LUMI = 4
+TEE = 5
+KAST = 6
+SUGAVM = 7
+BLOCK_END = 7
 
 breakable = set([])
-solid = set([SEA,KAST])
-breakto = {SEA:SEA, SAND:SEA, GRASS:SAND, TEE:SAND, KAST:SAND, KIVI:SAND}
+solid = set([KAST])
+breakto = {SUGAVM:SUGAVM, SEA:SUGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI}
 
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
@@ -37,9 +39,9 @@ def loadBlocks(size):
                                 (size, size))
     kast = pg.transform.scale(pg.image.load("kast.png"),
                                 (size, size))
-    gold = pg.transform.scale(pg.image.load("goldblock.png"),
+    lumi = pg.transform.scale(pg.image.load("☃.png"),
                                 (size, size))
-    gwall = pg.transform.scale(pg.image.load("goldwall.png"),
+    sugavv = pg.transform.scale(pg.image.load("deepw.png"),
                                 (size, size))
     window = pg.transform.scale(pg.image.load("window.png"),
                                 (size, size))
@@ -52,6 +54,8 @@ def loadBlocks(size):
     odoor = pg.transform.scale(pg.image.load("odoor.png"),
                                 (size, size))
     ## set up the blocks dictionary
-    blocks = { SEA:sky, SAND:block, GRASS:ground, TEE:tee, KAST:kast, KIVI:kivi}
-    bn={SEA:"vesi",SAND:"liiv", GRASS:"muru", TEE:"tee", KAST:"kast", KIVI:"kivi"}
+    blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
+               KAST:kast, KIVI:kivi, LUMI:lumi, SUGAVM:sugavv}
+    bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
+        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SUGAVM:"sügav vesi"}
 
