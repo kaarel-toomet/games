@@ -122,23 +122,28 @@ else:
 ##    worldWidth = min(max(worldWidth, 2), 2000)
 ##    groundLevel = min(max(groundLevel, 0.0), 1.0)
     world = np.zeros((worldHeight, worldWidth), 'int8')
-    noisemap = np.zeros((worldHeight, worldWidth))
+    noisemap = np.empty((worldHeight, worldWidth))
+    freq = 16.0
     for x in range(worldWidth):
         for y in range(worldHeight):
-            noisemap[y,x] = noise.pnoise2(100, 100, 6, 0.5, 2, 1024, 1024, base=0)
+            noisemap[y,x] = noise.snoise2(x/freq, y/freq)
+    maxnoise = np.max(noisemap)
+    minnoise = np.min(noisemap)
+    thresholds = np.quantile(noisemap, [0.33, 0.66])
+    print("thresholds", thresholds)
 ##    iGround = int((1 - groundLevel)*worldHeight)
 ##    world[iGround] = 1
 ##    world[iGround+1:] = 1
     for x in range(worldWidth):
         for y in range(worldHeight):
 ##            #print(noisemap[y,x])
-##            if noisemap[y,x] < -0.05:
-##                world[y,x] = 0
-##            elif noisemap[y,x] < 0:
-##                world[y,x] = 1
-##            elif noisemap[y,x] > 1:
-##                world[y,x] = 2
-            world[y,x] = r.randint(0,r.randint(1,r.randint(2,3)))
+           if noisemap[y,x] < thresholds[0]:
+               world[y,x] = 0
+           elif noisemap[y,x] < thresholds[1]:
+               world[y,x] = 1
+           else:
+               world[y,x] = 2
+               world[y,x] = r.randint(0,r.randint(1,r.randint(2,3)))
     ## where crzy hat has her home:
     homeX = int(worldWidth/2)
     homeY = int(worldHeight/2)
