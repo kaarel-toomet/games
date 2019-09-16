@@ -12,6 +12,7 @@ screen = pg.display.set_mode((0,0), pg.RESIZABLE)
 screenw = screen.get_width()
 screenh = screen.get_height()
 pg.display.set_caption("Star Eater")
+acc = 0
 do = True
 dist = 5
 up = True
