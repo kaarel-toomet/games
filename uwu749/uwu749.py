@@ -99,6 +99,7 @@ gmod = 0
 gmods = {0:"creative",1:"survival"}
 items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
 oitems = items
+aia = False
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 kraam = pg.sprite.Group()
@@ -264,7 +265,8 @@ for x in range(worldWidth):
             if r.randint(0,400) == 0:
                 kollid.add(Koll(x,y))
 def reset():
-    global hullmyts
+    global hullmyts, gameover, lifes
+    gameover = False
     lifes = 5
     player.empty()
     hullmyts = Player(homeX, homeY)
@@ -379,16 +381,16 @@ while do:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_p:
                     pause = False
-                    pd = "PAUSED"
-                    ptext = dfont.render(pd, True, (127,127,127))
-                    ptext_rect = ptext.get_rect()
-                    ptext_rect.centerx = screen.get_rect().centerx
-                    ptext_rect.y = 50
-                    screen.blit(ptext,ptext_rect)
-                    screen.blit(text,text_rect)
-                    pg.display.update()
+        pd = "PAUSIL"
+        ptext = dfont.render(pd, True, (127,127,127))
+        ptext_rect = ptext.get_rect()
+        ptext_rect.centerx = screen.get_rect().centerx
+        ptext_rect.y = 50
+        screen.blit(ptext,ptext_rect)
+        screen.blit(text,text_rect)
+        pg.display.update()
     if lifes == 0:
-        uded = "GAME OVER"
+        uded = "SA SURID ÄRA"
         dtext = dfont.render(uded, True, (255,0,0))
         dtext_rect = dtext.get_rect()
         dtext_rect.centerx = screen.get_rect().centerx
@@ -410,6 +412,13 @@ while do:
     if len(col) > 0:
         kraam.remove(col)
         punktid += 100
+    col = pg.sprite.spritecollide(hullmyts,kollid,False)
+    if len(col) > 0:
+        if not aia:
+            lifes -= 1
+        aia = True
+    else:
+        aia = False
                     ## ---------- screen udpate ----------
     screen.fill(bgColor)
     screen.blit(screenBuffer, (sx,sy))
@@ -419,9 +428,9 @@ while do:
         screen.blit(home, screenCoords(homeX,homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenw,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
-             ", punktid: " + str(punktid))
+             ", punktid: " + str(punktid) + " elud: " + str(lifes))
     if len(kraam) == 0:
-        score += " (kõik)"
+        score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
