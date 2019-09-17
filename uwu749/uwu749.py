@@ -23,7 +23,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- blocks ----------
-f=64
+f=32
 # block size on screen
 pg.init()
 
@@ -55,6 +55,8 @@ blocks1.loadBlocks(f)
 pic = pg.transform.scale(pg.image.load("pic.png"),(f,f))
 kutt = pg.transform.scale(pg.image.load("person.png"),(f,f))
 home = pg.transform.scale(pg.image.load("home.png"),(f,f))
+kuld = pg.transform.scale(pg.image.load("kuld.png"),(f,f))
+koll = pg.transform.scale(pg.image.load("koll.png"),(f,f))
 ##
 bgColor = (64,64,64)
 # dark gray
@@ -84,13 +86,14 @@ mleft = False
 mright = False
 timer = pg.time.Clock()
 lifes = 5
+punktid = 0
 font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
 tfont = pg.font.SysFont("Times",100)
 pause = False
 gameover = False
-bb=1
+bb = 1
 seehome = 1
 gmod = 0
 gmods = {0:"creative",1:"survival"}
@@ -98,6 +101,7 @@ items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:
 oitems = items
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
+kraam = pg.sprite.Group()
 ##
 s = files1.loadWorld()
 if s is not None:
@@ -134,7 +138,6 @@ else:
 ##    world[iGround+1:] = 1
     for x in range(worldWidth):
         for y in range(worldHeight):
-            #print(noisemap[y,x])
             if noisemap[y,x] < -0.3:
                 world[y,x] = 7
             elif noisemap[y,x] < -0.05:
@@ -147,7 +150,6 @@ else:
                 world[y,x] = 3
             elif noisemap[y,x] < 11:
                 world[y,x] = 4
-            #world[y,x] = r.randint(0,r.randint(1,r.randint(2,3)))
     ## where crzy hat has her home:
     homeX = int(worldWidth/2)
     homeY = int(worldHeight/2)
@@ -171,7 +173,7 @@ class Player(pg.sprite.Sprite):
         self.y=y
         self.rect.x, self.rect.y = screenCoords(x, y)
     def update(self, mup, mdown, mleft, mright):
-        global sx, sy, world, gmod
+        global sx, sy, world, gmod, f
         y = self.y
         x = self.x
 ##        if world[y,x] == blocks1.SKY and gmod == 1:
@@ -195,7 +197,9 @@ class Player(pg.sprite.Sprite):
         self.y = y
         sx = screenw/2-hullmyts.getxy()[0]*f
         sy = screenh/2-hullmyts.getxy()[1]*f
-        self.rect.x, self.rect.y = screenCoords(self.x, self.y)
+##        self.rect.x, self.rect.y = screenCoords(self.x, self.y)
+        self.rect.x = f*x
+        self.rect.y = f*y
     def getxy(self):
         return(self.x,self.y)
 class Tüüp(pg.sprite.Sprite):
@@ -210,11 +214,28 @@ class Tüüp(pg.sprite.Sprite):
         self.rect.y = y*f
     def update(self):
         global f
-        if r.randint(0,0) == 0:
+        if r.randint(0,30) == 0:
             self.x += r.randint(-1,1)
             self.y += r.randint(-1,1)
         self.rect.x = self.x*f
         self.rect.y = self.y*f
+class jura(pg.sprite.Sprite):
+    def __init__(self,x,y, img=kuld, n=100):
+        global f
+        pg.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = self.image.get_rect()
+        self.x=x
+        self.y=y
+        self.rect.x = x*f
+        self.rect.y = y*f
+        self.n = n
+    def update(self):
+        pass
+for x in range(worldWidth):
+        for y in range(worldHeight):
+            if r.randint(0,400) == 0:
+                kraam.add(jura(x,y))
 def reset():
     global hullmyts
     lifes = 5
@@ -234,6 +255,8 @@ def build(x,y):
         screenBuffer.blit( blocks1.blocks[bb], tc(x, y)) 
 def destroy(x,y):
     if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
+        if r.randint(0,200) == 0 and world[y,x] != blocks1.breakto[world[y,x]]:
+            kraam.add(jura(x,y))
         items[world[y,x]] += 1
         screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], tc(x, y))
         world[y,x] = blocks1.breakto[world[y,x]]
@@ -304,11 +327,8 @@ while do:
                 seehome = 1-seehome
             elif event.key == pg.K_z:
                 files1.saveWorld(world, (homeX, homeY), items)
-            elif event.key == pg.K_c and (not world[hullmyts.getxy()[1],hullmyts.getxy()[0]] in blocks1.breakable):
-                xy=hullmyts.getxy()
-                items[world[xy[1],xy[0]]] += 1
-                world[xy[1],xy[0]] = 0
-                screenBuffer.blit( blocks1.blocks[blocks1.SEA], tc(xy[0],xy[1]))
+            elif event.key == pg.K_c:
+                destroy(hullmyts.getxy()[0],hullmyts.getxy()[1])
             elif event.key == pg.K_g:
                 gmod = 1-gmod
             elif event.key == pg.K_t:
@@ -359,6 +379,10 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
+    col = pg.sprite.spritecollide(hullmyts,kraam,False)
+    if len(col) > 0:
+        kraam.remove(col)
+        punktid += 100
                     ## ---------- screen udpate ----------
     screen.fill(bgColor)
     screen.blit(screenBuffer, (sx,sy))
@@ -367,16 +391,20 @@ while do:
     if seehome == 1:
         screen.blit(home, screenCoords(homeX,homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenw,30))
-    score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]))
+    score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
+             ", punktid: " + str(punktid))
+    if len(kraam) == 0:
+        score += " (kõik)"
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 10
     screen.blit(text,text_rect)
     player.update(mup,mdown, mleft, mright)
-    player.draw(screen)
+    player.draw(m8Buffer)
     kutid.update()
     kutid.draw(m8Buffer)
+    kraam.draw(m8Buffer)
     pg.display.update()
     ##
     mup = False
