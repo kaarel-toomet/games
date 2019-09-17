@@ -267,8 +267,8 @@ for x in range(worldWidth):
         for y in range(worldHeight):
             if r.randint(0,400) == 0:
                 kraam.add(jura(x,y))
-            if r.randint(0,400) == 0:
-                kollid.add(Koll(x,y))
+##            if r.randint(0,400) == 0:
+##                kollid.add(Koll(x,y))
 def reset():
     global hullmyts, gameover, lifes
     gameover = False
@@ -415,6 +415,8 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
+    if r.randint(0,400) == 0:
+        kollid.add(Koll(r.randint(0,worldWidth),r.randint(0,worldHeight)))
     col = pg.sprite.spritecollide(hullmyts,kraam,False)
     if len(col) > 0:
         kraam.remove(col)
