@@ -102,6 +102,7 @@ oitems = items
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 kraam = pg.sprite.Group()
+kollid = pg.sprite.Group()
 ##
 s = files1.loadWorld()
 if s is not None:
@@ -219,6 +220,30 @@ class Tüüp(pg.sprite.Sprite):
             self.y += r.randint(-1,1)
         self.rect.x = self.x*f
         self.rect.y = self.y*f
+class Koll(pg.sprite.Sprite):
+    def __init__(self,x,y):
+        global f
+        pg.sprite.Sprite.__init__(self)
+        self.image = koll
+        self.rect = self.image.get_rect()
+        self.x=x
+        self.y=y
+        self.rect.x = x*f
+        self.rect.y = y*f
+    def update(self):
+        global f, hullmyts
+        if r.randint(0,30) == 0:
+            xy = hullmyts.getxy()
+            if xy[0] < self.x:
+                self.x -= 1
+            if xy[0] > self.x:
+                self.x += 1
+            if xy[1] < self.y:
+                self.y -= 1
+            if xy[1] > self.y:
+                self.y += 1
+        self.rect.x = self.x*f
+        self.rect.y = self.y*f
 class jura(pg.sprite.Sprite):
     def __init__(self,x,y, img=kuld, n=100):
         global f
@@ -236,6 +261,8 @@ for x in range(worldWidth):
         for y in range(worldHeight):
             if r.randint(0,400) == 0:
                 kraam.add(jura(x,y))
+            if r.randint(0,400) == 0:
+                kollid.add(Koll(x,y))
 def reset():
     global hullmyts
     lifes = 5
@@ -404,6 +431,8 @@ while do:
     player.draw(m8Buffer)
     kutid.update()
     kutid.draw(m8Buffer)
+    kollid.update()
+    kollid.draw(m8Buffer)
     kraam.draw(m8Buffer)
     pg.display.update()
     ##
