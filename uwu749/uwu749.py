@@ -99,7 +99,7 @@ gmod = 0
 gmods = {0:"creative",1:"survival"}
 items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
 oitems = items
-aia = False
+aia = 0
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 kraam = pg.sprite.Group()
@@ -245,6 +245,11 @@ class Koll(pg.sprite.Sprite):
                 self.y += 1
         self.rect.x = self.x*f
         self.rect.y = self.y*f
+    def lammutus(self,x,y):
+        global punktid
+        if self.x == x and self.y == y:
+            kollid.remove(self)
+            punktid += 100
 class jura(pg.sprite.Sprite):
     def __init__(self,x,y, img=kuld, n=100):
         global f
@@ -289,6 +294,8 @@ def destroy(x,y):
         items[world[y,x]] += 1
         screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], tc(x, y))
         world[y,x] = blocks1.breakto[world[y,x]]
+    for k in kollid:
+        k.lammutus(x,y)
 # initialize player        
 reset()
                 
@@ -413,12 +420,11 @@ while do:
         kraam.remove(col)
         punktid += 100
     col = pg.sprite.spritecollide(hullmyts,kollid,False)
-    if len(col) > 0:
-        if not aia:
-            lifes -= 1
-        aia = True
-    else:
-        aia = False
+    if len(col) > 0 and aia == 0:
+        lifes -= 1
+        aia = 30
+    if aia > 0:
+        aia -= 1
                     ## ---------- screen udpate ----------
     screen.fill(bgColor)
     screen.blit(screenBuffer, (sx,sy))
