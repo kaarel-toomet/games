@@ -6,6 +6,7 @@ import numpy as np
 import sys
 import subprocess
 import noise
+import time
 
 import blocks1
 import files1
@@ -37,18 +38,18 @@ if sys.platform == 'linux':
     if(res.returncode == 0):
         # success
         wh = res.stdout.split(b' ')
-        screenw = int(wh[0])
-        screenh = int(wh[1])
-        screen = pg.display.set_mode((screenw, screenh), pg.RESIZABLE)
+        screenWidth = int(wh[0])
+        screenHeight = int(wh[1])
+        screen = pg.display.set_mode((screenWidth, screenHeight), pg.RESIZABLE)
         xdotool = True
 if not xdotool:
     screen = pg.display.set_mode((0,0), pg.RESIZABLE)
-    screenw, screenh = pg.display.get_surface().get_size()
+    screenWidth, screenHeight = pg.display.get_surface().get_size()
 pg.display.set_caption(str(r.randint(0,9000)))
 pg.mixer.init()
 screen = pg.display.set_mode((0,0), pg.RESIZABLE)
-screenw = screen.get_width()
-screenh = screen.get_height()
+screenWidth = screen.get_width()
+screenHeight = screen.get_height()
 
 ## load config and all that
 blocks1.loadBlocks(tileSize)
@@ -88,10 +89,11 @@ def coordinateShifts(iChunk, jChunk, cx, cy):
     (ssx, ssy, wsx, wsy)
     wx, wy: shift b/w world and window coordinates
     """
-    wsx = (iChunk - 1)*chunkSize
-    wsy = (jChunk - 1)*chunkSize
-    ssx = screenw/2 - (cx + wsx)*tileSize
-    ssy = screenh/2 - (cy + wsy)*tileSize
+    wsx = -(iChunk - 1)*chunkSize
+    wsy = -(jChunk - 1)*chunkSize
+    ssx = int(screenWidth/2) + cx*tileSize
+    # note: we can directly translate b/w world and screen w/o need for window!
+    ssy = int(screenHeight/2) + cy*tileSize
     return (ssx, ssy, wsx, wsy)
 
 def windowCoords(x,y):
@@ -113,9 +115,9 @@ def screenCoords(x, y):
     return(ssx + x*tileSize, ssy + y*tileSize)
 ##
 
-screenBuffer = pg.Surface(size=(4*screenw, 4*screenh))
+screenBuffer = pg.Surface(size=(4*screenWidth, 4*screenHeight))
 screenBuffer.fill(bgColor)
-m8Buffer = pg.Surface([4*screenw, 4*screenh], pg.SRCALPHA, 32)
+m8Buffer = pg.Surface([4*screenWidth, 4*screenHeight], pg.SRCALPHA, 32)
 # this is the buffer where movement-related drawing is done,
 # afterwards it is copied to the screen
 do = True
@@ -152,7 +154,8 @@ kraam = pg.sprite.Group()
 kollid = pg.sprite.Group()
 
 ##
-s = files1.loadWorld()
+# s = files1.loadWorld()
+s = None
 if s is not None:
     world = s['world']
     homeX = s['home'][0]
@@ -192,9 +195,9 @@ else:
             elif noiseval < 11:
                 world[y,x] = 4
     print("done")
-    ## where Crazy Hat has her home:
-    homeX = int(worldWidth/2)
-    homeY = int(worldHeight/2)
+                ## where Crazy Hat has her home:
+    homeX = 0
+    homeY = 0
 
 ## create the active window, centered on home:
 worldWidthChunks = worldWidth/chunkSize
@@ -207,12 +210,14 @@ for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
         if 0 <= ic < worldWidthChunks and 0 <= jc < worldHeightChunks:
             # we are in the middle of the world
             activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] =\
-            world[iChunk*chunkSize:(iChunk+1)*chunkSize, jChunk*chunkSize:(jChunk+1)*chunkSize].copy()
+                                                                                    world[iChunk*chunkSize:(iChunk+1)*chunkSize, jChunk*chunkSize:(jChunk+1)*chunkSize].copy()
         else:
             # this chunk is outside of the world
             activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = 0
 
 ## Draw the world
+ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, 0, 0)
+print("shifts", ssx, ssy, wsx, wsy)
 for x in range(activeWindow.shape[0]):
     for y in range(activeWindow.shape[1]):
         screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], windowCoords(y, x))
@@ -230,10 +235,10 @@ class Player(pg.sprite.Sprite):
         global world, gmod, f
         y = self.y
         x = self.x
-##        if world[y,x] == blocks1.SKY and gmod == 1:
-##            mup = False
-##            if world[y+1,x] == blocks1.SKY:
-##                mdown = True
+        ##        if world[y,x] == blocks1.SKY and gmod == 1:
+        ##            mup = False
+        ##            if world[y+1,x] == blocks1.SKY:
+        ##                mdown = True
         if mup:
             y = max(self.y - 1, 0)
         if mdown:
@@ -247,9 +252,10 @@ class Player(pg.sprite.Sprite):
         if world[y,x] in blocks1.breakable:
             world[y,x] = blocks1.breakto[world[y,x]]
             screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], windowCoords(x, y))
-        self.x = x
-        self.y = y
-        ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, hullmyts.getxy()[0], hullmyts.getxy()[1])
+            self.x = x
+            self.y = y
+            # ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, hullmyts.getxy()[0], hullmyts.getxy()[1])
+        ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, self.x, self.y)
         self.rect.x = tileSize*x
         self.rect.y = tileSize*y
     def getxy(self):
@@ -274,8 +280,8 @@ class Tüüp(pg.sprite.Sprite):
         if r.randint(0,30) == 0:
             self.x += r.randint(-1,1)
             self.y += r.randint(-1,1)
-        self.rect.x = self.x*tileSize
-        self.rect.y = self.y*tileSize
+            self.rect.x = self.x*tileSize
+            self.rect.y = self.y*tileSize
 class Koll(pg.sprite.Sprite):
     def __init__(self,x,y):
         global f
@@ -298,8 +304,8 @@ class Koll(pg.sprite.Sprite):
                 self.y -= 1
             if xy[1] > self.y:
                 self.y += 1
-        self.rect.x = self.x*tileSize
-        self.rect.y = self.y*tileSize
+                self.rect.x = self.x*tileSize
+                self.rect.y = self.y*tileSize
     def lammutus(self,x,y):
         global punktid
         if self.x == x and self.y == y:
@@ -322,8 +328,8 @@ for x in range(worldWidth):
         for y in range(worldHeight):
             if r.randint(0,400) == 0:
                 kraam.add(jura(x,y))
-##            if r.randint(0,400) == 0:
-##                kollid.add(Koll(x,y))
+                ##            if r.randint(0,400) == 0:
+                ##                kollid.add(Koll(x,y))
 def reset():
     global hullmyts, gameover, lifes, punktid
     punktid = 0
@@ -341,40 +347,40 @@ def build(x,y):
             if items[bb] <= 0:
                 return
             items[bb] -= 1
-        world[y,x] = bb
-        screenBuffer.blit( blocks1.blocks[bb], windowCoords(x, y)) 
+            world[y,x] = bb
+            screenBuffer.blit( blocks1.blocks[bb], windowCoords(x, y)) 
 def destroy(x,y):
     if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
         if r.randint(0,200) == 0 and world[y,x] != blocks1.breakto[world[y,x]]:
             kraam.add(jura(x,y))
-        items[world[y,x]] += 1
-        screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], windowCoords(x, y))
-        world[y,x] = blocks1.breakto[world[y,x]]
+            items[world[y,x]] += 1
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], windowCoords(x, y))
+            world[y,x] = blocks1.breakto[world[y,x]]
     for k in kollid:
         k.lammutus(x,y)
-# initialize player        
+        # initialize player        
 reset()
-                
+
 while do:
-##    while title:
-##        for event in pg.event.get():
-##            if event.type == pg.QUIT:
-##                title = False
-##                do = False
-##            elif event.type == pg.KEYDOWN:
-##                if event.key == pg.K_s:
-##                    gmod = 1
-##                    title = False
-##                elif event.key == pg.K_c:
-##                    gmod = 0
-##                    title = False
-##        score = ("press C for creative mode, press S for survival(WIP)")
-##        text = tfont.render(score, True, (0,255,0))
-##        text_rect = text.get_rect()
-##        text_rect.centerx = screen.get_rect().centerx
-##        text_rect.y = screenh/2
-##        screen.blit(text,text_rect)
-##        screen.blit(uwu,(screenw/2-f*8,screenh/4-f*2))
+    ##    while title:
+    ##        for event in pg.event.get():
+    ##            if event.type == pg.QUIT:
+    ##                title = False
+    ##                do = False
+    ##            elif event.type == pg.KEYDOWN:
+    ##                if event.key == pg.K_s:
+    ##                    gmod = 1
+    ##                    title = False
+    ##                elif event.key == pg.K_c:
+    ##                    gmod = 0
+    ##                    title = False
+    ##        score = ("press C for creative mode, press S for survival(WIP)")
+    ##        text = tfont.render(score, True, (0,255,0))
+    ##        text_rect = text.get_rect()
+    ##        text_rect.centerx = screen.get_rect().centerx
+    ##        text_rect.y = screenHeight/2
+    ##        screen.blit(text,text_rect)
+    ##        screen.blit(uwu,(screenWidth/2-f*8,screenHeight/4-f*2))
 ##        pg.display.update()
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -492,7 +498,7 @@ while do:
     m8Buffer.fill((0,0,0,0))
     if seehome == 1:
         screen.blit(home, screenCoords(homeX, homeY))
-    pg.draw.rect(screen,(0,0,0),(0,10,screenw,30))
+    pg.draw.rect(screen,(0,0,0),(0,10,screenWidth,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes))
     if len(kraam) == 0:
