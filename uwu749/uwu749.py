@@ -16,14 +16,14 @@ parser.add_argument('-v', type=int, default=0,
                     help='verbosity level')
 parser.add_argument('-x', '--width', type=int, default=64,
                     dest='width',        ##other useless comment
-                    help='world width (tiles)')
+                    help='window width (tiles)')
 parser.add_argument('-y', '--height', type=int, default=64,
                     dest='height',
-                    help='world height (tiles)')
+                    help='window height (tiles)')
 args = parser.parse_args()
 
 ## ---------- blocks ----------
-f=32
+tileSize = 32
 # block size on screen
 pg.init()
 
@@ -62,10 +62,10 @@ bgColor = (64,64,64)
 # dark gray
 ## coordinate transformation for the buffer
 def tc(x,y):
-    return(x*f, y*f)
+    return(x*tileSize, y*tileSize)
 ## coordnate transformation for the actual screen
 def screenCoords(x, y):
-    return(sx + x*f, sy + y*f)
+    return(sx + x*tileSize, sy + y*tileSize)
 ##
 screenBuffer = pg.Surface(size=(4*screenw, 4*screenh))
 screenBuffer.fill(bgColor)
@@ -102,7 +102,12 @@ oitems = items
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 kraam = pg.sprite.Group()
-##
+
+## Screen and active window
+chunkSize = 32
+# size of tiles chunks for loading/saving
+windowWidth = 3*chunkSize  # how many tiles loaded into the active window
+widnowHeight = 3*chunkSize
 s = files1.loadWorld()
 if s is not None:
     world = s['world']
@@ -120,50 +125,60 @@ if s is not None:
 else:
     ## ---------- Build the world ----------
     ## variables
-    worldWidth = args.width
-    worldHeight = args.height
+    worldWidth = 1024
+    worldHeight = 1024
     #groundLevel = 0.5
     # in fraction, from bottom.  0.3 means bottom 30%
     ## sanity check
-##    worldHeight = min(max(worldHeight, 2), 400)
-##    worldWidth = min(max(worldWidth, 2), 2000)
-##    groundLevel = min(max(groundLevel, 0.0), 1.0)
-    world = np.zeros((worldHeight, worldWidth), 'int8')
-    noisemap = np.empty((worldHeight, worldWidth))
+    print("creating the world..", end="")
+    world = np.empty((worldHeight, worldWidth), 'int8')
     freq = 16.0
     for x in range(worldWidth):
         for y in range(worldHeight):
-            noisemap[y,x] = noise.snoise2(x/50, y/50, 20, 0.5, 2, 1024, 1024, 0,)
-##    iGround = int((1 - groundLevel)*worldHeight)
-##    world[iGround] = 1
-##    world[iGround+1:] = 1
-    for x in range(worldWidth):
-        for y in range(worldHeight):
-            if noisemap[y,x] < -0.3:
+            noiseval = noise.snoise2(x/50, y/50, 20, 0.5, 2, 1024, 1024, 0,)
+            if noiseval < -0.3:
                 world[y,x] = 7
-            elif noisemap[y,x] < -0.05:
+            elif noiseval < -0.05:
                 world[y,x] = 0
-            elif noisemap[y,x] < 0:
+            elif noiseval < 0:
                 world[y,x] = 1
-            elif noisemap[y,x] < 0.3:
+            elif noiseval < 0.3:
                 world[y,x] = 2
-            elif noisemap[y,x] < 0.4:
+            elif noiseval < 0.4:
                 world[y,x] = 3
-            elif noisemap[y,x] < 11:
+            elif noiseval < 11:
                 world[y,x] = 4
-    ## where crzy hat has her home:
+    print("done")
+    ## where Crazy Hat has her home:
     homeX = int(worldWidth/2)
     homeY = int(worldHeight/2)
-## Draw the world
-for x in range(world.shape[0]):
-    for y in range(world.shape[1]):
-        screenBuffer.blit( blocks1.blocks[ world[x,y] ], tc(y, x))
-## ---------- world-screen coordinate translation ----------
-## upper left corner of the world will be drawn at (sx, sy) on screen.
+
+## create the active window, centered on home:
+worldWidthChunks = worldWidth/chunkSize
+worldHeightChunks = worldHeight/chunkSize
+iChunk = homeX % chunkSize
+jChunk = homeY % chunkSize
+activeWindow = np.empty((windowWidth, windowHeight), 'int8')
+for i, ic in enumerate(range(iChunk-1, iChunk+1)):
+    for j, jc in enumerate(range(jChunk-1, jChunk+1)):
+        if 0 <= ic < worldWidthChunks and 0 <= jc < worldHeightChunks:
+            # we are in the middle of the world
+            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] =
+            world[iChunk*chunkSize:(iChunk+1)*chunkSize, jChunk*chunkSize:(jChunk+1)*chunkSize].copy()
+        else
+            # this chunk is outside of the world
+            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = 0
+## ---------- activeWindow-screen coordinate translation ----------
+## upper left corner of the activeWindow will be drawn at (sx, sy) on screen.
 ## This will be done when copying the screen buffer on screen
-sx = screenw/2 - worldWidth*f/2
-sy = screenh/2 - worldHeight*f/2
+sx = screenw/2 - worldWidth*tileSize/2
+sy = screenh/2 - worldHeight*tileSize/2
 ## ---------- world done ----------
+
+## Draw the world
+for x in range(activeWindow.shape[0]):
+    for y in range(activeWindow.shape[1]):
+        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], tc(y, x))
 
 class Player(pg.sprite.Sprite):
     def __init__(self,x,y):
@@ -196,40 +211,40 @@ class Player(pg.sprite.Sprite):
             screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], tc(x, y))
         self.x = x
         self.y = y
-        sx = screenw/2-hullmyts.getxy()[0]*f
-        sy = screenh/2-hullmyts.getxy()[1]*f
+        sx = screenw/2-hullmyts.getxy()[0]*tileSize
+        sy = screenh/2-hullmyts.getxy()[1]*tileSize
 ##        self.rect.x, self.rect.y = screenCoords(self.x, self.y)
-        self.rect.x = f*x
-        self.rect.y = f*y
+        self.rect.x = tileSize*x
+        self.rect.y = tileSize*y
     def getxy(self):
         return(self.x,self.y)
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
-        global f
+        global tileSize
         pg.sprite.Sprite.__init__(self)
         self.image = kutt
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y
-        self.rect.x = x*f
-        self.rect.y = y*f
+        self.rect.x = x*tileSize
+        self.rect.y = y*tileSize
     def update(self):
-        global f
+        global tileSize
         if r.randint(0,30) == 0:
             self.x += r.randint(-1,1)
             self.y += r.randint(-1,1)
-        self.rect.x = self.x*f
-        self.rect.y = self.y*f
+        self.rect.x = self.x*tileSize
+        self.rect.y = self.y*tileSize
 class jura(pg.sprite.Sprite):
     def __init__(self,x,y, img=kuld, n=100):
-        global f
+        global tileSize
         pg.sprite.Sprite.__init__(self)
         self.image = img
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y
-        self.rect.x = x*f
-        self.rect.y = y*f
+        self.rect.x = x*tileSize
+        self.rect.y = y*tileSize
         self.n = n
     def update(self):
         pass
