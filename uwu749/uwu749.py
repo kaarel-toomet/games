@@ -9,6 +9,7 @@ import noise
 import time
 
 import blocks1
+import coordinates
 import files1
 
 ## Command line arguments
@@ -62,69 +63,13 @@ koll = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
 bgColor = (64,64,64)
 # dark gray
 
-## ---------- coordinate translation ----------
-## the game contains 3 types of coordinates:
-## * screen coordinates in pixels, (0,0) is top left
-## * active window coordinates in tiles, (0,0) is top left (the same thing as screenBuffer)
-## * world coordinates, in tiles, potentially unlimited, (0,0) is center (TBD)
-##
-## translation is mainly done using tuples (sx, sx) to shift to screen coords,
-## and (wx, wx) to screenBuffer coords.
-
 ## Screen and active window
 chunkSize = 32
 # size of tiles chunks for loading/saving
 windowWidth = 3*chunkSize  # how many tiles loaded into the active window
 windowHeight = 3*chunkSize
 
-def coordinateShifts(iChunk, jChunk, cx, cy):
-    """
-    compute the coordinate shifts b/w coordinates
-    shifts should be added to the world coordinates to make the translation
-    INPUTS: 
-    iChunk, jChunk: central chunk of the active window
-    cx, cy: screen center world coordinates 
-            normally location of Crazy Hat
-    RETURNS:
-    (ssx, ssy, wsx, wsy)
-    wx, wy: shift b/w world and window coordinates
-    """
-    wsx = -(iChunk - 1)*chunkSize
-    wsy = -(jChunk - 1)*chunkSize
-    ssx = int(screenWidth/2) - cx*tileSize
-    # note: we can directly translate b/w world and screen w/o need for window!
-    ssy = int(screenHeight/2) - cy*tileSize
-    return (ssx, ssy, wsx, wsy)
-
-def blitShifts(iChunk, jChunk, cx, cy):
-    """
-    cx, cy: screen center world coords
-    """
-    xLeft = -wsx
-    # window left edge in world coords
-    yTop = -wsy
-    bsx, bsy = screenCoords(xLeft, yTop)
-    return bsx, bsy
-
-def windowCoords(x,y):
-    """
-    transform world coordinates to screenBuffer coordinates
-    x, y: world coordinates
-    returns:
-    (bx, by): screen buffer coordinates
-    """
-    return(wsx + x, wsy + y)
-
-def screenCoords(x, y):
-    """
-    transform world coordinates to screen coordinates
-    x, y: world coordinates
-    returns:
-    (ex, ey): screen coordinates
-    """
-    return(ssx + x*tileSize, ssy + y*tileSize)
-##
-
+coordinates.setup(screenWidth, screenHeight, chunkSize, tileSize)
 screenBuffer = pg.Surface(size=(4*screenWidth, 4*screenHeight))
 screenBuffer.fill(bgColor)
 m8Buffer = pg.Surface([4*screenWidth, 4*screenHeight], pg.SRCALPHA, 32)
@@ -226,16 +171,14 @@ for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
             activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = 0
 
 ## Draw the world
-ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, homeX, homeY)
-bsx, bsy = blitShifts(iChunk, jChunk, homeX, homeY)
+coordinates.coordinateShifts(iChunk, jChunk, homeX, homeY)
 print("home", homeX, homeY)
-print("window home", windowCoords(homeX, homeY))
-print("chunk", iChunk, jChunk)
-print("shifts", ssx, ssy, wsx, wsy, bsx, bsy)
+print("window home", coordinates.windowCoords(homeX, homeY))
 for x in range(activeWindow.shape[0]):
     for y in range(activeWindow.shape[1]):
-        # print("screen coords", x, y, screenCoords(x, y))
-        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], (bsx, bsy))
+        windowX, windowY = coordinates.windowCoords(x, y)
+        print("window coords", x, y, windowX, windowY)
+        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], (windowX*tileSize, windowY*tileSize))
 # screen.blit(screenBuffer, (bsx, bsy))
 # pg.display.update()
 # time.sleep(4)
@@ -249,7 +192,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y
-        self.rect.x, self.rect.y = screenCoords(x, y)
+        self.rect.x, self.rect.y = coordinates.screenCoords(x, y)
     def update(self, mup, mdown, mleft, mright):
         global ssx, ssy, wsx, wsy, bsx, bsy
         global world, gmod, f
@@ -271,12 +214,12 @@ class Player(pg.sprite.Sprite):
             return
         if world[y,x] in blocks1.breakable:
             world[y,x] = blocks1.breakto[world[y,x]]
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], screenCoords(x, y))
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]],
+                               coordinates.screenCoords(x, y))
             self.x = x
             self.y = y
             # ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, hullmyts.getxy()[0], hullmyts.getxy()[1])
-        ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, self.x, self.y)
-        bsx, bsy = blitShifts(iChunk, jChunk, self.x, self.y)
+        coordinates.coordinateShifts(iChunk, jChunk, self.x, self.y)
         self.rect.x = tileSize*x
         self.rect.y = tileSize*y
     def getxy(self):
@@ -369,13 +312,14 @@ def build(x,y):
                 return
             items[bb] -= 1
             world[y,x] = bb
-            screenBuffer.blit( blocks1.blocks[bb], screenCoords(x, y)) 
+            screenBuffer.blit( blocks1.blocks[bb], coordinates.screenCoords(x, y)) 
 def destroy(x,y):
     if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
         if r.randint(0,200) == 0 and world[y,x] != blocks1.breakto[world[y,x]]:
             kraam.add(jura(x,y))
             items[world[y,x]] += 1
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], screenCoords(x, y))
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]],
+                               coordinates.screenCoords(x, y))
             world[y,x] = blocks1.breakto[world[y,x]]
     for k in kollid:
         k.lammutus(x,y)
@@ -514,11 +458,11 @@ while do:
         aia -= 1
     ## ---------- screen udpate ----------
     screen.fill(bgColor)
-    screen.blit(screenBuffer, (bsx, bsy))
-    screen.blit(m8Buffer, (bsx, bsy))
+    screen.blit(screenBuffer, coordinates.blitShift)
+    screen.blit(m8Buffer, coordinates.blitShift)
     m8Buffer.fill((0,0,0,0))
     if seehome == 1:
-        screen.blit(home, screenCoords(homeX, homeY))
+        screen.blit(home, coordinates.screenCoords(homeX, homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenWidth,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes))
