@@ -47,20 +47,18 @@ def coordinateShifts(iChunk, jChunk, cx, cy):
     ssx = int(screenWidth/2) - cx*tileSize
     # note: we can directly translate b/w world and screen w/o need for window!
     ssy = int(screenHeight/2) - cy*tileSize
-    blitShift = screenCoords(-wsx, -wsy)
-    print("chunk", iChunk, jChunk)
-    print("shifts", ssx, ssy, wsx, wsy, blitShift)
+    blitShift = worldToScreen(-wsx, -wsy)
 
-def windowCoords(x,y):
+def worldToWindow(x,y):
     """
-    transform world coordinates to screenBuffer coordinates
+    transform world coordinates to window coordinates
     x, y: world coordinates
     returns:
-    (bx, by): screen buffer coordinates
+    (bx, by): screen buffer coordinates (in tiles)
     """
     return(wsx + x, wsy + y)
 
-def screenCoords(x, y):
+def worldToScreen(x, y):
     """
     transform world coordinates to screen coordinates
     x, y: world coordinates
@@ -69,6 +67,15 @@ def screenCoords(x, y):
     """
     return(ssx + x*tileSize, ssy + y*tileSize)
 
+def worldToScreenbuffer(x, y):
+    """
+    transform world coordinates to screenbuffer coordinates
+    x, y: world coordinates
+    returns:
+    (ex, ey): screenbuffer coordinates (in pixels)
+    """
+    return((wsx + x)*tileSize, (wsy + y)*tileSize)
+ 
 def windowToScreenBuffer(wx, wy):
     """
     translate from window coordinates to screenBuffer coordinates

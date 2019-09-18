@@ -172,28 +172,23 @@ for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
 
 ## Draw the world
 coordinates.coordinateShifts(iChunk, jChunk, homeX, homeY)
-print("home", homeX, homeY)
-print("window home", coordinates.windowCoords(homeX, homeY))
 for wx in range(activeWindow.shape[0]):
     # note: we run over window coordinates
     for wy in range(activeWindow.shape[1]):
         sbLoc = coordinates.windowToScreenBuffer(wx, wy)
-        print("window coords", wx, wy, sbLoc)
         screenBuffer.blit( blocks1.blocks[ activeWindow[wx,wy] ], sbLoc)
-screen.blit(screenBuffer, coordinates.blitShift)
-pg.display.update()
-time.sleep(10)
-sys.exit(0)
 
-        
+
 class Player(pg.sprite.Sprite):
     def __init__(self,x,y):
         pg.sprite.Sprite.__init__(self)
         self.image = pic
         self.rect = self.image.get_rect()
+        ## location in world coordinates
         self.x=x
         self.y=y
-        self.rect.x, self.rect.y = coordinates.screenCoords(x, y)
+        ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self, mup, mdown, mleft, mright):
         global ssx, ssy, wsx, wsy, bsx, bsy
         global world, gmod, f
@@ -216,16 +211,21 @@ class Player(pg.sprite.Sprite):
         if world[y,x] in blocks1.breakable:
             world[y,x] = blocks1.breakto[world[y,x]]
             screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]],
-                               coordinates.screenCoords(x, y))
-            self.x = x
-            self.y = y
-            # ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, hullmyts.getxy()[0], hullmyts.getxy()[1])
+                               coordinates.worldToScreenbuffer(x, y))
+        self.x = x
+        self.y = y
         coordinates.coordinateShifts(iChunk, jChunk, self.x, self.y)
-        self.rect.x = tileSize*x
-        self.rect.y = tileSize*y
+        # update the coordinate system
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def getxy(self):
+        """
+        return world coordinates
+        """
         return(self.x,self.y)
     def setxy(self,x,y):
+        """
+        x, y: world coordinates
+        """
         self.x = x
         self.y = y
         self.rect.x = x*tileSize
@@ -238,27 +238,23 @@ class Tüüp(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y
-        self.rect.x = x*tileSize
-        self.rect.y = y*tileSize
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self):
         global tileSize
         if r.randint(0,30) == 0:
             self.x += r.randint(-1,1)
             self.y += r.randint(-1,1)
-            self.rect.x = self.x*tileSize
-            self.rect.y = self.y*tileSize
+            self.rect.x, self.rect.y = worldToScreenbuffer(self.x, self.y)
 class Koll(pg.sprite.Sprite):
     def __init__(self,x,y):
-        global f
         pg.sprite.Sprite.__init__(self)
         self.image = koll
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y
-        self.rect.x = x*tileSize
-        self.rect.y = y*tileSize
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self):
-        global f, hullmyts
+        global hullmyts
         if r.randint(0,30) == 0:
             xy = hullmyts.getxy()
             if xy[0] < self.x:
@@ -269,8 +265,7 @@ class Koll(pg.sprite.Sprite):
                 self.y -= 1
             if xy[1] > self.y:
                 self.y += 1
-                self.rect.x = self.x*tileSize
-                self.rect.y = self.y*tileSize
+            self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def lammutus(self,x,y):
         global punktid
         if self.x == x and self.y == y:
@@ -284,8 +279,7 @@ class jura(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y
-        self.rect.x = x*tileSize
-        self.rect.y = y*tileSize
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
         self.n = n
     def update(self):
         pass
@@ -313,14 +307,14 @@ def build(x,y):
                 return
             items[bb] -= 1
             world[y,x] = bb
-            screenBuffer.blit( blocks1.blocks[bb], coordinates.screenCoords(x, y)) 
+            screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreen(x, y)) 
 def destroy(x,y):
     if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
         if r.randint(0,200) == 0 and world[y,x] != blocks1.breakto[world[y,x]]:
             kraam.add(jura(x,y))
             items[world[y,x]] += 1
             screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]],
-                               coordinates.screenCoords(x, y))
+                               coordinates.worldToScreen(x, y))
             world[y,x] = blocks1.breakto[world[y,x]]
     for k in kollid:
         k.lammutus(x,y)
@@ -463,7 +457,7 @@ while do:
     screen.blit(m8Buffer, coordinates.blitShift)
     m8Buffer.fill((0,0,0,0))
     if seehome == 1:
-        screen.blit(home, coordinates.screenCoords(homeX, homeY))
+        screen.blit(home, coordinates.worldToScreen(homeX, homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenWidth,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes))
@@ -475,7 +469,7 @@ while do:
     text_rect.y = 10
     screen.blit(text,text_rect)
     ## ---------- player update ----------
-    player.update(mup,mdown, mleft, mright)
+    player.update(mup, mdown, mleft, mright)
     player.draw(m8Buffer)
     kutid.update()
     kutid.draw(m8Buffer)
