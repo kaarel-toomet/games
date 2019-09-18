@@ -99,15 +99,19 @@ gmod = 0
 gmods = {0:"creative",1:"survival"}
 items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
 oitems = items
+aia = 0
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 kraam = pg.sprite.Group()
+kollid = pg.sprite.Group()
 
 ## Screen and active window
 chunkSize = 32
 # size of tiles chunks for loading/saving
 windowWidth = 3*chunkSize  # how many tiles loaded into the active window
-widnowHeight = 3*chunkSize
+windowHeight = 3*chunkSize
+
+##
 s = files1.loadWorld()
 if s is not None:
     world = s['world']
@@ -119,7 +123,7 @@ if s is not None:
         print("dfkglaj")
         items = {x[0]:x[1] for x in s["stuff"]}
     except:
-        tiems = {}
+        items = {}
     if len(items.keys()) != blocks1.BLOCK_END:
         items = oitems
 else:
@@ -218,6 +222,11 @@ class Player(pg.sprite.Sprite):
         self.rect.y = tileSize*y
     def getxy(self):
         return(self.x,self.y)
+    def setxy(self,x,y):
+        self.x = x
+        self.y = y
+        self.rect.x = f*x
+        self.rect.y = f*y
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
         global tileSize
@@ -235,6 +244,35 @@ class Tüüp(pg.sprite.Sprite):
             self.y += r.randint(-1,1)
         self.rect.x = self.x*tileSize
         self.rect.y = self.y*tileSize
+class Koll(pg.sprite.Sprite):
+    def __init__(self,x,y):
+        global f
+        pg.sprite.Sprite.__init__(self)
+        self.image = koll
+        self.rect = self.image.get_rect()
+        self.x=x
+        self.y=y
+        self.rect.x = x*f
+        self.rect.y = y*f
+    def update(self):
+        global f, hullmyts
+        if r.randint(0,30) == 0:
+            xy = hullmyts.getxy()
+            if xy[0] < self.x:
+                self.x -= 1
+            if xy[0] > self.x:
+                self.x += 1
+            if xy[1] < self.y:
+                self.y -= 1
+            if xy[1] > self.y:
+                self.y += 1
+        self.rect.x = self.x*tileSize
+        self.rect.y = self.y*tileSize
+    def lammutus(self,x,y):
+        global punktid
+        if self.x == x and self.y == y:
+            kollid.remove(self)
+            punktid += 100
 class jura(pg.sprite.Sprite):
     def __init__(self,x,y, img=kuld, n=100):
         global tileSize
@@ -252,8 +290,12 @@ for x in range(worldWidth):
         for y in range(worldHeight):
             if r.randint(0,400) == 0:
                 kraam.add(jura(x,y))
+##            if r.randint(0,400) == 0:
+##                kollid.add(Koll(x,y))
 def reset():
-    global hullmyts
+    global hullmyts, gameover, lifes, punktid
+    punktid = 0
+    gameover = False
     lifes = 5
     player.empty()
     hullmyts = Player(homeX, homeY)
@@ -276,6 +318,8 @@ def destroy(x,y):
         items[world[y,x]] += 1
         screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], tc(x, y))
         world[y,x] = blocks1.breakto[world[y,x]]
+    for k in kollid:
+        k.lammutus(x,y)
 # initialize player        
 reset()
                 
@@ -331,7 +375,7 @@ while do:
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
-                reset()
+                hullmyts.setxy(homeX,homeY)
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
                 homeY = hullmyts.getxy()[1]
@@ -368,16 +412,18 @@ while do:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_p:
                     pause = False
-                    pd = "PAUSED"
-                    ptext = dfont.render(pd, True, (127,127,127))
-                    ptext_rect = ptext.get_rect()
-                    ptext_rect.centerx = screen.get_rect().centerx
-                    ptext_rect.y = 50
-                    screen.blit(ptext,ptext_rect)
-                    screen.blit(text,text_rect)
-                    pg.display.update()
+                elif event.key == pg.K_r:
+                    reset()
+        pd = "PAUSIL"
+        ptext = dfont.render(pd, True, (127,127,127))
+        ptext_rect = ptext.get_rect()
+        ptext_rect.centerx = screen.get_rect().centerx
+        ptext_rect.y = 50
+        screen.blit(ptext,ptext_rect)
+        screen.blit(text,text_rect)
+        pg.display.update()
     if lifes == 0:
-        uded = "GAME OVER"
+        uded = "SA SURID ÄRA"
         dtext = dfont.render(uded, True, (255,0,0))
         dtext_rect = dtext.get_rect()
         dtext_rect.centerx = screen.get_rect().centerx
@@ -395,10 +441,18 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
+    if r.randint(0,400) == 0:
+        kollid.add(Koll(r.randint(0,worldWidth),r.randint(0,worldHeight)))
     col = pg.sprite.spritecollide(hullmyts,kraam,False)
     if len(col) > 0:
         kraam.remove(col)
         punktid += 100
+    col = pg.sprite.spritecollide(hullmyts,kollid,False)
+    if len(col) > 0 and aia == 0:
+        lifes -= 1
+        aia = 30
+    if aia > 0:
+        aia -= 1
                     ## ---------- screen udpate ----------
     screen.fill(bgColor)
     screen.blit(screenBuffer, (sx,sy))
@@ -408,9 +462,9 @@ while do:
         screen.blit(home, screenCoords(homeX,homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenw,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
-             ", punktid: " + str(punktid))
+             ", punktid: " + str(punktid) + " elud: " + str(lifes))
     if len(kraam) == 0:
-        score += " (kõik)"
+        score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
@@ -420,6 +474,8 @@ while do:
     player.draw(m8Buffer)
     kutid.update()
     kutid.draw(m8Buffer)
+    kollid.update()
+    kollid.draw(m8Buffer)
     kraam.draw(m8Buffer)
     pg.display.update()
     ##
