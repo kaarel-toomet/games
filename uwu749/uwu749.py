@@ -116,7 +116,7 @@ if s is not None:
         print("dfkglaj")
         items = {x[0]:x[1] for x in s["stuff"]}
     except:
-        tiems = {}
+        items = {}
     if len(items.keys()) != blocks1.BLOCK_END:
         items = oitems
 else:
@@ -204,6 +204,11 @@ class Player(pg.sprite.Sprite):
         self.rect.y = f*y
     def getxy(self):
         return(self.x,self.y)
+    def setxy(self,x,y):
+        self.x = x
+        self.y = y
+        self.rect.x = f*x
+        self.rect.y = f*y
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
         global f
@@ -270,7 +275,8 @@ for x in range(worldWidth):
 ##            if r.randint(0,400) == 0:
 ##                kollid.add(Koll(x,y))
 def reset():
-    global hullmyts, gameover, lifes
+    global hullmyts, gameover, lifes, punktid
+    punktid = 0
     gameover = False
     lifes = 5
     player.empty()
@@ -351,7 +357,7 @@ while do:
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
-                reset()
+                hullmyts.setxy(homeX,homeY)
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
                 homeY = hullmyts.getxy()[1]
@@ -388,6 +394,8 @@ while do:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_p:
                     pause = False
+                elif event.key == pg.K_r:
+                    reset()
         pd = "PAUSIL"
         ptext = dfont.render(pd, True, (127,127,127))
         ptext_rect = ptext.get_rect()
