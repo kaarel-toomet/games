@@ -164,8 +164,8 @@ for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
     for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
         if 0 <= ic < worldWidthChunks and 0 <= jc < worldHeightChunks:
             # we are in the middle of the world
-            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] =\
-            world[iChunk*chunkSize:(iChunk+1)*chunkSize, jChunk*chunkSize:(jChunk+1)*chunkSize].copy()
+            activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] =\
+            world[ic*chunkSize:(ic+1)*chunkSize, jc*chunkSize:(jc+1)*chunkSize].copy()
         else:
             # this chunk is outside of the world
             activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = 0
@@ -174,15 +174,16 @@ for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
 coordinates.coordinateShifts(iChunk, jChunk, homeX, homeY)
 print("home", homeX, homeY)
 print("window home", coordinates.windowCoords(homeX, homeY))
-for x in range(activeWindow.shape[0]):
-    for y in range(activeWindow.shape[1]):
-        windowX, windowY = coordinates.windowCoords(x, y)
-        print("window coords", x, y, windowX, windowY)
-        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], (windowX*tileSize, windowY*tileSize))
-# screen.blit(screenBuffer, (bsx, bsy))
-# pg.display.update()
-# time.sleep(4)
-# sys.exit(0)
+for wx in range(activeWindow.shape[0]):
+    # note: we run over window coordinates
+    for wy in range(activeWindow.shape[1]):
+        sbLoc = coordinates.windowToScreenBuffer(wx, wy)
+        print("window coords", wx, wy, sbLoc)
+        screenBuffer.blit( blocks1.blocks[ activeWindow[wx,wy] ], sbLoc)
+screen.blit(screenBuffer, coordinates.blitShift)
+pg.display.update()
+time.sleep(10)
+sys.exit(0)
 
         
 class Player(pg.sprite.Sprite):

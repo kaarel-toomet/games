@@ -69,3 +69,8 @@ def screenCoords(x, y):
     """
     return(ssx + x*tileSize, ssy + y*tileSize)
 
+def windowToScreenBuffer(wx, wy):
+    """
+    translate from window coordinates to screenBuffer coordinates
+    """
+    return wx*tileSize, wy*tileSize
