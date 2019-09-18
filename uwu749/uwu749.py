@@ -91,10 +91,20 @@ def coordinateShifts(iChunk, jChunk, cx, cy):
     """
     wsx = -(iChunk - 1)*chunkSize
     wsy = -(jChunk - 1)*chunkSize
-    ssx = int(screenWidth/2) + cx*tileSize
+    ssx = int(screenWidth/2) - cx*tileSize
     # note: we can directly translate b/w world and screen w/o need for window!
-    ssy = int(screenHeight/2) + cy*tileSize
+    ssy = int(screenHeight/2) - cy*tileSize
     return (ssx, ssy, wsx, wsy)
+
+def blitShifts(iChunk, jChunk, cx, cy):
+    """
+    cx, cy: screen center world coords
+    """
+    xLeft = -wsx
+    # window left edge in world coords
+    yTop = -wsy
+    bsx, bsy = screenCoords(xLeft, yTop)
+    return bsx, bsy
 
 def windowCoords(x,y):
     """
@@ -103,7 +113,7 @@ def windowCoords(x,y):
     returns:
     (bx, by): screen buffer coordinates
     """
-    return(wsx + x*tileSize, wsy + y*tileSize)
+    return(wsx + x, wsy + y)
 
 def screenCoords(x, y):
     """
@@ -196,32 +206,42 @@ else:
                 world[y,x] = 4
     print("done")
                 ## where Crazy Hat has her home:
-    homeX = 0
-    homeY = 0
+    homeX = int(worldWidth/2)
+    homeY = int(worldHeight/2)
 
 ## create the active window, centered on home:
 worldWidthChunks = worldWidth/chunkSize
 worldHeightChunks = worldHeight/chunkSize
-iChunk = homeX % chunkSize
-jChunk = homeY % chunkSize
+iChunk = homeX // chunkSize
+jChunk = homeY // chunkSize
 activeWindow = np.empty((windowWidth, windowHeight), 'int8')
 for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
     for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
         if 0 <= ic < worldWidthChunks and 0 <= jc < worldHeightChunks:
             # we are in the middle of the world
             activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] =\
-                                                                                    world[iChunk*chunkSize:(iChunk+1)*chunkSize, jChunk*chunkSize:(jChunk+1)*chunkSize].copy()
+            world[iChunk*chunkSize:(iChunk+1)*chunkSize, jChunk*chunkSize:(jChunk+1)*chunkSize].copy()
         else:
             # this chunk is outside of the world
             activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = 0
 
 ## Draw the world
-ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, 0, 0)
-print("shifts", ssx, ssy, wsx, wsy)
+ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, homeX, homeY)
+bsx, bsy = blitShifts(iChunk, jChunk, homeX, homeY)
+print("home", homeX, homeY)
+print("window home", windowCoords(homeX, homeY))
+print("chunk", iChunk, jChunk)
+print("shifts", ssx, ssy, wsx, wsy, bsx, bsy)
 for x in range(activeWindow.shape[0]):
     for y in range(activeWindow.shape[1]):
-        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], windowCoords(y, x))
+        # print("screen coords", x, y, screenCoords(x, y))
+        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], (bsx, bsy))
+# screen.blit(screenBuffer, (bsx, bsy))
+# pg.display.update()
+# time.sleep(4)
+# sys.exit(0)
 
+        
 class Player(pg.sprite.Sprite):
     def __init__(self,x,y):
         pg.sprite.Sprite.__init__(self)
@@ -231,7 +251,7 @@ class Player(pg.sprite.Sprite):
         self.y=y
         self.rect.x, self.rect.y = screenCoords(x, y)
     def update(self, mup, mdown, mleft, mright):
-        global ssx, ssy, wsx, wsy
+        global ssx, ssy, wsx, wsy, bsx, bsy
         global world, gmod, f
         y = self.y
         x = self.x
@@ -251,11 +271,12 @@ class Player(pg.sprite.Sprite):
             return
         if world[y,x] in blocks1.breakable:
             world[y,x] = blocks1.breakto[world[y,x]]
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], windowCoords(x, y))
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], screenCoords(x, y))
             self.x = x
             self.y = y
             # ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, hullmyts.getxy()[0], hullmyts.getxy()[1])
         ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, self.x, self.y)
+        bsx, bsy = blitShifts(iChunk, jChunk, self.x, self.y)
         self.rect.x = tileSize*x
         self.rect.y = tileSize*y
     def getxy(self):
@@ -348,13 +369,13 @@ def build(x,y):
                 return
             items[bb] -= 1
             world[y,x] = bb
-            screenBuffer.blit( blocks1.blocks[bb], windowCoords(x, y)) 
+            screenBuffer.blit( blocks1.blocks[bb], screenCoords(x, y)) 
 def destroy(x,y):
     if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
         if r.randint(0,200) == 0 and world[y,x] != blocks1.breakto[world[y,x]]:
             kraam.add(jura(x,y))
             items[world[y,x]] += 1
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], windowCoords(x, y))
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], screenCoords(x, y))
             world[y,x] = blocks1.breakto[world[y,x]]
     for k in kollid:
         k.lammutus(x,y)
@@ -493,8 +514,8 @@ while do:
         aia -= 1
     ## ---------- screen udpate ----------
     screen.fill(bgColor)
-    screen.blit(screenBuffer, (ssx,ssy))
-    screen.blit(m8Buffer, (ssx,ssy))
+    screen.blit(screenBuffer, (bsx, bsy))
+    screen.blit(m8Buffer, (bsx, bsy))
     m8Buffer.fill((0,0,0,0))
     if seehome == 1:
         screen.blit(home, screenCoords(homeX, homeY))
