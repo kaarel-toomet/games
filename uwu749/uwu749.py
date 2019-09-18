@@ -51,22 +51,68 @@ screenw = screen.get_width()
 screenh = screen.get_height()
 
 ## load config and all that
-blocks1.loadBlocks(f)
-pic = pg.transform.scale(pg.image.load("pic.png"),(f,f))
-kutt = pg.transform.scale(pg.image.load("person.png"),(f,f))
-home = pg.transform.scale(pg.image.load("home.png"),(f,f))
-kuld = pg.transform.scale(pg.image.load("kuld.png"),(f,f))
-koll = pg.transform.scale(pg.image.load("koll.png"),(f,f))
+blocks1.loadBlocks(tileSize)
+pic = pg.transform.scale(pg.image.load("pic.png"),(tileSize, tileSize))
+kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
+home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
+kuld = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
+koll = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
 ##
 bgColor = (64,64,64)
 # dark gray
-## coordinate transformation for the buffer
-def tc(x,y):
-    return(x*tileSize, y*tileSize)
-## coordnate transformation for the actual screen
-def screenCoords(x, y):
-    return(sx + x*tileSize, sy + y*tileSize)
+
+## ---------- coordinate translation ----------
+## the game contains 3 types of coordinates:
+## * screen coordinates in pixels, (0,0) is top left
+## * active window coordinates in tiles, (0,0) is top left (the same thing as screenBuffer)
+## * world coordinates, in tiles, potentially unlimited, (0,0) is center (TBD)
 ##
+## translation is mainly done using tuples (sx, sx) to shift to screen coords,
+## and (wx, wx) to screenBuffer coords.
+
+## Screen and active window
+chunkSize = 32
+# size of tiles chunks for loading/saving
+windowWidth = 3*chunkSize  # how many tiles loaded into the active window
+windowHeight = 3*chunkSize
+
+def coordinateShifts(iChunk, jChunk, cx, cy):
+    """
+    compute the coordinate shifts b/w coordinates
+    shifts should be added to the world coordinates to make the translation
+    INPUTS: 
+    iChunk, jChunk: central chunk of the active window
+    cx, cy: screen center world coordinates 
+            normally location of Crazy Hat
+    RETURNS:
+    (ssx, ssy, wsx, wsy)
+    wx, wy: shift b/w world and window coordinates
+    """
+    wsx = (iChunk - 1)*chunkSize
+    wsy = (jChunk - 1)*chunkSize
+    ssx = screenw/2 - (cx + wsx)*tileSize
+    ssy = screenh/2 - (cy + wsy)*tileSize
+    return (ssx, ssy, wsx, wsy)
+
+def windowCoords(x,y):
+    """
+    transform world coordinates to screenBuffer coordinates
+    x, y: world coordinates
+    returns:
+    (bx, by): screen buffer coordinates
+    """
+    return(wsx + x*tileSize, wsy + y*tileSize)
+
+def screenCoords(x, y):
+    """
+    transform world coordinates to screen coordinates
+    x, y: world coordinates
+    returns:
+    (ex, ey): screen coordinates
+    """
+    return(ssx + x*tileSize, ssy + y*tileSize)
+##
+
 screenBuffer = pg.Surface(size=(4*screenw, 4*screenh))
 screenBuffer.fill(bgColor)
 m8Buffer = pg.Surface([4*screenw, 4*screenh], pg.SRCALPHA, 32)
@@ -105,12 +151,6 @@ kutid = pg.sprite.Group()
 kraam = pg.sprite.Group()
 kollid = pg.sprite.Group()
 
-## Screen and active window
-chunkSize = 32
-# size of tiles chunks for loading/saving
-windowWidth = 3*chunkSize  # how many tiles loaded into the active window
-windowHeight = 3*chunkSize
-
 ##
 s = files1.loadWorld()
 if s is not None:
@@ -120,7 +160,6 @@ if s is not None:
     worldWidth = world.shape[1]
     worldHeight = world.shape[0]
     try:
-        print("dfkglaj")
         items = {x[0]:x[1] for x in s["stuff"]}
     except:
         items = {}
@@ -163,26 +202,20 @@ worldHeightChunks = worldHeight/chunkSize
 iChunk = homeX % chunkSize
 jChunk = homeY % chunkSize
 activeWindow = np.empty((windowWidth, windowHeight), 'int8')
-for i, ic in enumerate(range(iChunk-1, iChunk+1)):
-    for j, jc in enumerate(range(jChunk-1, jChunk+1)):
+for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+    for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
         if 0 <= ic < worldWidthChunks and 0 <= jc < worldHeightChunks:
             # we are in the middle of the world
-            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] =
+            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] =\
             world[iChunk*chunkSize:(iChunk+1)*chunkSize, jChunk*chunkSize:(jChunk+1)*chunkSize].copy()
-        else
+        else:
             # this chunk is outside of the world
             activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = 0
-## ---------- activeWindow-screen coordinate translation ----------
-## upper left corner of the activeWindow will be drawn at (sx, sy) on screen.
-## This will be done when copying the screen buffer on screen
-sx = screenw/2 - worldWidth*tileSize/2
-sy = screenh/2 - worldHeight*tileSize/2
-## ---------- world done ----------
 
 ## Draw the world
 for x in range(activeWindow.shape[0]):
     for y in range(activeWindow.shape[1]):
-        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], tc(y, x))
+        screenBuffer.blit( blocks1.blocks[ activeWindow[x,y] ], windowCoords(y, x))
 
 class Player(pg.sprite.Sprite):
     def __init__(self,x,y):
@@ -193,7 +226,8 @@ class Player(pg.sprite.Sprite):
         self.y=y
         self.rect.x, self.rect.y = screenCoords(x, y)
     def update(self, mup, mdown, mleft, mright):
-        global sx, sy, world, gmod, f
+        global ssx, ssy, wsx, wsy
+        global world, gmod, f
         y = self.y
         x = self.x
 ##        if world[y,x] == blocks1.SKY and gmod == 1:
@@ -212,12 +246,10 @@ class Player(pg.sprite.Sprite):
             return
         if world[y,x] in blocks1.breakable:
             world[y,x] = blocks1.breakto[world[y,x]]
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], tc(x, y))
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], windowCoords(x, y))
         self.x = x
         self.y = y
-        sx = screenw/2-hullmyts.getxy()[0]*tileSize
-        sy = screenh/2-hullmyts.getxy()[1]*tileSize
-##        self.rect.x, self.rect.y = screenCoords(self.x, self.y)
+        ssx, ssy, wsx, wsy = coordinateShifts(iChunk, jChunk, hullmyts.getxy()[0], hullmyts.getxy()[1])
         self.rect.x = tileSize*x
         self.rect.y = tileSize*y
     def getxy(self):
@@ -225,8 +257,8 @@ class Player(pg.sprite.Sprite):
     def setxy(self,x,y):
         self.x = x
         self.y = y
-        self.rect.x = f*x
-        self.rect.y = f*y
+        self.rect.x = x*tileSize
+        self.rect.y = y*tileSize
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
         global tileSize
@@ -252,8 +284,8 @@ class Koll(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y
-        self.rect.x = x*f
-        self.rect.y = y*f
+        self.rect.x = x*tileSize
+        self.rect.y = y*tileSize
     def update(self):
         global f, hullmyts
         if r.randint(0,30) == 0:
@@ -310,13 +342,13 @@ def build(x,y):
                 return
             items[bb] -= 1
         world[y,x] = bb
-        screenBuffer.blit( blocks1.blocks[bb], tc(x, y)) 
+        screenBuffer.blit( blocks1.blocks[bb], windowCoords(x, y)) 
 def destroy(x,y):
     if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
         if r.randint(0,200) == 0 and world[y,x] != blocks1.breakto[world[y,x]]:
             kraam.add(jura(x,y))
         items[world[y,x]] += 1
-        screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], tc(x, y))
+        screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]], windowCoords(x, y))
         world[y,x] = blocks1.breakto[world[y,x]]
     for k in kollid:
         k.lammutus(x,y)
@@ -453,13 +485,13 @@ while do:
         aia = 30
     if aia > 0:
         aia -= 1
-                    ## ---------- screen udpate ----------
+    ## ---------- screen udpate ----------
     screen.fill(bgColor)
-    screen.blit(screenBuffer, (sx,sy))
-    screen.blit(m8Buffer, (sx,sy))
+    screen.blit(screenBuffer, (ssx,ssy))
+    screen.blit(m8Buffer, (ssx,ssy))
     m8Buffer.fill((0,0,0,0))
     if seehome == 1:
-        screen.blit(home, screenCoords(homeX,homeY))
+        screen.blit(home, screenCoords(homeX, homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenw,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes))
@@ -470,6 +502,7 @@ while do:
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 10
     screen.blit(text,text_rect)
+    ## ---------- player update ----------
     player.update(mup,mdown, mleft, mright)
     player.draw(m8Buffer)
     kutid.update()
