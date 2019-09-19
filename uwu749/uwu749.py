@@ -303,10 +303,14 @@ def build(x,y):
             world[y,x] = bb
             screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreen(x, y)) 
 def destroy(x,y):
+    """
+    destroy a block and replace it with 'breakto'
+    """
     winx, winy = coordinates.worldToWindow(x, y)
+    print("coords:", x, y, winx, winy)
     if r.randint(0,200) == 0 and activeWindow[winy,winx] != blocks1.breakto[ activeWindow[winy,winx]]:
         kraam.add(jura(x,y))
-        items[world[y,x]] += 1
+        items[activeWindow[winy,winx]] += 1
         screenBuffer.blit( blocks1.blocks[blocks1.breakto[ activeWindow[winy,winx]]],
                            coordinates.worldToScreen(x, y))
         activeWindow[winy,winx] = blocks1.breakto[activeWindow[winy,winx]]
