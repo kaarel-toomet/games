@@ -244,7 +244,7 @@ class Tüüp(pg.sprite.Sprite):
         if r.randint(0,30) == 0:
             self.x += r.randint(-1,1)
             self.y += r.randint(-1,1)
-            self.rect.x, self.rect.y = worldToScreenbuffer(self.x, self.y)
+            self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
 class Koll(pg.sprite.Sprite):
     def __init__(self,x,y):
         pg.sprite.Sprite.__init__(self)
@@ -253,6 +253,7 @@ class Koll(pg.sprite.Sprite):
         self.x=x
         self.y=y
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+        print("koll", self.x, self.y, self.rect.x, self.rect.y)
     def update(self):
         global hullmyts
         if r.randint(0,30) == 0:
