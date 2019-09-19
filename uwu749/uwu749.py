@@ -172,7 +172,7 @@ for wx in range(activeWindow.shape[0]):
     # note: we run over window coordinates
     for wy in range(activeWindow.shape[1]):
         sbLoc = coordinates.windowToScreenBuffer(wx, wy)
-        screenBuffer.blit( blocks1.blocks[ activeWindow[wx,wy] ], sbLoc)
+        screenBuffer.blit( blocks1.blocks[ activeWindow[wy,wx] ], sbLoc)
 
 
 class Player(pg.sprite.Sprite):
@@ -305,15 +305,17 @@ def build(x,y):
 def destroy(x,y):
     """
     destroy a block and replace it with 'breakto'
+    x, y: world coordinates
     """
     winx, winy = coordinates.worldToWindow(x, y)
-    print("coords:", x, y, winx, winy)
-    if r.randint(0,200) == 0 and activeWindow[winy,winx] != blocks1.breakto[ activeWindow[winy,winx]]:
+    material = activeWindow[winy,winx]
+    breakto = blocks1.breakto[ material]
+    ## if gold and destroyable material
+    if r.randint(0,200) == 0 and material != breakto:
         kraam.add(jura(x,y))
-        items[activeWindow[winy,winx]] += 1
-        screenBuffer.blit( blocks1.blocks[blocks1.breakto[ activeWindow[winy,winx]]],
-                           coordinates.worldToScreen(x, y))
-        activeWindow[winy,winx] = blocks1.breakto[activeWindow[winy,winx]]
+    items[material] += 1
+    screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
+    activeWindow[winy,winx] = breakto
     for k in kollid:
         k.lammutus(x,y)
         # initialize player        
