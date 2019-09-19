@@ -124,51 +124,47 @@ if s is not None:
     if len(items.keys()) != blocks1.BLOCK_END:
         items = oitems
 else:
-    ## ---------- Build the world ----------
+    ## ---------- Build a new world ----------
     ## variables
-    worldWidth = 1024
-    worldHeight = 1024
-    #groundLevel = 0.5
-    # in fraction, from bottom.  0.3 means bottom 30%
-    ## sanity check
-    print("creating the world..", end="")
-    world = np.empty((worldHeight, worldWidth), 'int8')
-    freq = 16.0
-    for x in range(worldWidth):
-        for y in range(worldHeight):
-            noiseval = noise.snoise2(x/50, y/50, 20, 0.5, 2, 1024, 1024, 0,)
-            if noiseval < -0.3:
-                world[y,x] = 7
-            elif noiseval < -0.05:
-                world[y,x] = 0
-            elif noiseval < 0:
-                world[y,x] = 1
-            elif noiseval < 0.3:
-                world[y,x] = 2
-            elif noiseval < 0.4:
-                world[y,x] = 3
-            elif noiseval < 11:
-                world[y,x] = 4
-    print("done")
-                ## where Crazy Hat has her home:
-    homeX = int(worldWidth/2)
-    homeY = int(worldHeight/2)
+    world = {}
+    # this is a dict from (iChunk, jChunk) -> tile code matrix
+    ## where Crazy Hat has her home:
+    homeX, homeY = 0, 0
+    ##
+    worldWidth = 100
+    worldHeight = 100
 
 ## create the active window, centered on home:
-worldWidthChunks = worldWidth/chunkSize
-worldHeightChunks = worldHeight/chunkSize
 iChunk = homeX // chunkSize
 jChunk = homeY // chunkSize
 activeWindow = np.empty((windowWidth, windowHeight), 'int8')
 for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
     for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-        if 0 <= ic < worldWidthChunks and 0 <= jc < worldHeightChunks:
-            # we are in the middle of the world
+        if (ic, jc) in world:
+            # this chunk has already been built
             activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] =\
-            world[ic*chunkSize:(ic+1)*chunkSize, jc*chunkSize:(jc+1)*chunkSize].copy()
+            world[(ic, jc)].copy()
         else:
-            # this chunk is outside of the world
-            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = 0
+            # build a new chunk
+            chunk = np.empty((chunkSize, chunkSize), 'int8')
+            for cx in range(chunk.shape[0]):
+                for cy in range(chunk.shape[1]):
+                    wx = ic*chunkSize + cx
+                    wy = jc*chunkSize + cy
+                    noiseval = noise.snoise2(wx/50, wy/50, 20, 0.5, 2, 1024, 1024, 0,)
+                    if noiseval < -0.3:
+                        chunk[cy,cx] = 7
+                    elif noiseval < -0.05:
+                        chunk[cy,cx] = 0
+                    elif noiseval < 0:
+                        chunk[cy,cx] = 1
+                    elif noiseval < 0.3:
+                        chunk[cy,cx] = 2
+                    elif noiseval < 0.4:
+                        chunk[cy,cx] = 3
+                    elif noiseval < 11:
+                        chunk[cy,cx] = 4
+            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = chunk.copy()
 
 ## Draw the world
 coordinates.coordinateShifts(iChunk, jChunk, homeX, homeY)
@@ -194,26 +190,23 @@ class Player(pg.sprite.Sprite):
         global world, gmod, f
         y = self.y
         x = self.x
-        ##        if world[y,x] == blocks1.SKY and gmod == 1:
-        ##            mup = False
-        ##            if world[y+1,x] == blocks1.SKY:
-        ##                mdown = True
         if mup:
-            y = max(self.y - 1, 0)
+            y = self.y - 1
         if mdown:
-            y = min(self.y + 1, worldHeight - 1)
+            y = self.y + 1
         if mleft:
-            x = max(self.x - 1, 0)
+            x = self.x - 1
         if mright:
-            x = min(self.x + 1, worldWidth - 1)
-        if world[y,x] in blocks1.solid:
+            x = self.x + 1
+        winx, winy = coordinates.worldToWindow(x, y)
+        if activeWindow[winy,winx] in blocks1.solid:
             return
-        if world[y,x] in blocks1.breakable:
-            world[y,x] = blocks1.breakto[world[y,x]]
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]],
+        self.x, self.y = x, y
+        if activeWindow[winy,winx] in blocks1.breakable:
+            activeWindow[winy,winx] = blocks1.breakto[activeWindow[winy,winx]]
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[activeWindow[winy,winx]]],
                                coordinates.worldToScreenbuffer(x, y))
         self.x = x
-        self.y = y
         coordinates.coordinateShifts(iChunk, jChunk, self.x, self.y)
         # update the coordinate system
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
@@ -310,13 +303,13 @@ def build(x,y):
             world[y,x] = bb
             screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreen(x, y)) 
 def destroy(x,y):
-    if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
-        if r.randint(0,200) == 0 and world[y,x] != blocks1.breakto[world[y,x]]:
-            kraam.add(jura(x,y))
-            items[world[y,x]] += 1
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[world[y,x]]],
-                               coordinates.worldToScreen(x, y))
-            world[y,x] = blocks1.breakto[world[y,x]]
+    winx, winy = coordinates.worldToWindow(x, y)
+    if r.randint(0,200) == 0 and activeWindow[winy,winx] != blocks1.breakto[ activeWindow[winy,winx]]:
+        kraam.add(jura(x,y))
+        items[world[y,x]] += 1
+        screenBuffer.blit( blocks1.blocks[blocks1.breakto[ activeWindow[winy,winx]]],
+                           coordinates.worldToScreen(x, y))
+        activeWindow[winy,winx] = blocks1.breakto[activeWindow[winy,winx]]
     for k in kollid:
         k.lammutus(x,y)
         # initialize player        
