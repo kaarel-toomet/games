@@ -52,11 +52,46 @@ the game uses 4 types of coordinates:
    these measure pixel locations on current screen.  Size is stored in
    `screenWidth`, `screenHeight`, and depends on your monitor.
 
+In principle there are two more coordinate systems: one chunk-based
+(based on `(iChunk, jChunk)`, and one for each chunk.  These are
+currently not formalized.
 
 #### Coordinate translations
 
-translation is mainly done using tuples (sx, sx) to shift to screen coords,
-and (wx, wx) to screenBuffer coords.
+Technically, the coordinate translations are done using linear
+transformations, involving shifts and multiplications by `tileSize`.
+What may be confusing is to understand which coordinate system is the
+current one.
+
+Coordinate transformation code is in module `coordinates` so 
+before you start you have to call `setup` to set up the
+parameters:
+
+```python
+import coordinates
+coordinates.setup(screenWidth, screenHeight, chunkSize, tileSize)
+```
+This initializes the module-specific variables.
+
+Next, each time you want to shift the screen, you have to
+re-initialize the current translation parameters by
+
+```python
+coordinates.coordinateShifts(iChunk, jChunk, x, y)
+```
+where `iChunk` and `jChunk` are the current chunk id-s, and `x`, `y`
+are the world coordinates for the center of the screen (normally Crazy
+Hat's world coordinates).
+
+Now you can use functions
+```python
+worldToWindow(x, y)
+worldToScreen(x, y)
+worldToScreenbuffer(x, y)
+windowToScreenBuffer(winx, winy)
+```
+All of these take in two coordinates and return a tuple of translated
+coordinates. 
 
 
 #### Code
