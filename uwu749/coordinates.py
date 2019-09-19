@@ -1,13 +1,3 @@
-## ---------- coordinate translation ----------
-## the game needs 4 types of coordinates:
-## * screen coordinates in pixels, (0,0) is top left
-## * screenBuffer coordinates, in pixels, (0,0), is top left
-## * active window coordinates in tiles, (0,0) is top left.  The
-##   same as screenBuffer, except in tiles instead of pixels
-## * world coordinates, in tiles, potentially unlimited, (0,0) is center (TBD)
-##
-## translation is mainly done using tuples (sx, sx) to shift to screen coords,
-## and (wx, wx) to screenBuffer coords.
 
 ## basic data (meant to be private)
 screenWidth, screenHeight = None, None
@@ -48,6 +38,8 @@ def coordinateShifts(iChunk, jChunk, cx, cy):
     # note: we can directly translate b/w world and screen w/o need for window!
     ssy = int(screenHeight/2) - cy*tileSize
     blitShift = worldToScreen(-wsx, -wsy)
+    print("chunk", iChunk, jChunk)
+    print("shifts", ssx, ssy, wsx, wsy, blitShift)
 
 def worldToWindow(x,y):
     """
