@@ -23,7 +23,7 @@ bn = {}
 def loadBlocks(size):
     ## load blocks and scale to size
     global blocks, bn
-    block = pg.transform.scale(pg.image.load("asdfblock.png"),
+    block = pg.transform.scale(pg.image.load("blocks/asdfblock.png"),
                                (size, size))
     rblock = pg.transform.scale(pg.image.load("redblock.png"),
                                 (size, size))
@@ -45,7 +45,7 @@ def loadBlocks(size):
                                 (size, size))
     window = pg.transform.scale(pg.image.load("window.png"),
                                 (size, size))
-    kivi = pg.transform.scale(pg.image.load("asdfback.png"),
+    kivi = pg.transform.scale(pg.image.load("blocks/asdfback.png"),
                                 (size, size))
     inf = pg.transform.scale(pg.image.load("infinity.png"),
                                 (size, size))
