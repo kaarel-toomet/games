@@ -5,12 +5,12 @@ import random as r
 import numpy as np
 import sys
 import subprocess
-import noise
 import time
 
 import blocks1
 import coordinates
 import files1
+import world
 
 ## Command line arguments
 parser = argparse.ArgumentParser(description='uwu749: Crazy Hat builds another world!')
@@ -109,7 +109,6 @@ kraam = pg.sprite.Group()
 kollid = pg.sprite.Group()
 
 ##
-# s = files1.loadWorld()
 s = None
 if s is not None:
     world = s['world']
@@ -126,8 +125,7 @@ if s is not None:
 else:
     ## ---------- Build a new world ----------
     ## variables
-    world = {}
-    # this is a dict from (iChunk, jChunk) -> tile code matrix
+    world = world.World(50, 50, 20, 0.5, 2, 1024, 1024, 0)
     ## where Crazy Hat has her home:
     homeX, homeY = 0, 0
     ##
@@ -140,31 +138,7 @@ jChunk = homeY // chunkSize
 activeWindow = np.empty((windowWidth, windowHeight), 'int8')
 for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
     for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-        if (ic, jc) in world:
-            # this chunk has already been built
-            activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] =\
-            world[(ic, jc)].copy()
-        else:
-            # build a new chunk
-            chunk = np.empty((chunkSize, chunkSize), 'int8')
-            for cx in range(chunk.shape[0]):
-                for cy in range(chunk.shape[1]):
-                    wx = ic*chunkSize + cx
-                    wy = jc*chunkSize + cy
-                    noiseval = noise.snoise2(wx/50, wy/50, 20, 0.5, 2, 1024, 1024, 0,)
-                    if noiseval < -0.3:
-                        chunk[cy,cx] = 7
-                    elif noiseval < -0.05:
-                        chunk[cy,cx] = 0
-                    elif noiseval < 0:
-                        chunk[cy,cx] = 1
-                    elif noiseval < 0.3:
-                        chunk[cy,cx] = 2
-                    elif noiseval < 0.4:
-                        chunk[cy,cx] = 3
-                    elif noiseval < 11:
-                        chunk[cy,cx] = 4
-            activeWindow[j*chunkSize:(j+1)*chunkSize,i*chunkSize:(i+1)*chunkSize] = chunk.copy()
+        activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] = world.get((ic, jc))
 
 ## Draw the world
 coordinates.coordinateShifts(iChunk, jChunk, homeX, homeY)
