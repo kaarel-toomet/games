@@ -41,12 +41,10 @@ def coordinateShifts(chunkID, cx, cy):
     iChunk, jChunk = chunkID
     winsx = -(iChunk - 1)*chunkSize
     winsy = -(jChunk - 1)*chunkSize
-    print("winshift", winsx, winsy)
     ssx = int(screenWidth/2) - cx*tileSize
     # note: we can directly translate b/w world and screen w/o need for window!
     ssy = int(screenHeight/2) - cy*tileSize
     blitShift = worldToScreen(-winsx, -winsy)
-    print("blitshift", blitShift)
 
 def updateWindow(activeWindow, world, chunkID1, chunkID=None):
    """

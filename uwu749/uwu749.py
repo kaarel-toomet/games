@@ -274,15 +274,16 @@ def reset():
     player.add(hullmyts)
 def build(x,y):
     global bb
-    if x>=0 and y>=0 and x<worldWidth and y<worldHeight:
-        if world[y,x] in blocks1.breakable:
+    winx, winy = coordinates.worldToWindow(x, y)
+    if activeWindow[winy,winx] in blocks1.breakable:
+        return
+    if gmod == 1:
+        ## in case of game mode 1, account for how many blocks CH has
+        if items[bb] <= 0:
             return
-        if gmod == 1:
-            if items[bb] <= 0:
-                return
-            items[bb] -= 1
-            world[y,x] = bb
-            screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreen(x, y)) 
+        items[bb] -= 1
+    activeWindow[winy,winx] = bb
+    screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreenbuffer(x, y)) 
 def destroy(x,y):
     """
     destroy a block and replace it with 'breakto'
