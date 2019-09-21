@@ -1,8 +1,45 @@
 ### code for creating and operating with the world
 import numpy as np
 import noise
+import pygame as pg
 
 import coordinates
+
+
+class Minerals:
+   """
+   Group of minerals that is connected to chunks and will be loaded/saved
+   when one updates chunk location.
+   'mineral' refers to the fact that these sprites are not moving,
+   but can be added/deleted and detect collision
+
+   central data structure is a dict
+   { chunkID -> list of minerals }
+   empty list: this has been initialized
+   None: it has not been initialized
+   """
+   def __init__(self):
+      self.chunks = {}
+   def add(self, mineral):
+      """
+      add new mineral at it's (world) coordinates
+      """
+      chunkID = coordinates.chunkID((mineral.x, mineral.y))
+      ## add the mineral to the chunk-specific list
+      chunkMinerals = self.chunks.get(chunkID, [])
+      # when adding a mineral, we do not care about initialization flag,
+      # hence we only pull in the list
+      chunkMinerals.append(mineral)
+      self.chunks[chunkID] = chunkMinerals
+      # adding even a single mineral marks this list as initialized
+   def get(self, chunkID):
+      """
+      return the list of minerals at this chunkID
+      None if not initialized
+      empty list if initialized but everything removed
+      """
+      self.chunks.get(chunkID, None)
+
 
 class World:
    """
@@ -58,4 +95,3 @@ class World:
 
    def put(self, chunkID, data):
       self.chunks[chunkID] = data.copy()
-      

@@ -64,21 +64,20 @@ bgColor = (64,64,64)
 # dark gray
 
 ## Screen and active window
-chunkSize = 32
-# size of tiles chunks for loading/saving
+chunkSize = 30
+# size of tile chunks for loading/saving
 windowWidth = 3*chunkSize  # how many tiles loaded into the active window
 windowHeight = 3*chunkSize
 
 coordinates.setup(screenWidth, screenHeight, chunkSize, tileSize)
 screenBuffer = pg.Surface(size=(4*screenWidth, 4*screenHeight))
 screenBuffer.fill(bgColor)
-m8Buffer = pg.Surface([4*screenWidth, 4*screenHeight], pg.SRCALPHA, 32)
+spriteBuffer = pg.Surface([4*screenWidth, 4*screenHeight], pg.SRCALPHA, 32)
 # this is the buffer where movement-related drawing is done,
 # afterwards it is copied to the screen
 do = True
 title = True
 dist = 1
-actuallyuselessvariable = 39
 up = True
 down = True
 left = True
@@ -246,24 +245,23 @@ class Koll(pg.sprite.Sprite):
         if self.x == x and self.y == y:
             kollid.remove(self)
             punktid += 100
-class jura(pg.sprite.Sprite):
-    def __init__(self,x,y, img=kuld, n=100):
-        global tileSize
+
+
+class gold(pg.sprite.Sprite):
+    def __init__(self, x, y, img=kuld, n=100):
+        """
+        x, y: world coordinates
+        """
         pg.sprite.Sprite.__init__(self)
         self.image = img
         self.rect = self.image.get_rect()
-        self.x=x
-        self.y=y
+        self.x = x
+        self.y = y
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
         self.n = n
     def update(self):
         pass
-for x in range(worldWidth):
-        for y in range(worldHeight):
-            if r.randint(0,400) == 0:
-                kraam.add(jura(x,y))
-                ##            if r.randint(0,400) == 0:
-                ##                kollid.add(Koll(x,y))
+
 def reset():
     global hullmyts, gameover, lifes, punktid
     punktid = 0
@@ -294,13 +292,14 @@ def destroy(x,y):
     breakto = blocks1.breakto[ material]
     ## if gold and destroyable material
     if r.randint(0,200) == 0 and material != breakto:
-        kraam.add(jura(x,y))
+        kraam.add(gold(x,y))
     items[material] += 1
     screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     activeWindow[winy,winx] = breakto
     for k in kollid:
         k.lammutus(x,y)
-        # initialize player        
+
+## initialize player        
 reset()
 
 while do:
@@ -328,7 +327,17 @@ while do:
         if event.type == pg.QUIT:
             do = False
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_a:
+            ## start with movements: these are by far most common
+            if event.key == pg.K_UP:
+                mup = True
+            elif event.key == pg.K_DOWN:
+                mdown = True
+            elif event.key == pg.K_LEFT:
+                mleft = True
+            elif event.key == pg.K_RIGHT:
+                mright = True
+            ##
+            elif event.key == pg.K_a:
                 build(hullmyts.getxy()[0]-1,hullmyts.getxy()[1])
             elif event.key == pg.K_s:
                 build(hullmyts.getxy()[0],hullmyts.getxy()[1]+1)
@@ -344,14 +353,6 @@ while do:
                 destroy(hullmyts.getxy()[0]+1,hullmyts.getxy()[1])
             elif event.key == pg.K_i:
                 destroy(hullmyts.getxy()[0],hullmyts.getxy()[1]-1)
-            elif event.key == pg.K_UP:
-                mup = True  #useless comment
-            elif event.key == pg.K_DOWN:
-                mdown = True
-            elif event.key == pg.K_LEFT:
-                mleft = True
-            elif event.key == pg.K_RIGHT:
-                mright = True
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
@@ -423,7 +424,7 @@ while do:
                     reset()
     if r.randint(0,400) == 0:
         kollid.add(Koll(r.randint(0,worldWidth),r.randint(0,worldHeight)))
-    col = pg.sprite.spritecollide(hullmyts,kraam,False)
+    col = pg.sprite.spritecollide(hullmyts, kraam, False)
     if len(col) > 0:
         kraam.remove(col)
         punktid += 100
@@ -436,8 +437,8 @@ while do:
     ## ---------- screen udpate ----------
     screen.fill(bgColor)
     screen.blit(screenBuffer, coordinates.blitShift)
-    screen.blit(m8Buffer, coordinates.blitShift)
-    m8Buffer.fill((0,0,0,0))
+    screen.blit(spriteBuffer, coordinates.blitShift)
+    spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
         screen.blit(home, coordinates.worldToScreen(homeX, homeY))
     pg.draw.rect(screen,(0,0,0),(0,10,screenWidth,30))
@@ -452,18 +453,14 @@ while do:
     screen.blit(text,text_rect)
     ## ---------- player update ----------
     player.update(mup, mdown, mleft, mright)
-    player.draw(m8Buffer)
+    player.draw(spriteBuffer)
     kutid.update()
-    kutid.draw(m8Buffer)
+    kutid.draw(spriteBuffer)
     kollid.update()
-    kollid.draw(m8Buffer)
-    kraam.draw(m8Buffer)
+    kollid.draw(spriteBuffer)
+    kraam.draw(spriteBuffer)
     pg.display.update()
     ##
-    mup = False
-    mdown = False
-    mleft = False
-    mright = False
     timer.tick(60)
 
 pg.quit()

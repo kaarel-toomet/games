@@ -25,9 +25,9 @@ def loadBlocks(size):
     global blocks, bn
     block = pg.transform.scale(pg.image.load("blocks/asdfblock.png"),
                                (size, size))
-    rblock = pg.transform.scale(pg.image.load("redblock.png"),
+    rblock = pg.transform.scale(pg.image.load("blocks/redblock.png"),
                                 (size, size))
-    sky = pg.transform.scale(pg.image.load("sky.png"),
+    sky = pg.transform.scale(pg.image.load("blocks/sky.png"),
                              (size, size))
     ground = pg.transform.scale(pg.image.load("ground.png"),
                                 (size, size))
