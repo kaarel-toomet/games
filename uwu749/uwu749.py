@@ -133,15 +133,15 @@ else:
     worldHeight = 100
 
 ## create the active window, centered on home:
-iChunk = homeX // chunkSize
-jChunk = homeY // chunkSize
+chunkID = coordinates.chunkID((homeX, homeY))
 activeWindow = np.empty((windowWidth, windowHeight), 'int8')
-for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
-    for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-        activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] = world.get((ic, jc))
+coordinates.updateWindow(activeWindow, world, chunkID)
+# for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+#     for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
+#         activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] = world.get((ic, jc))
 
 ## Draw the world
-coordinates.coordinateShifts(iChunk, jChunk, homeX, homeY)
+coordinates.coordinateShifts(chunkID, homeX, homeY)
 for wx in range(activeWindow.shape[0]):
     # note: we run over window coordinates
     for wy in range(activeWindow.shape[1]):
@@ -161,7 +161,7 @@ class Player(pg.sprite.Sprite):
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self, mup, mdown, mleft, mright):
         global ssx, ssy, wsx, wsy, bsx, bsy
-        global world, gmod, f
+        global chunkID
         y = self.y
         x = self.x
         if mup:
@@ -180,8 +180,11 @@ class Player(pg.sprite.Sprite):
             activeWindow[winy,winx] = blocks1.breakto[activeWindow[winy,winx]]
             screenBuffer.blit( blocks1.blocks[blocks1.breakto[activeWindow[winy,winx]]],
                                coordinates.worldToScreenbuffer(x, y))
-        self.x = x
-        coordinates.coordinateShifts(iChunk, jChunk, self.x, self.y)
+        chunkID1 = coordinates.chunkID((self.x, self.y))
+        if chunkID1 != chunkID:
+            coordinates.updateWindow(activeWindow, world, chunkID1, chunkID)
+            chunkID = chunkID1
+        coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def getxy(self):

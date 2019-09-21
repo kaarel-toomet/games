@@ -18,7 +18,13 @@ def setup(screenw, screenh, chunksize, tilesize):
    chunkSize = chunksize
    tileSize = tilesize
 
-def coordinateShifts(iChunk, jChunk, cx, cy):
+def chunkID(worldLoc):
+   """
+   return chunkID based on worldLoc = (x,y)
+   """
+   return worldLoc[0] // chunkSize, worldLoc[1] // chunkSize
+   
+def coordinateShifts(chunkID, cx, cy):
     """
     compute the coordinate shifts b/w coordinates
     shifts should be _added_ to the world coordinates to make the translation,
@@ -32,15 +38,32 @@ def coordinateShifts(iChunk, jChunk, cx, cy):
     wx, wy: shift b/w world and window coordinates
     """
     global wsx, wsy, sbsx, sbsy, ssx, ssy, blitShift
+    iChunk, jChunk = chunkID
     wsx = -(iChunk - 1)*chunkSize
     wsy = -(jChunk - 1)*chunkSize
     ssx = int(screenWidth/2) - cx*tileSize
     # note: we can directly translate b/w world and screen w/o need for window!
     ssy = int(screenHeight/2) - cy*tileSize
     blitShift = worldToScreen(-wsx, -wsy)
-    print("chunk", iChunk, jChunk)
-    print("shifts", ssx, ssy, wsx, wsy, blitShift)
 
+def updateWindow(activeWindow, world, chunkID1, chunkID=None):
+   """
+   load new chunks to the active window, store back the old chunks
+   in case those have been changed
+   inputs:
+   activeWindow: window, will be changed by reference
+   world: the World object
+   chunkID1: new chunkID (iChunk, jChunk)
+   chunkID: old chunkID, for storing stuff back to the world
+   """
+   ## read new chunks to the window
+   print("new chunk", chunkID1)
+   iChunk, jChunk = chunkID1
+   for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+      for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
+         activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] = world.get((ic, jc))
+
+    
 def worldToWindow(x,y):
     """
     transform world coordinates to window coordinates
