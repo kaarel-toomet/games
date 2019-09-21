@@ -4,8 +4,8 @@ screenWidth, screenHeight = None, None
 chunkSize = None
 tileSize = None
 ## shifts: 
-wsx = None  # window
-wsy = None
+winsx = None  # window
+winsy = None
 sbsx = None  # screenBuffer
 sbsy = None
 ssx = None  # screen
@@ -33,18 +33,20 @@ def coordinateShifts(chunkID, cx, cy):
     iChunk, jChunk: central chunk of the active window
     cx, cy: screen center world coordinates 
             normally location of Crazy Hat
-    RETURNS:
-    (ssx, ssy, wsx, wsy)
+    COMPUTES:
+    (ssx, ssy, winsx, winsy)
     wx, wy: shift b/w world and window coordinates
     """
-    global wsx, wsy, sbsx, sbsy, ssx, ssy, blitShift
+    global winsx, winsy, sbsx, sbsy, ssx, ssy, blitShift
     iChunk, jChunk = chunkID
-    wsx = -(iChunk - 1)*chunkSize
-    wsy = -(jChunk - 1)*chunkSize
+    winsx = -(iChunk - 1)*chunkSize
+    winsy = -(jChunk - 1)*chunkSize
+    print("winshift", winsx, winsy)
     ssx = int(screenWidth/2) - cx*tileSize
     # note: we can directly translate b/w world and screen w/o need for window!
     ssy = int(screenHeight/2) - cy*tileSize
-    blitShift = worldToScreen(-wsx, -wsy)
+    blitShift = worldToScreen(-winsx, -winsy)
+    print("blitshift", blitShift)
 
 def updateWindow(activeWindow, world, chunkID1, chunkID=None):
    """
@@ -56,12 +58,17 @@ def updateWindow(activeWindow, world, chunkID1, chunkID=None):
    chunkID1: new chunkID (iChunk, jChunk)
    chunkID: old chunkID, for storing stuff back to the world
    """
+   if not chunkID is None:
+      ## put back modified chunks
+      iChunk, jChunk = chunkID
+      for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+         for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
+            world.put((jc, ic), activeWindow[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize])
    ## read new chunks to the window
-   print("new chunk", chunkID1)
    iChunk, jChunk = chunkID1
    for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
       for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-         activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] = world.get((ic, jc))
+         activeWindow[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize] = world.get((jc, ic))
 
     
 def worldToWindow(x,y):
@@ -71,7 +78,7 @@ def worldToWindow(x,y):
     returns:
     (bx, by): screen buffer coordinates (in tiles)
     """
-    return(wsx + x, wsy + y)
+    return(winsx + x, winsy + y)
 
 def worldToScreen(x, y):
     """
@@ -89,7 +96,7 @@ def worldToScreenbuffer(x, y):
     returns:
     (ex, ey): screenbuffer coordinates (in pixels)
     """
-    return((wsx + x)*tileSize, (wsy + y)*tileSize)
+    return((winsx + x)*tileSize, (winsy + y)*tileSize)
  
 def windowToScreenBuffer(wx, wy):
     """

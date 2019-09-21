@@ -56,3 +56,6 @@ class World:
       self.chunks[chunkID] = chunk
       return chunk
 
+   def put(self, chunkID, data):
+      self.chunks[chunkID] = data.copy()
+      

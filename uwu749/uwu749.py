@@ -108,6 +108,14 @@ kutid = pg.sprite.Group()
 kraam = pg.sprite.Group()
 kollid = pg.sprite.Group()
 
+def drawWindow():
+    for wx in range(activeWindow.shape[0]):
+        # note: we run over window coordinates
+        for wy in range(activeWindow.shape[1]):
+            sbLoc = coordinates.windowToScreenBuffer(wx, wy)
+            screenBuffer.blit(blocks1.blocks[ activeWindow[wy,wx] ], sbLoc)
+
+
 ##
 s = None
 if s is not None:
@@ -142,12 +150,7 @@ coordinates.updateWindow(activeWindow, world, chunkID)
 
 ## Draw the world
 coordinates.coordinateShifts(chunkID, homeX, homeY)
-for wx in range(activeWindow.shape[0]):
-    # note: we run over window coordinates
-    for wy in range(activeWindow.shape[1]):
-        sbLoc = coordinates.windowToScreenBuffer(wx, wy)
-        screenBuffer.blit( blocks1.blocks[ activeWindow[wy,wx] ], sbLoc)
-
+drawWindow()
 
 class Player(pg.sprite.Sprite):
     def __init__(self,x,y):
@@ -184,6 +187,7 @@ class Player(pg.sprite.Sprite):
         if chunkID1 != chunkID:
             coordinates.updateWindow(activeWindow, world, chunkID1, chunkID)
             chunkID = chunkID1
+            drawWindow()
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
