@@ -29,7 +29,7 @@ def loadBlocks(size):
                                 (size, size))
     sky = pg.transform.scale(pg.image.load("blocks/sky.png"),
                              (size, size))
-    ground = pg.transform.scale(pg.image.load("ground.png"),
+    ground = pg.transform.scale(pg.image.load("blocks/ground.png"),
                                 (size, size))
     tee = pg.transform.scale(pg.image.load("tee.png"),
                                 (size, size))

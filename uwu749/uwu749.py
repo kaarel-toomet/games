@@ -104,10 +104,13 @@ oitems = items
 aia = 0
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
-kraam = pg.sprite.Group()
+kraam = world.Minerals()
 kollid = pg.sprite.Group()
 
 def drawWindow():
+    """
+    draws the activeWindow, including minerals
+    """
     for wx in range(activeWindow.shape[0]):
         # note: we run over window coordinates
         for wy in range(activeWindow.shape[1]):
@@ -143,11 +146,7 @@ else:
 chunkID = coordinates.chunkID((homeX, homeY))
 activeWindow = np.empty((windowWidth, windowHeight), 'int8')
 coordinates.updateWindow(activeWindow, world, chunkID)
-# for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
-#     for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-#         activeWindow[i*chunkSize:(i+1)*chunkSize, j*chunkSize:(j+1)*chunkSize] = world.get((ic, jc))
-
-## Draw the world
+# load the world chunks into activeWindow
 coordinates.coordinateShifts(chunkID, homeX, homeY)
 drawWindow()
 
@@ -203,6 +202,7 @@ class Player(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x*tileSize
         self.rect.y = y*tileSize
+
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
         global tileSize
