@@ -6,7 +6,7 @@ import pygame as pg
 import coordinates
 
 
-class Minerals:
+class Minerals():
    """
    Group of minerals that is connected to chunks and will be loaded/saved
    when one updates chunk location.
@@ -20,6 +20,8 @@ class Minerals:
    """
    def __init__(self):
       self.chunks = {}
+      self.N = 0
+      # total number of minerals across all chunks
    def add(self, mineral):
       """
       add new mineral at it's (world) coordinates
@@ -32,6 +34,7 @@ class Minerals:
       chunkMinerals.append(mineral)
       self.chunks[chunkID] = chunkMinerals
       # adding even a single mineral marks this list as initialized
+      self.N += 1
    def get(self, chunkID):
       """
       return the list of minerals at this chunkID
@@ -39,6 +42,29 @@ class Minerals:
       empty list if initialized but everything removed
       """
       self.chunks.get(chunkID, None)
+
+   def getN(self):
+      """
+      how many items in total across all chunks
+      """
+      return self.N
+
+
+def activeSprites(sprites, activeWindow):
+   """
+   extract the sprites from 'sprites' that are inside 'activeWindow'
+   RETURN:
+   pg.sprits.Group of sprites inside of the window
+   """
+   activeSprites = pg.sprite.Group()
+   chunkIDs = activeWindow.getChunkIDs()
+   for chunkID in chunkIDs:
+      s = sprites.get(chunkID)
+      print("type", type(s), chunkID)
+      if s is not None:
+         activeSprites.add(s)
+   print("activeSprites", type(activeSprites))
+   return(activeSprites)
 
 
 class World:

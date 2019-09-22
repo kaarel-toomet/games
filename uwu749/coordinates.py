@@ -1,3 +1,4 @@
+import numpy as np
 
 ## basic data (meant to be private)
 screenWidth, screenHeight = None, None
@@ -12,6 +13,65 @@ ssx = None  # screen
 ssy = None
 blitShift = None, None  # blit whole screen
 
+class activeWindow():
+   """
+   data related to the activeWindow: a square of the 9 cunks, centered at Crazy Hat
+   """
+   def __init__(self, width, height):
+      self.matrix = np.empty((width, height), 'int8')
+      self.chunkID = None
+      # contains no chunks so far...
+   def __getitem__(self, key):
+      return self.matrix[key[0], key[1]]
+   def __setitem__(self, key, value):
+      self.matrix[key[0], key[1]] = value
+   def draw(self, screenBuffer, blocks):
+       """
+       draws the activeWindow on screenBuffer
+       screenBuffer:
+       blocks: the block images corresponding to the activeWindow codes
+       """
+       for wx in range(self.getWidth()):
+          # note: we run over window coordinates
+          for wy in range(self.getHeight()):
+             sbLoc = windowToScreenBuffer(wx, wy)
+             screenBuffer.blit(blocks[ self.matrix[wy,wx] ], sbLoc)
+   def getChunkIDs(self):
+      """
+      get a list of all chunkID-s in this window
+      """
+      chunkIDs = [(self.chunkID[0]-1, self.chunkID[1]-1), (self.chunkID[0], self.chunkID[1]-1), (self.chunkID[0]+1, self.chunkID[1]-1),
+                  (self.chunkID[0]-1, self.chunkID[1]), (self.chunkID[0], self.chunkID[1]), (self.chunkID[0]+1, self.chunkID[1]),
+                  (self.chunkID[0]-1, self.chunkID[1]+1), (self.chunkID[0], self.chunkID[1]+1), (self.chunkID[0]+1, self.chunkID[1]+1)]
+      return chunkIDs
+   
+   def getWidth(self):
+      return self.matrix.shape[0]
+   def getHeight(self):
+      return self.matrix.shape[1]
+   
+   def update(self, world, chunkID):
+      """
+      load new chunks to the active window, store back the old chunks
+      in case those have been changed
+      inputs:
+      world: the World object
+      chunkID: chunkID for the new center
+      """
+      if not self.chunkID is None:
+         ## put back modified chunks
+         iChunk, jChunk = self.chunkID
+         for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+            for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
+               world.put((jc, ic), self.matrix[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize])
+      ## read new chunks to the window
+      iChunk, jChunk = chunkID
+      for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+         for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
+            self.matrix[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize] = world.get((jc, ic))
+      self.chunkID = chunkID
+
+    
 def setup(screenw, screenh, chunksize, tilesize):
    global screenWidth, screenHeight, chunkSize, tileSize
    screenWidth, screenHeight = screenw, screenh
@@ -46,29 +106,6 @@ def coordinateShifts(chunkID, cx, cy):
     ssy = int(screenHeight/2) - cy*tileSize
     blitShift = worldToScreen(-winsx, -winsy)
 
-def updateWindow(activeWindow, world, chunkID1, chunkID=None):
-   """
-   load new chunks to the active window, store back the old chunks
-   in case those have been changed
-   inputs:
-   activeWindow: window, will be changed by reference
-   world: the World object
-   chunkID1: new chunkID (iChunk, jChunk)
-   chunkID: old chunkID, for storing stuff back to the world
-   """
-   if not chunkID is None:
-      ## put back modified chunks
-      iChunk, jChunk = chunkID
-      for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
-         for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-            world.put((jc, ic), activeWindow[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize])
-   ## read new chunks to the window
-   iChunk, jChunk = chunkID1
-   for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
-      for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-         activeWindow[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize] = world.get((jc, ic))
-
-    
 def worldToWindow(x,y):
     """
     transform world coordinates to window coordinates
