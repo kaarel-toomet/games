@@ -86,8 +86,6 @@ def activeSprites(sprites, activeWindow):
       s = sprites.get(chunkID)
       if s is not None:
          activeSprites.add(s)
-         for sp in s:
-            print("active sprites:", sp.x, sp.y)
    return(activeSprites)
 
 
