@@ -26,7 +26,6 @@ class Minerals():
       """
       add new mineral at it's (world) coordinates
       """
-      print("add mineral id:", id(mineral))
       chunkID = coordinates.chunkID((mineral.x, mineral.y))
       ## add the mineral to the chunk-specific list
       chunkMinerals = self.chunks.get(chunkID, [])
@@ -44,10 +43,6 @@ class Minerals():
       empty list if initialized but everything removed
       """
       minerals = self.chunks.get(chunkID, None)
-      print("get id", chunkID)
-      if not minerals is None:
-         for m in minerals:
-            print("sprite id:", id(m))
       return minerals
 
    def getN(self):

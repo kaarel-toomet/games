@@ -369,7 +369,17 @@ while do:
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
-                hullmyts.setxy(homeX,homeY)
+                ## go home
+                hullmyts.setxy(homeX, homeY)
+                chunkID1 = coordinates.chunkID((hullmyts.x, hullmyts.y))
+                if chunkID1 != chunkID:
+                    ## chunk changed: update activeWindow and sprites
+                    activeWindow.update(ground, chunkID1)
+                    activeWindow.draw(screenBuffer, blocks1.blocks)
+                    chunkID = chunkID1
+                    activeKraam = world.activeSprites(kraam, activeWindow)
+                    coordinates.coordinateShifts(chunkID, hullmyts.x, hullmyts.y)
+                    activeKraam.update()
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
                 homeY = hullmyts.getxy()[1]

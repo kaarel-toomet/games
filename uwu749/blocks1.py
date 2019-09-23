@@ -35,7 +35,7 @@ def loadBlocks(size):
                                 (size, size))
     pebbl = pg.transform.scale(pg.image.load("blocks/pebbl.png"),
                                 (size, size))
-    core = pg.transform.scale(pg.image.load("coalpebbl.png"),
+    core = pg.transform.scale(pg.image.load("blocks/coalpebbl.png"),
                                 (size, size))
     kast = pg.transform.scale(pg.image.load("kast.png"),
                                 (size, size))
