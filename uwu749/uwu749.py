@@ -85,7 +85,6 @@ def drawSprites(sprites, spriteBuffer):
     Just draw the sprites listed in the group on screen
     ensure correct coordinates
     """
-    print("sprites:", type(sprites))
     sprites.draw(spriteBuffer)
 
 ## Screen and active window
@@ -163,8 +162,10 @@ coordinates.coordinateShifts(chunkID, homeX, homeY)
 activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
 ## create minerals: sprites that do not move
-for i in range(10):
-    kraam.add(Gold(r.randint(0, activeWindow.getWidth()), r.randint(0, activeWindow.getHeight())))
+for i in range(40):
+    winx, winy = r.randint(0, activeWindow.getWidth()), r.randint(0, activeWindow.getHeight())
+    x, y = coordinates.windowToWorld(winx, winy)
+    kraam.add(Gold(x, y))
 activeKraam = world.activeSprites(kraam, activeWindow)
 # those mineral sprites that are in activeWindow
 activeWindow.draw(screenBuffer, blocks1.blocks)
@@ -432,6 +433,7 @@ while do:
         kollid.add(Koll(r.randint(0,worldWidth),r.randint(0,worldHeight)))
     col = pg.sprite.spritecollide(hullmyts, activeKraam, False)
     if len(col) > 0:
+        activeKraam.remove(col)
         kraam.remove(col)
         punktid += 100
     col = pg.sprite.spritecollide(hullmyts,kollid,False)

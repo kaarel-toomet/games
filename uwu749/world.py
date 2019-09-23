@@ -26,6 +26,7 @@ class Minerals():
       """
       add new mineral at it's (world) coordinates
       """
+      print("add mineral id:", id(mineral))
       chunkID = coordinates.chunkID((mineral.x, mineral.y))
       ## add the mineral to the chunk-specific list
       chunkMinerals = self.chunks.get(chunkID, [])
@@ -35,13 +36,19 @@ class Minerals():
       self.chunks[chunkID] = chunkMinerals
       # adding even a single mineral marks this list as initialized
       self.N += 1
+
    def get(self, chunkID):
       """
       return the list of minerals at this chunkID
       None if not initialized
       empty list if initialized but everything removed
       """
-      self.chunks.get(chunkID, None)
+      minerals = self.chunks.get(chunkID, None)
+      print("get id", chunkID)
+      if not minerals is None:
+         for m in minerals:
+            print("sprite id:", id(m))
+      return minerals
 
    def getN(self):
       """
@@ -49,10 +56,28 @@ class Minerals():
       """
       return self.N
 
+   def remove(self, spriteList):
+      for sprite in spriteList:
+         chunkID = coordinates.chunkID((sprite.x, sprite.y))
+         print("removing at chunk", chunkID)
+         chunkMinerals = self.chunks.get(chunkID, [])
+         try:
+            chunkMinerals.remove(sprite)
+            self.N -= 1
+            self.chunks[chunkID] = chunkMinerals
+         except ValueError:
+            print("sprite not in list", id(sprite))
+            print(len(chunkMinerals), "chunkMinerals:", chunkMinerals)
+            for cm in chunkMinerals:
+               print("but there is chunk minerals id:", id(cm))
+
 
 def activeSprites(sprites, activeWindow):
    """
    extract the sprites from 'sprites' that are inside 'activeWindow'
+   INPUTS:
+   sprites:
+   chunk-sprite groups like 'Minerals'
    RETURN:
    pg.sprits.Group of sprites inside of the window
    """
@@ -60,10 +85,9 @@ def activeSprites(sprites, activeWindow):
    chunkIDs = activeWindow.getChunkIDs()
    for chunkID in chunkIDs:
       s = sprites.get(chunkID)
-      print("type", type(s), chunkID)
       if s is not None:
+         print("adding active id:", id(s))
          activeSprites.add(s)
-   print("activeSprites", type(activeSprites))
    return(activeSprites)
 
 
