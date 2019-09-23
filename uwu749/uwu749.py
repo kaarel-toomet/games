@@ -76,12 +76,7 @@ class Gold(pg.sprite.Sprite):
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
         self.n = n
     def update(self):
-        print("window shift", coordinates.winsx, coordinates.winsy)
-        print("blitshift", coordinates.blitShift)
-        print("update gold at", self.x, self.y, ": from", self.rect, end="")
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-        print("to:", self.rect)
-        print("gold window", coordinates.worldToWindow(self.x, self.y))
 
 
 def drawSprites(sprites, spriteBuffer):
@@ -454,19 +449,6 @@ while do:
     if aia > 0:
         aia -= 1
     ## ---------- screen udpate ----------
-    spriteBuffer.fill((0,0,0,0))
-    if seehome == 1:
-        screen.blit(home, coordinates.worldToScreen(homeX, homeY))
-    ## ---------- player update ----------
-    ## draw sprites: static: no update need, dynamic: update
-    drawSprites(activeKraam, spriteBuffer)
-    kutid.update()
-    kutid.draw(spriteBuffer)
-    kollid.update()
-    kollid.draw(spriteBuffer)
-    player.update(mup, mdown, mleft, mright)
-    player.draw(spriteBuffer)
-    pg.display.update()
     screen.fill(bgColor)
     screen.blit(screenBuffer, coordinates.blitShift)
     screen.blit(spriteBuffer, coordinates.blitShift)
@@ -483,6 +465,19 @@ while do:
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 10
     screen.blit(text,text_rect)
+    ## sprite update
+    spriteBuffer.fill((0,0,0,0))
+    if seehome == 1:
+        screen.blit(home, coordinates.worldToScreen(homeX, homeY))
+    ## draw sprites: static: no update need, dynamic: update
+    drawSprites(activeKraam, spriteBuffer)
+    kutid.update()
+    kutid.draw(spriteBuffer)
+    kollid.update()
+    kollid.draw(spriteBuffer)
+    player.update(mup, mdown, mleft, mright)
+    player.draw(spriteBuffer)
+    pg.display.update()
     ##
     timer.tick(60)
 
