@@ -59,7 +59,6 @@ class Minerals():
    def remove(self, spriteList):
       for sprite in spriteList:
          chunkID = coordinates.chunkID((sprite.x, sprite.y))
-         print("removing at chunk", chunkID)
          chunkMinerals = self.chunks.get(chunkID, [])
          try:
             chunkMinerals.remove(sprite)
@@ -86,8 +85,9 @@ def activeSprites(sprites, activeWindow):
    for chunkID in chunkIDs:
       s = sprites.get(chunkID)
       if s is not None:
-         print("adding active id:", id(s))
          activeSprites.add(s)
+         for sp in s:
+            print("active sprites:", sp.x, sp.y)
    return(activeSprites)
 
 

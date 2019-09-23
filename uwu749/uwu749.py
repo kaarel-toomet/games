@@ -77,7 +77,9 @@ class Gold(pg.sprite.Sprite):
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
         self.n = n
     def update(self):
-        pass
+        print("update gold at", self.x, self.y, ": from", self.rect, end="")
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+        print("to:", self.rect)
 
 
 def drawSprites(sprites, spriteBuffer):
@@ -162,7 +164,7 @@ coordinates.coordinateShifts(chunkID, homeX, homeY)
 activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
 ## create minerals: sprites that do not move
-for i in range(40):
+for i in range(5):
     winx, winy = r.randint(0, activeWindow.getWidth()), r.randint(0, activeWindow.getHeight())
     x, y = coordinates.windowToWorld(winx, winy)
     kraam.add(Gold(x, y))
@@ -205,9 +207,14 @@ class Player(pg.sprite.Sprite):
                                coordinates.worldToScreenbuffer(x, y))
         chunkID1 = coordinates.chunkID((self.x, self.y))
         if chunkID1 != chunkID:
+            ## chunk changed: update activeWindow and sprites
             activeWindow.update(ground, chunkID1)
             activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
+            coordinates.coordinateShifts(chunkID, self.x, self.y)
+            # for updating static sprites we need the shift now
+            activeKraam = world.activeSprites(kraam, activeWindow)
+            activeKraam.update()
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
