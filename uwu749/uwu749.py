@@ -10,6 +10,7 @@ import time
 import blocks1
 import coordinates
 import files1
+import sprites
 import world
 
 ## Command line arguments
@@ -127,7 +128,7 @@ oitems = items
 aia = 0
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
-kraam = world.Minerals()
+kraam = sprites.Minerals()
 kollid = pg.sprite.Group()
 
 ##

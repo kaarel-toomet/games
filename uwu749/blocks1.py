@@ -37,7 +37,7 @@ def loadBlocks(size):
                                 (size, size))
     core = pg.transform.scale(pg.image.load("blocks/coalpebbl.png"),
                                 (size, size))
-    kast = pg.transform.scale(pg.image.load("kast.png"),
+    kast = pg.transform.scale(pg.image.load("blocks/kast.png"),
                                 (size, size))
     lumi = pg.transform.scale(pg.image.load("☃.png"),
                                 (size, size))
