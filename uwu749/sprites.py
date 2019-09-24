@@ -5,16 +5,23 @@ import numpy as np
 import pygame as pg
 import random
 
+import blocks1
 import coordinates
+import world
 
-koll = None
+crazyHatImage = None
+kollImage = None
 kuldImage = None
 
 def setup(tileSize):
-   global kuldImage, koll
+   global kuldImage, kollImage, crazyHatImage
+   crazyHatImage = pg.transform.scale(pg.image.load("pic.png"),(tileSize, tileSize))
    kuldImage = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
-   koll = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
+   kollImage = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
 
+activeKraam = None
+activeKollid = None
+   
 class ChunkSprites():
    """
    Group of sprites connected to chunks and will be loaded/saved
@@ -75,6 +82,72 @@ class ChunkSprites():
                print("but there is chunk minerals id:", id(cm))
 
 
+class CrazyHat(pg.sprite.Sprite):
+    def __init__(self,x,y):
+        pg.sprite.Sprite.__init__(self)
+        self.image = crazyHatImage
+        self.rect = self.image.get_rect()
+        ## location in world coordinates
+        self.x=x
+        self.y=y
+        ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+    def update(self, mup, mdown, mleft, mright,
+               kraam, kollid,
+               activeWindow, screenBuffer,
+               ground):
+        global activeKraam, activeKollid
+        y = self.y
+        x = self.x
+        if mup:
+            y = self.y - 1
+        if mdown:
+            y = self.y + 1
+        if mleft:
+            x = self.x - 1
+        if mright:
+            x = self.x + 1
+        # if (self.x, self.y) == (x, y):
+        #     # no movement
+        #     return
+        winx, winy = coordinates.worldToWindow(x, y)
+        if activeWindow[(winy,winx)] in blocks1.solid:
+            return
+        if activeWindow[(winy,winx)] in blocks1.breakable:
+            activeWindow[(winy,winx)] = blocks1.breakto[activeWindow[(winy,winx)]]
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[activeWindow[(winy,winx)]]],
+                               coordinates.worldToScreenbuffer(x, y))
+        self.x, self.y = x, y
+        chunkID = activeWindow.getChunkID()
+        chunkID1 = coordinates.chunkID((self.x, self.y))
+        if chunkID1 != chunkID:
+            ## chunk changed: update activeWindow and sprites
+            activeWindow.update(ground, chunkID1)
+            activeWindow.draw(screenBuffer, blocks1.blocks)
+            chunkID = chunkID1
+            activeKraam = world.activeSprites(kraam, activeWindow)
+            activeKollid = world.activeSprites(kollid, activeWindow)
+            coordinates.coordinateShifts(chunkID, self.x, self.y)
+            activeKraam.update()
+            activeKollid.update(self)
+        coordinates.coordinateShifts(chunkID, self.x, self.y)
+        # update the coordinate system at every move, not just for chunk update
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+    def getxy(self):
+        """
+        return world coordinates
+        """
+        return(self.x,self.y)
+    def setxy(self,x,y):
+        """
+        x, y: world coordinates
+        """
+        self.x = x
+        self.y = y
+        self.rect.x = x*tileSize
+        self.rect.y = y*tileSize
+
+
 class Gold(pg.sprite.Sprite):
     def __init__(self, x, y, n=100):
         """
@@ -96,7 +169,7 @@ class Koll(pg.sprite.Sprite):
         x, y: world coordinates
         """
         pg.sprite.Sprite.__init__(self)
-        self.image = koll
+        self.image = kollImage
         self.rect = self.image.get_rect()
         self.x=x
         self.y=y

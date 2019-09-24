@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import pygame as pg
-import random as r
 import numpy as np
 import sys
 import subprocess
@@ -48,7 +47,7 @@ if sys.platform == 'linux':
 if not xdotool:
     screen = pg.display.set_mode((0,0), pg.RESIZABLE)
     screenWidth, screenHeight = pg.display.get_surface().get_size()
-pg.display.set_caption(str(r.randint(0,9000)))
+pg.display.set_caption(str(np.random.randint(0,9000)))
 pg.mixer.init()
 screen = pg.display.set_mode((0,0), pg.RESIZABLE)
 screenWidth = screen.get_width()
@@ -56,7 +55,6 @@ screenHeight = screen.get_height()
 
 ## load config and all that
 blocks1.loadBlocks(tileSize)
-pic = pg.transform.scale(pg.image.load("pic.png"),(tileSize, tileSize))
 kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
 home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
 ##
@@ -144,78 +142,17 @@ activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
 ## create minerals: sprites that do not move
 for i in range(25):
-    winx, winy = r.randint(0, activeWindow.getWidth()), r.randint(0, activeWindow.getHeight())
+    winx, winy = (np.random.randint(0, activeWindow.getWidth()),
+                  np.random.randint(0, activeWindow.getHeight())
+                  )
     x, y = coordinates.windowToWorld(winx, winy)
     kraam.add(sprites.Gold(x, y))
-activeKraam = world.activeSprites(kraam, activeWindow)
+sprites.activeKraam = world.activeSprites(kraam, activeWindow)
 # those mineral sprites that are in activeWindow
-activeKollid = world.activeSprites(kollid, activeWindow)
+sprites.activeKollid = world.activeSprites(kollid, activeWindow)
 # have to initialize this, in principle we may have a few kolls pre-created
 activeWindow.draw(screenBuffer, blocks1.blocks)
-drawSprites(activeKraam, spriteBuffer)
-
-
-class Player(pg.sprite.Sprite):
-    def __init__(self,x,y):
-        pg.sprite.Sprite.__init__(self)
-        self.image = pic
-        self.rect = self.image.get_rect()
-        ## location in world coordinates
-        self.x=x
-        self.y=y
-        ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
-        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-    def update(self, mup, mdown, mleft, mright):
-        global ssx, ssy, wsx, wsy, bsx, bsy
-        global activeKraam, activeKollid, chunkID
-        y = self.y
-        x = self.x
-        if mup:
-            y = self.y - 1
-        if mdown:
-            y = self.y + 1
-        if mleft:
-            x = self.x - 1
-        if mright:
-            x = self.x + 1
-        # if (self.x, self.y) == (x, y):
-        #     # no movement
-        #     return
-        winx, winy = coordinates.worldToWindow(x, y)
-        if activeWindow[(winy,winx)] in blocks1.solid:
-            return
-        if activeWindow[(winy,winx)] in blocks1.breakable:
-            activeWindow[(winy,winx)] = blocks1.breakto[activeWindow[(winy,winx)]]
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[activeWindow[(winy,winx)]]],
-                               coordinates.worldToScreenbuffer(x, y))
-        self.x, self.y = x, y
-        chunkID1 = coordinates.chunkID((self.x, self.y))
-        if chunkID1 != chunkID:
-            ## chunk changed: update activeWindow and sprites
-            activeWindow.update(ground, chunkID1)
-            activeWindow.draw(screenBuffer, blocks1.blocks)
-            chunkID = chunkID1
-            activeKraam = world.activeSprites(kraam, activeWindow)
-            activeKollid = world.activeSprites(kollid, activeWindow)
-            coordinates.coordinateShifts(chunkID, self.x, self.y)
-            activeKraam.update()
-            activeKollid.update(hullmyts)
-        coordinates.coordinateShifts(chunkID, self.x, self.y)
-        # update the coordinate system at every move, not just for chunk update
-        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-    def getxy(self):
-        """
-        return world coordinates
-        """
-        return(self.x,self.y)
-    def setxy(self,x,y):
-        """
-        x, y: world coordinates
-        """
-        self.x = x
-        self.y = y
-        self.rect.x = x*tileSize
-        self.rect.y = y*tileSize
+drawSprites(sprites.activeKraam, spriteBuffer)
 
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
@@ -228,9 +165,9 @@ class Tüüp(pg.sprite.Sprite):
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self):
         global tileSize
-        if r.randint(0,30) == 0:
-            self.x += r.randint(-1,1)
-            self.y += r.randint(-1,1)
+        if np.random.randint(0,30) == 0:
+            self.x += np.random.randint(-1,1)
+            self.y += np.random.randint(-1,1)
             self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
 
 
@@ -240,7 +177,7 @@ def reset():
     gameover = False
     lifes = 5
     player.empty()
-    hullmyts = Player(homeX, homeY)
+    hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(hullmyts)
 def build(x,y):
     global bb
@@ -263,7 +200,7 @@ def destroy(x,y):
     material = activeWindow[(winy,winx)]
     breakto = blocks1.breakto[ material]
     ## if gold and destroyable material
-    if r.randint(0,200) == 0 and material != breakto:
+    if np.random.randint(0,200) == 0 and material != breakto:
         kraam.add(Gold(x,y))
     items[material] += 1
     screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
@@ -336,11 +273,11 @@ while do:
                     activeWindow.update(ground, chunkID1)
                     activeWindow.draw(screenBuffer, blocks1.blocks)
                     chunkID = chunkID1
-                    activeKraam = world.activeSprites(kraam, activeWindow)
-                    activeKollid = world.activeSprites(kollid, activeWindow)
+                    sprites.activeKraam = world.activeSprites(kraam, activeWindow)
+                    sprites.activeKollid = world.activeSprites(kollid, activeWindow)
                     coordinates.coordinateShifts(chunkID, hullmyts.x, hullmyts.y)
-                    activeKraam.update()
-                    activeKollid.update(hullmyts)
+                    sprites.activeKraam.update()
+                    sprites.activeKollid.update(hullmyts)
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
                 homeY = hullmyts.getxy()[1]
@@ -406,16 +343,17 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if r.randint(0,10) == 0:
-        kollid.add(sprites.Koll(r.randint(0, activeWindow.getWidth()), r.randint(0, activeWindow.getHeight())))
+    if np.random.randint(0, 20) == 0:
+        kollid.add(sprites.Koll(np.random.randint(0, activeWindow.getWidth()),
+                                np.random.randint(0, activeWindow.getHeight())))
         activeKollid = world.activeSprites(kollid, activeWindow)
         activeKollid.update(hullmyts)
-    col = pg.sprite.spritecollide(hullmyts, activeKraam, False)
+    col = pg.sprite.spritecollide(hullmyts, sprites.activeKraam, False)
     if len(col) > 0:
-        activeKraam.remove(col)
+        sprites.activeKraam.remove(col)
         kraam.remove(col)
         punktid += 100
-    col = pg.sprite.spritecollide(hullmyts, activeKollid, False)
+    col = pg.sprite.spritecollide(hullmyts, sprites.activeKollid, False)
     if len(col) > 0 and aia == 0:
         lifes -= 1
         aia = 30
@@ -443,12 +381,15 @@ while do:
     if seehome == 1:
         screen.blit(home, coordinates.worldToScreen(homeX, homeY))
     ## draw sprites: static: no update need, dynamic: update
-    drawSprites(activeKraam, spriteBuffer)
+    drawSprites(sprites.activeKraam, spriteBuffer)
     kutid.update()
     kutid.draw(spriteBuffer)
-    activeKollid.update(hullmyts)
-    drawSprites(activeKollid, spriteBuffer)
-    player.update(mup, mdown, mleft, mright)
+    sprites.activeKollid.update(hullmyts)
+    drawSprites(sprites.activeKollid, spriteBuffer)
+    player.update(mup, mdown, mleft, mright,
+                  kraam, kollid,
+                  activeWindow, screenBuffer,
+                  ground)
     player.draw(spriteBuffer)
     pg.display.update()
     ##

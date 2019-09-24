@@ -36,6 +36,13 @@ class activeWindow():
           for wy in range(self.getHeight()):
              sbLoc = windowToScreenBuffer(wx, wy)
              screenBuffer.blit(blocks[ self.matrix[wy,wx] ], sbLoc)
+
+   def getChunkID(self):
+      """
+      get the chunkID for the central chunk
+      """
+      return self.chunkID
+   
    def getChunkIDs(self):
       """
       get a list of all chunkID-s in this window
