@@ -1,7 +1,9 @@
 """
 Custom sprite classes
 """
+import numpy as np
 import pygame as pg
+import random
 
 import coordinates
 
@@ -99,13 +101,15 @@ class Koll(pg.sprite.Sprite):
         self.x=x
         self.y=y
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-    def update(self):
-        global hullmyts
-        if r.randint(0,30) == 0:
+    def update(self, hullmyts):
+        """
+        moves the koll at random toward the Crazy Hat
+        """
+        if np.random.randint(0,30) == 0:
             xy = hullmyts.getxy()
             delta = np.sign([self.x - xy[0], self.y - xy[1]])
-            self.x += delta[0]
-            self.y += delta[1]
+            self.x -= delta[0]
+            self.y -= delta[1]
             self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def lammutus(self,x,y):
         global punktid

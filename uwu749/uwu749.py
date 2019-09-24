@@ -115,6 +115,7 @@ kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 kraam = sprites.ChunkSprites()
 kollid = sprites.ChunkSprites()
+hullmyts = None
 
 ##
 s = None
@@ -198,7 +199,7 @@ class Player(pg.sprite.Sprite):
             activeKollid = world.activeSprites(kollid, activeWindow)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
             activeKraam.update()
-            activeKollid.update()
+            activeKollid.update(hullmyts)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
@@ -339,7 +340,7 @@ while do:
                     activeKollid = world.activeSprites(kollid, activeWindow)
                     coordinates.coordinateShifts(chunkID, hullmyts.x, hullmyts.y)
                     activeKraam.update()
-                    activeKollid.update()
+                    activeKollid.update(hullmyts)
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
                 homeY = hullmyts.getxy()[1]
@@ -405,10 +406,10 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if r.randint(0,400) == 0:
+    if r.randint(0,10) == 0:
         kollid.add(sprites.Koll(r.randint(0, activeWindow.getWidth()), r.randint(0, activeWindow.getHeight())))
         activeKollid = world.activeSprites(kollid, activeWindow)
-        activeKollid.update()
+        activeKollid.update(hullmyts)
     col = pg.sprite.spritecollide(hullmyts, activeKraam, False)
     if len(col) > 0:
         activeKraam.remove(col)
@@ -445,7 +446,7 @@ while do:
     drawSprites(activeKraam, spriteBuffer)
     kutid.update()
     kutid.draw(spriteBuffer)
-    activeKollid.update()
+    activeKollid.update(hullmyts)
     drawSprites(activeKollid, spriteBuffer)
     player.update(mup, mdown, mleft, mright)
     player.draw(spriteBuffer)
