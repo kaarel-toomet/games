@@ -141,7 +141,7 @@ coordinates.coordinateShifts(chunkID, homeX, homeY)
 activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
 ## create minerals: sprites that do not move
-for i in range(25):
+for i in range(30):
     winx, winy = (np.random.randint(0, activeWindow.getWidth()),
                   np.random.randint(0, activeWindow.getHeight())
                   )
@@ -343,9 +343,10 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.randint(0, 20) == 0:
-        kollid.add(sprites.Koll(np.random.randint(0, activeWindow.getWidth()),
-                                np.random.randint(0, activeWindow.getHeight())))
+    if np.random.randint(0, 100) == 0:
+        winx = np.random.randint(0, activeWindow.getWidth())
+        winy = np.random.randint(0, activeWindow.getHeight())
+        kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
         activeKollid = world.activeSprites(kollid, activeWindow)
         activeKollid.update(hullmyts)
     col = pg.sprite.spritecollide(hullmyts, sprites.activeKraam, False)

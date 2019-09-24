@@ -164,15 +164,20 @@ class Gold(pg.sprite.Sprite):
 
 
 class Koll(pg.sprite.Sprite):
-    def __init__(self,x,y):
+    def __init__(self, x, y=None):
         """
         x, y: world coordinates
+        if y is None, x must be a tuple of coordinates
         """
         pg.sprite.Sprite.__init__(self)
         self.image = kollImage
         self.rect = self.image.get_rect()
-        self.x=x
-        self.y=y
+        if isinstance(x, tuple):
+           self.x = x[0]
+           self.y = x[1]
+        else:
+           self.x=x
+           self.y=y
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self, hullmyts):
         """
@@ -183,7 +188,7 @@ class Koll(pg.sprite.Sprite):
             delta = np.sign([self.x - xy[0], self.y - xy[1]])
             self.x -= delta[0]
             self.y -= delta[1]
-            self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def lammutus(self,x,y):
         global punktid
         if self.x == x and self.y == y:

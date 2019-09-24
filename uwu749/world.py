@@ -19,6 +19,7 @@ def activeSprites(sprites, activeWindow):
    chunkIDs = activeWindow.getChunkIDs()
    for chunkID in chunkIDs:
       s = sprites.get(chunkID)
+      # list of sprites for this chunk
       if s is not None:
          activeSprites.add(s)
    return(activeSprites)
