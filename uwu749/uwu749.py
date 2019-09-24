@@ -76,9 +76,9 @@ windowWidth = 3*chunkSize  # how many tiles loaded into the active window
 windowHeight = 3*chunkSize
 
 coordinates.setup(screenWidth, screenHeight, chunkSize, tileSize)
-screenBuffer = pg.Surface(size=(3*screenWidth, 3*screenHeight))
+screenBuffer = pg.Surface(size=(windowWidth*tileSize, windowHeight*tileSize))
 screenBuffer.fill(bgColor)
-spriteBuffer = pg.Surface([3*screenWidth, 3*screenHeight], pg.SRCALPHA, 32)
+spriteBuffer = pg.Surface([windowWidth*tileSize, windowHeight*tileSize], pg.SRCALPHA, 32)
 # this is the buffer where movement-related drawing is done,
 # afterwards it is copied to the screen
 do = True
@@ -343,7 +343,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.randint(0, 100) == 0:
+    if np.random.randint(0, 120) == 0:
         winx = np.random.randint(0, activeWindow.getWidth())
         winy = np.random.randint(0, activeWindow.getHeight())
         kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
