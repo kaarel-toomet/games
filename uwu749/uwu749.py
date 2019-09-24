@@ -70,7 +70,7 @@ def drawSprites(sprites, spriteBuffer):
     sprites.draw(spriteBuffer)
 
 ## Screen and active window
-chunkSize = 29
+chunkSize = 33
 # size of tile chunks for loading/saving
 windowWidth = 3*chunkSize  # how many tiles loaded into the active window
 windowHeight = 3*chunkSize
@@ -205,7 +205,7 @@ def destroy(x,y):
     items[material] += 1
     screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     activeWindow[(winy, winx)] = breakto
-    for k in kollid:
+    for k in activeKollid:
         k.lammutus(x,y)
 
 ## initialize player        
@@ -343,7 +343,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.randint(0, 120) == 0:
+    if np.random.randint(0, 200) == 0:
         winx = np.random.randint(0, activeWindow.getWidth())
         winy = np.random.randint(0, activeWindow.getHeight())
         kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
