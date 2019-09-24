@@ -1,7 +1,17 @@
 """
 Custom sprite classes
 """
+import pygame as pg
+
 import coordinates
+
+koll = None
+kuldImage = None
+
+def setup(tileSize):
+   global kuldImage, koll
+   kuldImage = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
+   koll = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
 
 class ChunkSprites():
    """
@@ -62,9 +72,43 @@ class ChunkSprites():
             for cm in chunkMinerals:
                print("but there is chunk minerals id:", id(cm))
 
-class Minerals(ChunkSprites):
-   """
-   ChunkSprites that do not move: just a dummy update()
-   """
-   def update(self):
-      pass
+
+class Gold(pg.sprite.Sprite):
+    def __init__(self, x, y, n=100):
+        """
+        x, y: world coordinates
+        """
+        pg.sprite.Sprite.__init__(self)
+        self.image = kuldImage
+        self.rect = self.image.get_rect()
+        self.x, self.y = x, y
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+        self.n = n
+    def update(self):
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+
+
+class Koll(pg.sprite.Sprite):
+    def __init__(self,x,y):
+        """
+        x, y: world coordinates
+        """
+        pg.sprite.Sprite.__init__(self)
+        self.image = koll
+        self.rect = self.image.get_rect()
+        self.x=x
+        self.y=y
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+    def update(self):
+        global hullmyts
+        if r.randint(0,30) == 0:
+            xy = hullmyts.getxy()
+            delta = np.sign([self.x - xy[0], self.y - xy[1]])
+            self.x += delta[0]
+            self.y += delta[1]
+            self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+    def lammutus(self,x,y):
+        global punktid
+        if self.x == x and self.y == y:
+            kollid.remove(self)
+            punktid += 100
