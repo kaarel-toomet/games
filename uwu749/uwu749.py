@@ -206,18 +206,19 @@ def destroy(x,y):
     items[material] += 1
     screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     activeWindow[(winy, winx)] = breakto
-    killKolls(sprites.activeKollid, (x, y))
+    killKolls((x, y))
 
-def killKolls(kolls, location):
+def killKolls(location):
     """
     kill all kolls at (x, y).
     if the koll is not at (x, y), do nothing
-    x, y: world coordinates
+    location = (x, y), world coordinates
     """
     global punktid
-    for koll in kolls:
-        if(koll.getxy() == location):
-            kolls.remove(koll)
+    for activeKoll in sprites.activeKollid:
+        if(activeKoll.getxy() == location):
+            sprites.activeKollid.remove(activeKoll)
+            kollid.remove([activeKoll])
             punktid += 100
     
 
@@ -356,12 +357,12 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.randint(0, 200) == 0:
+    if np.random.randint(0, 201) == 0:
         winx = np.random.randint(0, activeWindow.getWidth())
         winy = np.random.randint(0, activeWindow.getHeight())
         kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
-        activeKollid = world.activeSprites(kollid, activeWindow)
-        activeKollid.update(hullmyts)
+        sprites.activeKollid = world.activeSprites(kollid, activeWindow)
+        print("-- koll:", winx, winy, sprites.activeKollid)
     col = pg.sprite.spritecollide(hullmyts, sprites.activeKraam, False)
     if len(col) > 0:
         sprites.activeKraam.remove(col)
