@@ -137,7 +137,7 @@ class CrazyHat(pg.sprite.Sprite):
         """
         return world coordinates
         """
-        return(self.x,self.y)
+        return(self.x, self.y)
     def setxy(self,x,y):
         """
         x, y: world coordinates
@@ -179,6 +179,13 @@ class Koll(pg.sprite.Sprite):
            self.x=x
            self.y=y
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+
+    def getxy(self):
+       """
+       return world coordinates
+       """
+       return(self.x, self.y)
+   
     def update(self, hullmyts):
         """
         moves the koll at random toward the Crazy Hat
@@ -189,8 +196,3 @@ class Koll(pg.sprite.Sprite):
             self.x -= delta[0]
             self.y -= delta[1]
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-    def lammutus(self,x,y):
-        global punktid
-        if self.x == x and self.y == y:
-            kollid.remove(self)
-            punktid += 100

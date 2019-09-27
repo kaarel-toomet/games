@@ -194,6 +194,7 @@ def build(x,y):
 def destroy(x,y):
     """
     destroy a block and replace it with 'breakto'
+    if there is a koll at (x, y), kill it and give 100 points
     x, y: world coordinates
     """
     winx, winy = coordinates.worldToWindow(x, y)
@@ -201,12 +202,24 @@ def destroy(x,y):
     breakto = blocks1.breakto[ material]
     ## if gold and destroyable material
     if np.random.randint(0,200) == 0 and material != breakto:
-        kraam.add(Gold(x,y))
+        kraam.add(sprites.Gold(x,y))
     items[material] += 1
     screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     activeWindow[(winy, winx)] = breakto
-    for k in activeKollid:
-        k.lammutus(x,y)
+    killKolls(sprites.activeKollid, (x, y))
+
+def killKolls(kolls, location):
+    """
+    kill all kolls at (x, y).
+    if the koll is not at (x, y), do nothing
+    x, y: world coordinates
+    """
+    global punktid
+    for koll in kolls:
+        if(koll.getxy() == location):
+            kolls.remove(koll)
+            punktid += 100
+    
 
 ## initialize player        
 reset()
