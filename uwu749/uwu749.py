@@ -214,11 +214,12 @@ def killKolls(location):
     if the koll is not at (x, y), do nothing
     location = (x, y), world coordinates
     """
-    global punktid
+    global punktid, kollid
     for activeKoll in sprites.activeKollid:
         if(activeKoll.getxy() == location):
-            sprites.activeKollid.remove(activeKoll)
+            print("removing", id(activeKoll))
             kollid.remove([activeKoll])
+            sprites.activeKollid.remove(activeKoll)
             punktid += 100
     
 

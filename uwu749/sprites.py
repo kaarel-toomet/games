@@ -70,6 +70,7 @@ class ChunkSprites():
    def remove(self, spriteList):
       for sprite in spriteList:
          chunkID = coordinates.chunkID((sprite.x, sprite.y))
+         print("removing at", (sprite.x, sprite.y), "chunk", coordinates.chunkID((sprite.x, sprite.y))) 
          chunkMinerals = self.chunks.get(chunkID, [])
          try:
             chunkMinerals.remove(sprite)
@@ -179,6 +180,7 @@ class Koll(pg.sprite.Sprite):
            self.x=x
            self.y=y
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+        self.chunkID = coordinates.chunkID(self.x, self.y)
 
     def getxy(self):
        """
@@ -195,4 +197,5 @@ class Koll(pg.sprite.Sprite):
             delta = np.sign([self.x - xy[0], self.y - xy[1]])
             self.x -= delta[0]
             self.y -= delta[1]
+            self.chunkID = coordinates.chunkID(self.x, self.y)
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
