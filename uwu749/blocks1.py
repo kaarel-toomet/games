@@ -39,19 +39,19 @@ def loadBlocks(size):
                                 (size, size))
     kast = pg.transform.scale(pg.image.load("blocks/kast.png"),
                                 (size, size))
-    lumi = pg.transform.scale(pg.image.load("☃.png"),
+    lumi = pg.transform.scale(pg.image.load("blocks/☃.png"),
                                 (size, size))
-    sugavv = pg.transform.scale(pg.image.load("deepw.png"),
+    sugavv = pg.transform.scale(pg.image.load("blocks/deepw.png"),
                                 (size, size))
-    window = pg.transform.scale(pg.image.load("window.png"),
+    window = pg.transform.scale(pg.image.load("blocks/window.png"),
                                 (size, size))
     kivi = pg.transform.scale(pg.image.load("blocks/asdfback.png"),
                                 (size, size))
-    inf = pg.transform.scale(pg.image.load("infinity.png"),
+    inf = pg.transform.scale(pg.image.load("blocks/infinity.png"),
                                 (size, size))
-    cdoor = pg.transform.scale(pg.image.load("cdoor.png"),
+    cdoor = pg.transform.scale(pg.image.load("blocks/cdoor.png"),
                                 (size, size))
-    odoor = pg.transform.scale(pg.image.load("odoor.png"),
+    odoor = pg.transform.scale(pg.image.load("blocks/odoor.png"),
                                 (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
