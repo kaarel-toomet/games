@@ -88,6 +88,8 @@ def setup(screenw, screenh, chunksize, tilesize):
 def chunkID(worldLoc):
    """
    return chunkID based on worldLoc = (x,y)
+   inputs:
+   worldLoc: tuple (x, y), world coordinates
    """
    return worldLoc[0] // chunkSize, worldLoc[1] // chunkSize
    

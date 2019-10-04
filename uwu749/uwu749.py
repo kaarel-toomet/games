@@ -69,6 +69,15 @@ def drawSprites(sprites, spriteBuffer):
     """
     sprites.draw(spriteBuffer)
 
+def updateScreen():
+    """
+    update various sprites.
+    these must be done here as these need access various global variables
+    """
+    global activeKraam, activeKollid
+    sprites.activeKraam.update()
+    sprites.activeKollid.update(hullmyts, kollid)
+    
 ## Screen and active window
 chunkSize = 33
 # size of tile chunks for loading/saving
@@ -144,11 +153,11 @@ activeWindow.update(ground, chunkID)
 for i in range(30):
     winx, winy = (np.random.randint(0, activeWindow.getWidth()),
                   np.random.randint(0, activeWindow.getHeight())
-                  )
+    )
     x, y = coordinates.windowToWorld(winx, winy)
     kraam.add(sprites.Gold(x, y))
-sprites.activeKraam = world.activeSprites(kraam, activeWindow)
-# those mineral sprites that are in activeWindow
+    sprites.activeKraam = world.activeSprites(kraam, activeWindow)
+    # those mineral sprites that are in activeWindow
 sprites.activeKollid = world.activeSprites(kollid, activeWindow)
 # have to initialize this, in principle we may have a few kolls pre-created
 activeWindow.draw(screenBuffer, blocks1.blocks)
@@ -189,8 +198,8 @@ def build(x,y):
         if items[bb] <= 0:
             return
         items[bb] -= 1
-    activeWindow[(winy,winx)] = bb
-    screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreenbuffer(x, y)) 
+        activeWindow[(winy,winx)] = bb
+        screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreenbuffer(x, y)) 
 def destroy(x,y):
     """
     destroy a block and replace it with 'breakto'
@@ -220,8 +229,9 @@ def killKolls(location):
             print("removing", id(activeKoll))
             kollid.remove([activeKoll])
             sprites.activeKollid.remove(activeKoll)
+            kollid.remove([activeKoll])
             punktid += 100
-    
+            
 
 ## initialize player        
 reset()
@@ -246,7 +256,6 @@ while do:
     ##        text_rect.y = screenHeight/2
     ##        screen.blit(text,text_rect)
     ##        screen.blit(uwu,(screenWidth/2-f*8,screenHeight/4-f*2))
-##        pg.display.update()
     for event in pg.event.get():
         if event.type == pg.QUIT:
             do = False
@@ -260,7 +269,7 @@ while do:
                 mleft = True
             elif event.key == pg.K_RIGHT:
                 mright = True
-            ##
+                ##
             elif event.key == pg.K_a:
                 build(hullmyts.getxy()[0]-1,hullmyts.getxy()[1])
             elif event.key == pg.K_s:
@@ -291,8 +300,7 @@ while do:
                     sprites.activeKraam = world.activeSprites(kraam, activeWindow)
                     sprites.activeKollid = world.activeSprites(kollid, activeWindow)
                     coordinates.coordinateShifts(chunkID, hullmyts.x, hullmyts.y)
-                    sprites.activeKraam.update()
-                    sprites.activeKollid.update(hullmyts)
+                    updateScreen()
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
                 homeY = hullmyts.getxy()[1]
@@ -400,7 +408,7 @@ while do:
     drawSprites(sprites.activeKraam, spriteBuffer)
     kutid.update()
     kutid.draw(spriteBuffer)
-    sprites.activeKollid.update(hullmyts)
+    updateScreen()
     drawSprites(sprites.activeKollid, spriteBuffer)
     player.update(mup, mdown, mleft, mright,
                   kraam, kollid,
