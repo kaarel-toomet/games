@@ -133,7 +133,7 @@ class CrazyHat(pg.sprite.Sprite):
         #     return
         winx, winy = coordinates.worldToWindow(x, y)
         if activeWindow[(winy,winx)] in blocks1.solid:
-            return
+           return
         if activeWindow[(winy,winx)] in blocks1.breakable:
             activeWindow[(winy,winx)] = blocks1.breakto[activeWindow[(winy,winx)]]
             screenBuffer.blit( blocks1.blocks[blocks1.breakto[activeWindow[(winy,winx)]]],

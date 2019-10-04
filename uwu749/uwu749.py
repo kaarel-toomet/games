@@ -181,13 +181,23 @@ class Tüüp(pg.sprite.Sprite):
 
 
 def reset():
-    global hullmyts, gameover, lifes, punktid
+    """
+    reset lifes and score
+    """
+    global hullmyts, gameover, lifes, punktid, player
+    global kraam, kollid
+    global activeWindow, screenBuffer, ground
     punktid = 0
     gameover = False
     lifes = 5
     player.empty()
     hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(hullmyts)
+    hullmyts.setxy(homeX, homeY,
+                   kraam, kollid,
+                   activeWindow, screenBuffer,
+                   ground)
+    
 def build(x,y):
     global bb
     winx, winy = coordinates.worldToWindow(x, y)

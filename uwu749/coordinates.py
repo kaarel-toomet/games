@@ -22,7 +22,14 @@ class activeWindow():
       self.chunkID = None
       # contains no chunks so far...
    def __getitem__(self, key):
-      return self.matrix[key[0], key[1]]
+      """
+      return the tile code in window
+      None if out of range
+      """
+      try:
+         return self.matrix[key[0], key[1]]
+      except:
+         return None
    def __setitem__(self, key, value):
       self.matrix[key[0], key[1]] = value
    def draw(self, screenBuffer, blocks):
