@@ -290,17 +290,11 @@ while do:
                 pause = True
             elif event.key == pg.K_r:
                 ## go home
-                hullmyts.setxy(homeX, homeY)
-                chunkID1 = coordinates.chunkID((hullmyts.x, hullmyts.y))
-                if chunkID1 != chunkID:
-                    ## chunk changed: update activeWindow and sprites
-                    activeWindow.update(ground, chunkID1)
-                    activeWindow.draw(screenBuffer, blocks1.blocks)
-                    chunkID = chunkID1
-                    sprites.activeKraam = world.activeSprites(kraam, activeWindow)
-                    sprites.activeKollid = world.activeSprites(kollid, activeWindow)
-                    coordinates.coordinateShifts(chunkID, hullmyts.x, hullmyts.y)
-                    updateScreen()
+                hullmyts.setxy(homeX, homeY,
+                               # setxy can change chunks, so potentially have to update all this stuff here
+                               kraam, kollid,
+                               activeWindow, screenBuffer,
+                               ground)
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
                 homeY = hullmyts.getxy()[1]

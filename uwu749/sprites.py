@@ -157,14 +157,28 @@ class CrazyHat(pg.sprite.Sprite):
         return world coordinates
         """
         return(self.x, self.y)
-    def setxy(self,x,y):
+
+    def setxy(self,x,y,
+              kraam, kollid,
+              activeWindow, screenBuffer,
+              ground):
         """
         x, y: world coordinates
         """
-        self.x = x
-        self.y = y
-        self.rect.x = x*tileSize
-        self.rect.y = y*tileSize
+        self.x, self.y = x, y
+        chunkID = activeWindow.getChunkID()
+        chunkID1 = coordinates.chunkID((self.x, self.y))
+        if chunkID1 != chunkID:
+            ## chunk changed: update activeWindow and sprites
+            activeWindow.update(ground, chunkID1)
+            activeWindow.draw(screenBuffer, blocks1.blocks)
+            chunkID = chunkID1
+            activeKraam = world.activeSprites(kraam, activeWindow)
+            activeKollid = world.activeSprites(kollid, activeWindow)
+            coordinates.coordinateShifts(chunkID, self.x, self.y)
+        coordinates.coordinateShifts(chunkID, self.x, self.y)
+        # update the coordinate system at every move, not just for chunk update
+        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
 
 
 class Gold(pg.sprite.Sprite):
