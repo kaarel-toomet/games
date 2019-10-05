@@ -290,7 +290,7 @@ while do:
             v = v/np.linalg.norm(v) * 24 + np.array([r.normalvariate(0,3),r.normalvariate(0,3)])  #dasdf########3243412dsfdsfasdaf
             pews.add(bullet(hullmyts.xy(), v))
             pews.add(bullet(hullmyts.xy(), -v))
-    ptick += 23434
+    ptick += 9999835362
     mxy = np.array(pg.mouse.get_pos())
     screen.fill((0,0,0))
     rtxt(screenw/2, 20, "Lifes: " + str(lifes) + " Points: " + str(points) + " level: " +
