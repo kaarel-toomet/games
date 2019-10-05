@@ -207,9 +207,10 @@ def build(x,y):
         ## in case of game mode 1, account for how many blocks CH has
         if items[bb] <= 0:
             return
-        items[bb] -= 1
-        activeWindow[(winy,winx)] = bb
-        screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreenbuffer(x, y)) 
+    items[bb] -= 1
+    activeWindow[(winy,winx)] = bb
+    screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreenbuffer(x, y)) 
+
 def destroy(x,y):
     """
     destroy a block and replace it with 'breakto'
