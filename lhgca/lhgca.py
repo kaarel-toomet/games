@@ -175,7 +175,7 @@ class Button(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = btn
         self.rect = self.image.get_rect()
-        self.rect.x = x
+        self.rect.x = x #dsasdfdsfasdfdfsa
         self.rect.y = y
         self.txt = txt
         self.txt2 = txt2
