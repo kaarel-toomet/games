@@ -3,6 +3,8 @@ import random as r
 pg.init()
 pg.mixer.init()
 pic = pg.image.load("hullmyts.png")
+pic2 = pg.image.load("hullmyts2.png")
+star = pg.image.load("star.png")
 pg.font
 screen = pg.display.set_mode((0,0), pg.RESIZABLE)
 screenw = screen.get_width()
@@ -20,6 +22,7 @@ mleft2 = False
 mright2 = False
 timer = pg.time.Clock()
 lifes = 5
+lifes2 = 5
 font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
@@ -27,10 +30,11 @@ pause = False
 gameover = False
 player = pg.sprite.Group()
 player2 = pg.sprite.Group()
+stars = pg.sprite.Group()
 class Player(pg.sprite.Sprite):
-    def __init__(self,x,y):
+    def __init__(self,x,y,img):
         pg.sprite.Sprite.__init__(self)
-        self.image = pic
+        self.image = img
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -59,14 +63,26 @@ class Player(pg.sprite.Sprite):
             self.rect.x -= dist
         if mright and right:
             self.rect.x += dist
+class Star(pg.sprite.Sprite):
+    def __init__(self,x,y,vx,vy):
+        pg.sprite.Sprite.__init__(self)
+        self.image = star
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.vx = vx
+        self.vy = vy
+    def update(self):
+        self.rect.x += self.vx
+        self.rect.y += self.vy
 def reset():
     lifes = 5
     player.empty()
     hullmyts = Player(screenw/2,screenh/2)
     player.add(hullmyts)
-hullmyts = Player(screenw/2,screenh/2)
+hullmyts = Player(screenw/2,screenh/2,pic)
 player.add(hullmyts)
-hullmyts2 = Player(screenw/2,screenh/2-100)
+hullmyts2 = Player(screenw/2,screenh/2-100,pic2)
 player2.add(hullmyts2)
 while do:
     for event in pg.event.get():
@@ -145,11 +161,17 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    screen.fill((0,0,0))
+    screen.fill((128,128,128))
     score = ("Lifes: " + str(lifes))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
-    text_rect.centerx = screen.get_rect().centerx
+    text_rect.centerx = screen.get_rect().centerx-200
+    text_rect.y = 10
+    screen.blit(text,text_rect)
+    score = ("Lifes: " + str(lifes2))
+    text = font.render(score, True, (0,0,0))
+    text_rect = text.get_rect()
+    text_rect.centerx = screen.get_rect().centerx+200
     text_rect.y = 10
     screen.blit(text,text_rect)
     player.update(mup,mdown, mleft, mright)
