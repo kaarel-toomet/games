@@ -43,7 +43,7 @@ points = 0
 ## you can also add more debug codes
 if debug_code == 0:
     def nextThreshold(distance, velocity):
-        lvlLength = 3600*velocity
+        lvlLength = 600*velocity
         return distance + lvlLength
 else:
     def nextThreshold(distance, velocity):
@@ -111,6 +111,9 @@ class Star(pg.sprite.Sprite):
     def update(self, vel):
         self.rect.y -= vel*self.vel
         #self.rect.x += r.randint(-self.vel,self.vel)
+        if self.rect.y < -10:
+            stars.remove(self)
+            ystars.remove(self)
 class TNT(pg.sprite.Sprite):
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
@@ -121,7 +124,8 @@ class TNT(pg.sprite.Sprite):
         #self.vel = vel
     def update(self):
         self.rect.y += 10
-        #self.rect.x += r.randint(-self.vel,self.vel)
+        if self.rect.y > screenh+10:
+            tnt.remove(self)
 class Frag(pg.sprite.Sprite):
     def __init__(self, x, y, vx, vy):
         pg.sprite.Sprite.__init__(self)
@@ -134,7 +138,16 @@ class Frag(pg.sprite.Sprite):
         #self.vel = vel
     def update(self):
         self.rect.x += self.vx
-        self.rect.y += self.vy 
+        self.rect.y += self.vy
+
+        if self.rect.y <= -10:
+            frag.remove(self)
+        elif self.rect.y >= screenh+10:
+            frag.remove(self)
+        elif self.rect.x <= -10:
+            frag.remove(self)
+        elif self.rect.x >= screenw+10:
+            frag.remove(self)
 def reset():
     lifes = 5
     player.empty()
@@ -205,9 +218,9 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    while r.uniform(0,1) <= 0.5:
+    while r.uniform(0,1+(10/(lvl+1))) <= 1:
         stars.add(Star(r.randint(0,screenw), 1, redstar))
-    while r.uniform(0,1) <= 0.5:
+    while r.uniform(0,1+(10/(lvl+1))) <= 1:
         ystars.add(Star(r.randint(0,screenw), 1, yellowstar))
     scol = pg.sprite.spritecollide(hullmyts,stars,False)
     if len(scol) > 0:
