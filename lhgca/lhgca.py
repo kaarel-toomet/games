@@ -10,6 +10,7 @@ import startmenu
 pg.init()
 pg.mixer.init()
 pic = pg.image.load("../data/hullmyts.png")
+btn = pg.image.load("button.png")
 pew = pg.image.load("pew.png")
 ugl = pg.image.load("ugly.png")
 pop = pg.mixer.Sound("pop.wav")
@@ -42,16 +43,17 @@ def denseBullet():
     return v
 def shellBullet():
     angle = np.random.uniform(0, 2*np.pi)
-    speed = np.random.uniform(25, 30)
+    speed = np.random.uniform(50, 50)
     v = speed*np.array([np.cos(angle), np.sin(angle)])
     return v
 if explosionType == "shell":
     explosionBullet = shellBullet
-    nExplosionBullets = 250
+    nExplosionBullets = 1000
 else:
     explosionBullet = denseBullet
     nExplosionBullets = 1000
 
+title = True
 do = True
 dist = 5
 up = True
@@ -168,8 +170,30 @@ class Ugly(pg.sprite.Sprite):
         self.vel += np.random.normal(scale=0.2, size=2)
         drift = chx - self.x
         self.vel += drift/np.linalg.norm(drift)*lvl*vf
+class Button(pg.sprite.Sprite):
+    def __init__(self,x,y, txt, txt2, font):
+        pg.sprite.Sprite.__init__(self)
+        self.image = btn
+        self.rect = self.image.get_rect()
+        self.rect.x = x #dsasdfdsfasdfdfsa
+        self.rect.y = y
+        self.txt = txt
+        self.txt2 = txt2
+        self.font = font
+    def update(self):
+        text = self.font.render(self.txt, True, (64,64,64))
+        text_rect = text.get_rect()
+        text_rect.centerx = self.rect.x+60
+        text_rect.centery = self.rect.y+20
+        screen.blit(text,text_rect)
+        text = self.font.render(self.txt2, True, (64,64,64))
+        text_rect = text.get_rect()
+        text_rect.centerx = self.rect.x+60
+        text_rect.centery = self.rect.y+40
+        screen.blit(text,text_rect)
 def reset():
-    global hullmyts, lifes, points
+    global hullmyts, lifes, points, s
+    s = 0
     lifes = 10
     player.empty()
     hullmyts = Player(np.array([screenw/2,screenh/2]))

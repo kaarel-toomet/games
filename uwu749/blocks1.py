@@ -23,35 +23,35 @@ bn = {}
 def loadBlocks(size):
     ## load blocks and scale to size
     global blocks, bn
-    block = pg.transform.scale(pg.image.load("asdfblock.png"),
+    block = pg.transform.scale(pg.image.load("blocks/asdfblock.png"),
                                (size, size))
-    rblock = pg.transform.scale(pg.image.load("redblock.png"),
+    rblock = pg.transform.scale(pg.image.load("blocks/redblock.png"),
                                 (size, size))
-    sky = pg.transform.scale(pg.image.load("sky.png"),
+    sky = pg.transform.scale(pg.image.load("blocks/sky.png"),
                              (size, size))
-    ground = pg.transform.scale(pg.image.load("ground.png"),
+    ground = pg.transform.scale(pg.image.load("blocks/ground.png"),
                                 (size, size))
-    tee = pg.transform.scale(pg.image.load("tee.png"),
+    tee = pg.transform.scale(pg.image.load("blocks/tee.png"),
                                 (size, size))
-    pebbl = pg.transform.scale(pg.image.load("pebbl.png"),
+    pebbl = pg.transform.scale(pg.image.load("blocks/pebbl.png"),
                                 (size, size))
-    core = pg.transform.scale(pg.image.load("coalpebbl.png"),
+    core = pg.transform.scale(pg.image.load("blocks/coalpebbl.png"),
                                 (size, size))
-    kast = pg.transform.scale(pg.image.load("kast.png"),
+    kast = pg.transform.scale(pg.image.load("blocks/kast.png"),
                                 (size, size))
-    lumi = pg.transform.scale(pg.image.load("☃.png"),
+    lumi = pg.transform.scale(pg.image.load("blocks/☃.png"),
                                 (size, size))
-    sugavv = pg.transform.scale(pg.image.load("deepw.png"),
+    sugavv = pg.transform.scale(pg.image.load("blocks/deepw.png"),
                                 (size, size))
-    window = pg.transform.scale(pg.image.load("window.png"),
+    window = pg.transform.scale(pg.image.load("blocks/window.png"),
                                 (size, size))
-    kivi = pg.transform.scale(pg.image.load("asdfback.png"),
+    kivi = pg.transform.scale(pg.image.load("blocks/asdfback.png"),
                                 (size, size))
-    inf = pg.transform.scale(pg.image.load("infinity.png"),
+    inf = pg.transform.scale(pg.image.load("blocks/infinity.png"),
                                 (size, size))
-    cdoor = pg.transform.scale(pg.image.load("cdoor.png"),
+    cdoor = pg.transform.scale(pg.image.load("blocks/cdoor.png"),
                                 (size, size))
-    odoor = pg.transform.scale(pg.image.load("odoor.png"),
+    odoor = pg.transform.scale(pg.image.load("blocks/odoor.png"),
                                 (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
