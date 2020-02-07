@@ -33,7 +33,7 @@ class World:
    __init__: set up parameters and empty data
 
    You have to set up coordinates before you set up the world
-   That initializes chunkSize and such
+   That initializes chunkWidth, chunkHeight and such
    """
    def __init__(self, freqX, freqY, a, b, c, d, e, f):
       """
@@ -53,27 +53,27 @@ class World:
       """
       if chunkID in self.chunks:
          return self.chunks[chunkID]
-      chunk = np.empty((coordinates.chunkSize, coordinates.chunkSize), 'int8')
+      chunk = np.empty((coordinates.chunkHeight, coordinates.chunkWidth), 'int8')
       jc, ic = chunkID
-      for cx in range(chunk.shape[0]):
-          for cy in range(chunk.shape[1]):
+      for cx in range(chunk.shape[1]):
+          for cy in range(chunk.shape[0]):
               ## world coordinates for Perlin noise computation
-              x = ic*coordinates.chunkSize + cx
-              y = jc*coordinates.chunkSize + cy
+              x = ic*coordinates.chunkWidth + cx
+              y = jc*coordinates.chunkHeight + cy
               noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
                                        self.a, self.b, self.c, self.d, self.e, self.f,)
               if noiseval < -0.3:
-                  chunk[cy,cx] = 7
+                 chunk[cy, cx] = 7
               elif noiseval < -0.05:
-                  chunk[cy,cx] = 0
+                 chunk[cy, cx] = 0
               elif noiseval < 0:
-                  chunk[cy,cx] = 1
+                 chunk[cy, cx] = 1
               elif noiseval < 0.3:
-                  chunk[cy,cx] = 2
+                 chunk[cy, cx] = 2
               elif noiseval < 0.4:
-                  chunk[cy,cx] = 3
+                 chunk[cy, cx] = 3
               elif noiseval < 11:
-                  chunk[cy,cx] = 4
+                 chunk[cy, cx] = 4
       self.chunks[chunkID] = chunk
       return chunk
 

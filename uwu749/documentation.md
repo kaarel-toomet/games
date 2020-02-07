@@ -44,7 +44,7 @@ the game uses 4 types of coordinates:
   Normally the center is at `(0,0)`.  The numbers grow right and
   down.  Typically denoted as `x`, `y`.
 * **active window coordinates** in tiles, `(0,0)` is top left.  It's
-  size is `3*chunkSize`.  Normally denoted `winx`, `winy`.
+  size is `3*chunkWidth` times `3*chunkHeight`.  Normally denoted `winx`, `winy`.
 * **screenBuffer coordinates**, in pixels, `(0,0)`, is top left.
   Pretty much the same thing as _active window coordinated_, just in
   pixels.  It is a square with side length `3*chunkSize*tileSize`.
@@ -53,7 +53,7 @@ the game uses 4 types of coordinates:
    `screenWidth`, `screenHeight`, and depends on your monitor.
 
 In principle there are two more coordinate systems: one chunk-based
-(based on `(iChunk, jChunk)`, and one for each chunk.  These are
+(based on `(iChunk, jChunk)`), and one for each chunk.  These are
 currently not formalized.
 
 #### Coordinate translations
