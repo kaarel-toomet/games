@@ -134,6 +134,16 @@ def coordinateShifts(chunkID, cx, cy):
     blitShift = worldToScreen(-winsx, -winsy)
 
 
+def screenToWorld(screenx, screeny):
+    """
+    transform world coordinates to screen coordinates
+    screenx, screeny: screen coordinates (pixels), horizontal, vertical
+    returns:
+    (x, y): world coordinates
+    """
+    return ((screenx - ssx) // tileSize, (screeny - ssy) // tileSize)
+
+ 
 def windowToWorld(winx, winy):
     """
     transform window coordinates to world coordinates

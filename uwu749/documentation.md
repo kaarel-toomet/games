@@ -52,6 +52,7 @@ the game uses 4 types of coordinates:
 * **screen coordinates** in pixels, (0,0) is top left
    these measure pixel locations on current screen.  Size is stored in
    `screenWidth`, `screenHeight`, and depends on your monitor.
+   Normally called `screenx` and `screeny`.
 
 In principle there are two more coordinate systems: one chunk-based
 (based on `(iChunk, jChunk)`), and one for each chunk.  These are
