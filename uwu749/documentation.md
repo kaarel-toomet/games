@@ -39,7 +39,7 @@ TBD
  
 #### Coordinate systems
  
-the game uses 4 types of coordinates:
+the game uses 5 types of coordinates:
 * **world coordinates**.  These are in tiles and of unlimited size.
   Normally the center is at `(0,0)`.  The numbers grow right and
   down.  Typically denoted as `x`, `y`.
@@ -53,9 +53,11 @@ the game uses 4 types of coordinates:
    these measure pixel locations on current screen.  Size is stored in
    `screenWidth`, `screenHeight`, and depends on your monitor.
    Normally called `screenx` and `screeny`.
+* **in-chunk coordinates**, location of objects (in tiles) inside each
+  chunk.  Used as `(inchunkx, inchunky)`, lower left is _(0,0)_. 
 
 In principle there are two more coordinate systems: one chunk-based
-(based on `(iChunk, jChunk)`), and one for each chunk.  These are
+(based on `(iChunk, jChunk)`).  These are
 currently not formalized.
 
 #### Coordinate translations
@@ -87,6 +89,8 @@ Hat's world coordinates).
 
 Now you can use functions
 ```python
+chunkToWorld(chunkx, chunky)
+screenToWorld(screenx, screeny)
 worldToWindow(x, y)
 worldToScreen(x, y)
 worldToScreenbuffer(x, y)

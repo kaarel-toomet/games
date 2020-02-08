@@ -79,12 +79,16 @@ class activeWindow():
          for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
             for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
                world.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
+      else:
+         self.chunkID = chunkID
+         # set chunkID here if it is None at initialization
       ## read new chunks to the window
       iChunk, jChunk = chunkID
       for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
          for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
             self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = world.get((jc, ic))
       self.chunkID = chunkID
+      # set new chunkid after doing all updates
     
 def setup(screenw, screenh, chunkwidth, chunkheight, tilesize):
    global screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize
@@ -101,15 +105,15 @@ def chunkID(worldLoc):
    """
    return worldLoc[0] // chunkWidth, worldLoc[1] // chunkHeight
 
-def chunkToWorld(chunkID, chunkx, chunky):
+def inchunkToWorld(chunkID, chunkx, chunky):
     """
-    transform chunk coordinates to world coordinates
+    transform in-chunk coordinates to world coordinates
     chunkID: chunk id (i, j)
     chunkx, chunky: window coordinates (in tiles)
     returns:
     (x, y): world coordinates (in tiles)
     """
-    return (chunkID[0]*chunkHieght + chunky, chunkID[1]*chunkWidth + chunkx)
+    return (chunkID[0]*chunkWidth + chunkx, chunkID[1]*chunkHeight + chunky)
    
 def coordinateShifts(chunkID, cx, cy):
     """

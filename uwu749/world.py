@@ -5,9 +5,10 @@ import pygame as pg
 import random as r
 
 import coordinates
+import globals
+import sprites
 
-
-def activeSprites(sprites, activeWindow):
+def activeSprites(sprites):
    """
    extract the sprites from 'sprites' that are inside 'activeWindow'
    INPUTS:
@@ -17,7 +18,7 @@ def activeSprites(sprites, activeWindow):
    pg.sprits.Group of sprites inside of the window
    """
    activeSprites = pg.sprite.Group()
-   chunkIDs = activeWindow.getChunkIDs()
+   chunkIDs = globals.activeWindow.getChunkIDs()
    for chunkID in chunkIDs:
       s = sprites.get(chunkID)
       # list of sprites for this chunk
@@ -84,9 +85,9 @@ class World:
           chunkx, chunky = (np.random.randint(0, chunk.shape[1]),
                             np.random.randint(0, chunk.shape[0])
           )
-          x, y = coordinates.chunkToWorld(chunkx, chunky)
-          kraam.add(sprites.Gold(x, y))
-          sprites.activeKraam = world.activeSprites(kraam, activeWindow)
+          x, y = coordinates.inchunkToWorld(chunkID, chunkx, chunky)
+          globals.kraam.add(sprites.Gold(x, y))
+          sprites.activeKraam = activeSprites(globals.kraam)
           # those mineral sprites that are in activeWindow
       return chunk
 

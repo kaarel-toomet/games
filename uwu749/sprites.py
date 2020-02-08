@@ -8,6 +8,7 @@ import random
 import blocks1
 import coordinates
 import world
+import globals
 
 crazyHatImage = None
 kollImage = None
@@ -21,7 +22,12 @@ def setup(tileSize):
 
 activeKraam = None
 activeKollid = None
-   
+
+class Test():
+   def __init__(self):
+      print("test class initializer")
+      
+
 class ChunkSprites():
    """
    Group of sprites connected to chunks and will be loaded/saved
@@ -146,8 +152,8 @@ class CrazyHat(pg.sprite.Sprite):
             activeWindow.update(ground, chunkID1)
             activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            activeKraam = world.activeSprites(kraam, activeWindow)
-            activeKollid = world.activeSprites(kollid, activeWindow)
+            activeKraam = world.activeSprites(kraam)
+            activeKollid = world.activeSprites(kollid)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
@@ -238,3 +244,7 @@ class Koll(pg.sprite.Sprite):
                monsters.moveChunk(self, newChunkID)
                self.chunkID = newChunkID
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+
+
+## Define globals
+globals.kraam = ChunkSprites()

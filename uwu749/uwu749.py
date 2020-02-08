@@ -11,6 +11,7 @@ import coordinates
 import files1
 import sprites
 import world
+import globals
 
 ## Command line arguments
 parser = argparse.ArgumentParser(description='uwu749: Crazy Hat builds another world!')
@@ -121,7 +122,6 @@ aia = 0
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
-kraam = sprites.ChunkSprites()
 kollid = sprites.ChunkSprites()
 hullmyts = None
 
@@ -146,13 +146,13 @@ else:
 
 ## create the active window, centered on home:
 chunkID = coordinates.chunkID((homeX, homeY))
-activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
+globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
 coordinates.coordinateShifts(chunkID, homeX, homeY)
-activeWindow.update(ground, chunkID)
+globals.activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
-sprites.activeKollid = world.activeSprites(kollid, activeWindow)
+sprites.activeKollid = world.activeSprites(kollid)
 # have to initialize this, in principle we may have a few kolls pre-created
-activeWindow.draw(screenBuffer, blocks1.blocks)
+globals.activeWindow.draw(screenBuffer, blocks1.blocks)
 drawSprites(sprites.activeKraam, spriteBuffer)
 
 class Tüüp(pg.sprite.Sprite):
@@ -177,8 +177,8 @@ def reset():
     reset lifes and score
     """
     global hullmyts, gameover, lifes, punktid, player
-    global kraam, kollid
-    global activeWindow, screenBuffer, ground
+    kollid
+    screenBuffer, ground
     punktid = 0
     gameover = False
     lifes = 5
@@ -186,21 +186,21 @@ def reset():
     hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(hullmyts)
     hullmyts.setxy(homeX, homeY,
-                   kraam, kollid,
-                   activeWindow, screenBuffer,
+                   globals.kraam, kollid,
+                   globals.activeWindow, screenBuffer,
                    ground)
     
 def build(x,y):
     global bb
     winx, winy = coordinates.worldToWindow(x, y)
-    if activeWindow[(winy,winx)] in blocks1.breakable:
+    if globals.activeWindow[(winy,winx)] in blocks1.breakable:
         return
     if gmod == 1:
         ## in case of game mode 1, account for how many blocks CH has
         if items[bb] <= 0:
             return
     items[bb] -= 1
-    activeWindow[(winy,winx)] = bb
+    globals.activeWindow[(winy,winx)] = bb
     screenBuffer.blit( blocks1.blocks[bb], coordinates.worldToScreenbuffer(x, y)) 
 
 def destroy(x,y):
@@ -210,14 +210,14 @@ def destroy(x,y):
     x, y: world coordinates
     """
     winx, winy = coordinates.worldToWindow(x, y)
-    material = activeWindow[(winy,winx)]
+    material = globals.activeWindow[(winy,winx)]
     breakto = blocks1.breakto[ material]
     ## if gold and destroyable material
     if np.random.randint(0,200) == 0 and material != breakto:
-        kraam.add(sprites.Gold(x,y))
+        globals.kraam.add(sprites.Gold(x,y))
     items[material] += 1
     screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
-    activeWindow[(winy, winx)] = breakto
+    globals.activeWindow[(winy, winx)] = breakto
     killKolls((x, y))
 
 def killKolls(location):
@@ -298,8 +298,8 @@ while do:
                 ## go home
                 hullmyts.setxy(homeX, homeY,
                                # setxy can change chunks, so potentially have to update all this stuff here
-                               kraam, kollid,
-                               activeWindow, screenBuffer,
+                               globals.kraam, kollid,
+                               globals.activeWindow, screenBuffer,
                                ground)
             elif event.key == pg.K_h:
                 homeX = hullmyts.getxy()[0]
@@ -370,15 +370,15 @@ while do:
                     gameover = False
                     reset()
     if np.random.randint(0, 201) == 0:
-        winx = np.random.randint(0, activeWindow.getWidth())
-        winy = np.random.randint(0, activeWindow.getHeight())
+        winx = np.random.randint(0, globals.activeWindow.getWidth())
+        winy = np.random.randint(0, globals.activeWindow.getHeight())
         kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
-        sprites.activeKollid = world.activeSprites(kollid, activeWindow)
+        sprites.activeKollid = world.activeSprites(kollid)
         print("-- koll:", winx, winy, sprites.activeKollid)
     col = pg.sprite.spritecollide(hullmyts, sprites.activeKraam, False)
     if len(col) > 0:
         sprites.activeKraam.remove(col)
-        kraam.remove(col)
+        globals.kraam.remove(col)
         punktid += 100
     col = pg.sprite.spritecollide(hullmyts, sprites.activeKollid, False)
     if len(col) > 0 and aia == 0:
@@ -396,7 +396,7 @@ while do:
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
              "  [x,y: " + str((hullmyts.x, hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((hullmyts.x, hullmyts.y))) + "]")
-    if kraam.getN() == 0:
+    if globals.kraam.getN() == 0:
         score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
@@ -414,8 +414,8 @@ while do:
     updateScreen()
     drawSprites(sprites.activeKollid, spriteBuffer)
     player.update(mup, mdown, mleft, mright,
-                  kraam, kollid,
-                  activeWindow, screenBuffer,
+                  globals.kraam, kollid,
+                  globals.activeWindow, screenBuffer,
                   ground)
     player.draw(spriteBuffer)
     pg.display.update()
