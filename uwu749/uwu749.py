@@ -81,6 +81,9 @@ def updateScreen():
 ## Screen and active window
 chunkWidth = int(np.ceil(screenWidth/2/tileSize))
 chunkHeight = int(np.ceil(screenHeight/2/tileSize))
+chunkWidth = 32
+chunkHeight = 31
+
 # size of tile chunks for loading/saving
 windowWidth = 3*chunkWidth  # how many tiles loaded into the active window
 windowHeight = 3*chunkHeight
@@ -283,14 +286,14 @@ while do:
                 build(globals.hullmyts.getxy()[0]+1, globals.hullmyts.getxy()[1])
             elif event.key == pg.K_w:
                 build(globals.hullmyts.getxy()[0], globals.globals.hullmyts.getxy()[1]-1)
-            # elif event.key == pg.K_j:
-            #     destroy(globals.hullmyts.getxy()[0]-1,globals.hullmyts.getxy()[1])
-            # elif event.key == pg.K_k:
-            #     destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]+1)
-            # elif event.key == pg.K_l:
-            #     destroy(globals.hullmyts.getxy()[0]+1,globals.hullmyts.getxy()[1])
-            # elif event.key == pg.K_i:
-            #     destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]-1)
+            elif event.key == pg.K_j:
+                destroy(globals.hullmyts.getxy()[0]-1,globals.hullmyts.getxy()[1])
+            elif event.key == pg.K_k:
+                destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]+1)
+            elif event.key == pg.K_l:
+                destroy(globals.hullmyts.getxy()[0]+1,globals.hullmyts.getxy()[1])
+            elif event.key == pg.K_i:
+                destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]-1)
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
@@ -329,8 +332,14 @@ while do:
             elif event.key == pg.K_RIGHT:
                 mright = False
         elif event.type == pg.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                pass
+            mxy = pg.mouse.get_pos()
+            tol = tileSize*6
+            if event.button == 1 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
+                destroy(coordinates.screenToWorld(mxy[0],mxy[1])[0],
+                coordinates.screenToWorld(mxy[0],mxy[1])[1])
+            elif event.button == 3 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
+                build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
+                coordinates.screenToWorld(mxy[0],mxy[1])[1])
     while pause:
         for event in pg.event.get():
             if event.type == pg.QUIT:
