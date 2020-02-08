@@ -25,8 +25,8 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- blocks ----------
-tileSize = 31
-# block size on screen
+tileSize = 32
+# block size on screen, should depend on the screen resolution
 
 pg.init()
 
@@ -47,11 +47,11 @@ if sys.platform == 'linux':
 if not xdotool:
     screen = pg.display.set_mode((0,0), pg.RESIZABLE)
     screenWidth, screenHeight = pg.display.get_surface().get_size()
-pg.display.set_caption(str(np.random.randint(0,9000)))
-pg.mixer.init()
-screen = pg.display.set_mode((0,0), pg.RESIZABLE)
-screenWidth = screen.get_width()
-screenHeight = screen.get_height()
+    pg.display.set_caption(str(np.random.randint(0,9000)))
+    pg.mixer.init()
+    screen = pg.display.set_mode((0,0), pg.RESIZABLE)
+    screenWidth = screen.get_width()
+    screenHeight = screen.get_height()
 
 ## load config and all that
 blocks1.loadBlocks(tileSize)
@@ -79,12 +79,13 @@ def updateScreen():
     sprites.activeKollid.update(hullmyts, kollid)
     
 ## Screen and active window
-chunkSize = 33
+chunkWidth = int(np.ceil(screenWidth/2/tileSize))
+chunkHeight = int(np.ceil(screenHeight/2/tileSize))
 # size of tile chunks for loading/saving
-windowWidth = 3*chunkSize  # how many tiles loaded into the active window
-windowHeight = 3*chunkSize
+windowWidth = 3*chunkWidth  # how many tiles loaded into the active window
+windowHeight = 3*chunkHeight
 
-coordinates.setup(screenWidth, screenHeight, chunkSize, tileSize)
+coordinates.setup(screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize)
 screenBuffer = pg.Surface(size=(windowWidth*tileSize, windowHeight*tileSize))
 screenBuffer.fill(bgColor)
 spriteBuffer = pg.Surface([windowWidth*tileSize, windowHeight*tileSize], pg.SRCALPHA, 32)

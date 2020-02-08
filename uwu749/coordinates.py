@@ -2,7 +2,8 @@ import numpy as np
 
 ## basic data (meant to be private)
 screenWidth, screenHeight = None, None
-chunkSize = None
+chunkWidth = None
+chunkHeight = None
 tileSize = None
 ## shifts: 
 winsx = None  # window
@@ -18,7 +19,7 @@ class activeWindow():
    data related to the activeWindow: a square of the 9 cunks, centered at Crazy Hat
    """
    def __init__(self, width, height):
-      self.matrix = np.empty((width, height), 'int8')
+      self.matrix = np.empty((height, width), 'int8')
       self.chunkID = None
       # contains no chunks so far...
    def __getitem__(self, key):
@@ -60,9 +61,9 @@ class activeWindow():
       return chunkIDs
    
    def getWidth(self):
-      return self.matrix.shape[0]
-   def getHeight(self):
       return self.matrix.shape[1]
+   def getHeight(self):
+      return self.matrix.shape[0]
    
    def update(self, world, chunkID):
       """
@@ -77,19 +78,19 @@ class activeWindow():
          iChunk, jChunk = self.chunkID
          for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
             for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-               world.put((jc, ic), self.matrix[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize])
+               world.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
       ## read new chunks to the window
       iChunk, jChunk = chunkID
       for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
          for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-            self.matrix[j*chunkSize:(j+1)*chunkSize, i*chunkSize:(i+1)*chunkSize] = world.get((jc, ic))
+            self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = world.get((jc, ic))
       self.chunkID = chunkID
-
     
-def setup(screenw, screenh, chunksize, tilesize):
-   global screenWidth, screenHeight, chunkSize, tileSize
+def setup(screenw, screenh, chunkwidth, chunkheight, tilesize):
+   global screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize
    screenWidth, screenHeight = screenw, screenh
-   chunkSize = chunksize
+   chunkWidth = chunkwidth
+   chunkHeight = chunkheight
    tileSize = tilesize
 
 def chunkID(worldLoc):
@@ -98,7 +99,7 @@ def chunkID(worldLoc):
    inputs:
    worldLoc: tuple (x, y), world coordinates
    """
-   return worldLoc[0] // chunkSize, worldLoc[1] // chunkSize
+   return worldLoc[0] // chunkWidth, worldLoc[1] // chunkHeight
    
 def coordinateShifts(chunkID, cx, cy):
     """
@@ -115,14 +116,24 @@ def coordinateShifts(chunkID, cx, cy):
     """
     global winsx, winsy, sbsx, sbsy, ssx, ssy, blitShift
     iChunk, jChunk = chunkID
-    winsx = -(iChunk - 1)*chunkSize
-    winsy = -(jChunk - 1)*chunkSize
+    winsx = -(iChunk - 1)*chunkWidth
+    winsy = -(jChunk - 1)*chunkHeight
     ssx = int(screenWidth/2) - cx*tileSize
     # note: we can directly translate b/w world and screen w/o need for window!
     ssy = int(screenHeight/2) - cy*tileSize
     blitShift = worldToScreen(-winsx, -winsy)
 
 
+def screenToWorld(screenx, screeny):
+    """
+    transform world coordinates to screen coordinates
+    screenx, screeny: screen coordinates (pixels), horizontal, vertical
+    returns:
+    (x, y): world coordinates
+    """
+    return ((screenx - ssx) // tileSize, (screeny - ssy) // tileSize)
+
+ 
 def windowToWorld(winx, winy):
     """
     transform window coordinates to world coordinates
