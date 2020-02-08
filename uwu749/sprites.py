@@ -142,7 +142,11 @@ class CrazyHat(pg.sprite.Sprite):
             globals.activeWindow.update(ground, chunkID1)
             globals.activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
+            globals.activeMineralGold.empty()
+            # have to empty the group here to tell sprites they do not belong to that group
             globals.activeMineralGold = world.activeSprites(globals.mineralGold)
+            globals.activeKollid.empty()
+            # have to empty the group here to tell sprites they do not belong to that group
             globals.activeKollid = world.activeSprites(globals.kollid)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
