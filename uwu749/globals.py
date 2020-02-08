@@ -4,7 +4,9 @@ global variables that need to be accessed in different modules
 must be initialized in uwu, or in the corresponding module
 """
 
-kraam = None
+mineralGold = None
+# mineral gold: mineral means it is not movin
 activeWindow = None
-activeKraam = None
+activeMineralGold = None
+# mineral gold in active window
 activeKollid = None

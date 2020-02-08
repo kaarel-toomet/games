@@ -86,8 +86,8 @@ class World:
                             np.random.randint(0, chunk.shape[0])
           )
           x, y = coordinates.inchunkToWorld(chunkID, (chunkx, chunky))
-          globals.kraam.add(sprites.Gold(x, y))
-      globals.activeKraam = activeSprites(globals.kraam)
+          globals.mineralGold.add(sprites.Gold(x, y))
+      globals.activeMineralGold = activeSprites(globals.mineralGold)
       # those mineral sprites that are in activeWindow
       return chunk
 

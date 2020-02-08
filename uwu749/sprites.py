@@ -112,7 +112,7 @@ class CrazyHat(pg.sprite.Sprite):
         ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self, mup, mdown, mleft, mright,
-               kraam, kollid,
+               mineralGold, kollid,
                activeWindow, screenBuffer,
                ground):
         y = self.y
@@ -143,7 +143,7 @@ class CrazyHat(pg.sprite.Sprite):
             activeWindow.update(ground, chunkID1)
             activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            globals.activeKraam = world.activeSprites(kraam)
+            globals.activeMineralGold = world.activeSprites(mineralGold)
             globals.activeKollid = world.activeSprites(kollid)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
@@ -156,7 +156,7 @@ class CrazyHat(pg.sprite.Sprite):
         return(self.x, self.y)
 
     def setxy(self,x,y,
-              kraam, kollid,
+              mineralGold, kollid,
               activeWindow, screenBuffer,
               ground):
         """
@@ -170,7 +170,7 @@ class CrazyHat(pg.sprite.Sprite):
             activeWindow.update(ground, chunkID1)
             activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            globals.activeKraam = world.activeSprites(kraam, activeWindow)
+            globals.activeMineralGold = world.activeSprites(mineralGold, activeWindow)
             globals.activeKollid = world.activeSprites(kollid, activeWindow)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
@@ -238,4 +238,4 @@ class Koll(pg.sprite.Sprite):
 
 
 ## Define globals
-globals.kraam = ChunkSprites()
+globals.mineralGold = ChunkSprites()

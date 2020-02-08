@@ -75,7 +75,7 @@ def updateScreen():
     update various sprites.
     these must be done here as these need access various global variables
     """
-    globals.activeKraam.update()
+    globals.activeMineralGold.update()
     globals.activeKollid.update(hullmyts, kollid)
     
 ## Screen and active window
@@ -145,7 +145,7 @@ else:
 
 ## create the active window, centered on home:
 chunkID = coordinates.chunkID((homeX, homeY))
-globals.kraam = sprites.ChunkSprites()
+globals.mineralGold = sprites.ChunkSprites()
 globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
 coordinates.coordinateShifts(chunkID, homeX, homeY)
 globals.activeWindow.update(ground, chunkID)
@@ -153,7 +153,7 @@ globals.activeWindow.update(ground, chunkID)
 globals.activeKollid = world.activeSprites(kollid)
 # have to initialize this, in principle we may have a few kolls pre-created
 globals.activeWindow.draw(screenBuffer, blocks1.blocks)
-drawSprites(globals.activeKraam, spriteBuffer)
+drawSprites(globals.activeMineralGold, spriteBuffer)
 
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
@@ -186,7 +186,7 @@ def reset():
     hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(hullmyts)
     hullmyts.setxy(homeX, homeY,
-                   globals.kraam, kollid,
+                   globals.mineralGold, kollid,
                    globals.activeWindow, screenBuffer,
                    ground)
     
@@ -214,7 +214,7 @@ def destroy(x,y):
     breakto = blocks1.breakto[ material]
     ## if gold and destroyable material
     if np.random.randint(0,200) == 0 and material != breakto:
-        globals.kraam.add(sprites.Gold(x,y))
+        globals.mineralGold.add(sprites.Gold(x,y))
     items[material] += 1
     screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
@@ -298,7 +298,7 @@ while do:
                 ## go home
                 hullmyts.setxy(homeX, homeY,
                                # setxy can change chunks, so potentially have to update all this stuff here
-                               globals.kraam, kollid,
+                               globals.mineralGold, kollid,
                                globals.activeWindow, screenBuffer,
                                ground)
             elif event.key == pg.K_h:
@@ -374,10 +374,10 @@ while do:
         winy = np.random.randint(0, globals.activeWindow.getHeight())
         kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
         globals.activeKollid = world.activeSprites(kollid)
-    col = pg.sprite.spritecollide(hullmyts, globals.activeKraam, False)
+    col = pg.sprite.spritecollide(hullmyts, globals.activeMineralGold, False)
     if len(col) > 0:
-        globals.activeKraam.remove(col)
-        globals.kraam.remove(col)
+        globals.activeMineralGold.remove(col)
+        globals.mineralGold.remove(col)
         punktid += 100
     col = pg.sprite.spritecollide(hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
@@ -395,7 +395,7 @@ while do:
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
              "  [x,y: " + str((hullmyts.x, hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((hullmyts.x, hullmyts.y))) + "]")
-    if globals.kraam.getN() == 0:
+    if globals.mineralGold.getN() == 0:
         score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
@@ -407,13 +407,13 @@ while do:
     if seehome == 1:
         screen.blit(home, coordinates.worldToScreen(homeX, homeY))
     ## draw sprites: static: no update need, dynamic: update
-    drawSprites(globals.activeKraam, spriteBuffer)
+    drawSprites(globals.activeMineralGold, spriteBuffer)
     kutid.update()
     kutid.draw(spriteBuffer)
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
     player.update(mup, mdown, mleft, mright,
-                  globals.kraam, kollid,
+                  globals.mineralGold, kollid,
                   globals.activeWindow, screenBuffer,
                   ground)
     player.draw(spriteBuffer)
