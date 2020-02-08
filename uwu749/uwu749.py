@@ -76,7 +76,7 @@ def updateScreen():
     these must be done here as these need access various global variables
     """
     globals.activeMineralGold.update()
-    globals.activeKollid.update(kollid)
+    globals.activeKollid.update(globals.kollid)
     
 ## Screen and active window
 chunkWidth = int(np.ceil(screenWidth/2/tileSize))
@@ -124,7 +124,7 @@ aia = 0
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
-kollid = sprites.ChunkSprites()
+globals.kollid = sprites.ChunkSprites()
 
 ##
 s = None
@@ -152,7 +152,7 @@ globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
 coordinates.coordinateShifts(chunkID, homeX, homeY)
 globals.activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
-globals.activeKollid = world.activeSprites(kollid)
+globals.activeKollid = world.activeSprites(globals.kollid)
 # have to initialize this, in principle we may have a few kolls pre-created
 globals.activeWindow.draw(screenBuffer, blocks1.blocks)
 drawSprites(globals.activeMineralGold, spriteBuffer)
@@ -179,7 +179,6 @@ def reset():
     reset lifes and score
     """
     global gameover, lifes, punktid, player
-    kollid
     screenBuffer, ground
     punktid = 0
     gameover = False
@@ -188,9 +187,8 @@ def reset():
     globals.hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(globals.hullmyts)
     globals.hullmyts.setxy(homeX, homeY,
-                   globals.mineralGold, kollid,
-                   globals.activeWindow, screenBuffer,
-                   ground)
+                           screenBuffer,
+                           ground)
     
 def build(x,y):
     global bb
@@ -229,15 +227,14 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global punktid, kollid
+    global punktid
     # punktid: (global) score
-    # kollid: (global) list of monsters
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
             print("removing", id(activeKoll))
-            kollid.remove([activeKoll])
+            globals.kollid.remove([activeKoll])
             globals.activeKollid.remove(activeKoll)
-            kollid.remove([activeKoll])
+            globals.kollid.remove([activeKoll])
             punktid += 100
             
 
@@ -300,8 +297,7 @@ while do:
                 ## go home
                 globals.hullmyts.setxy(homeX, homeY,
                                # setxy can change chunks, so potentially have to update all this stuff here
-                               globals.mineralGold, kollid,
-                               globals.activeWindow, screenBuffer,
+                               screenBuffer,
                                ground)
             elif event.key == pg.K_h:
                 homeX = globals.hullmyts.getxy()[0]
@@ -380,8 +376,8 @@ while do:
     if np.random.randint(0, 201) == 0:
         winx = np.random.randint(0, globals.activeWindow.getWidth())
         winy = np.random.randint(0, globals.activeWindow.getHeight())
-        kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
-        globals.activeKollid = world.activeSprites(kollid)
+        globals.kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
+        globals.activeKollid = world.activeSprites(globals.kollid)
     col = pg.sprite.spritecollide(globals.hullmyts, globals.activeMineralGold, False)
     if len(col) > 0:
         globals.activeMineralGold.remove(col)
@@ -421,8 +417,7 @@ while do:
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
     player.update(mup, mdown, mleft, mright,
-                  globals.mineralGold, kollid,
-                  globals.activeWindow, screenBuffer,
+                  screenBuffer,
                   ground)
     player.draw(spriteBuffer)
     pg.display.update()

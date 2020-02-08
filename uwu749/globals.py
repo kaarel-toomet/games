@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 global variables that need to be accessed in different modules
-must be initialized in uwu, or in the corresponding module
+these are just variable declarations, these must
+be initialized in uwu, or in the corresponding module
 """
 
 # the window that contains active chunks
@@ -12,5 +13,7 @@ hullmyts = None
 mineralGold = None
 # mineral gold in active window
 activeMineralGold = None
-#
+# monsters that want to eat you.  Technically, unlike minerals, these move
+kollid = None
+# monsters in the active window
 activeKollid = None
