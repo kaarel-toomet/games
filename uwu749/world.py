@@ -5,19 +5,20 @@ import pygame as pg
 import random as r
 
 import coordinates
+import globals
+import sprites
 
-
-def activeSprites(sprites, activeWindow):
+def activeSprites(sprites):
    """
    extract the sprites from 'sprites' that are inside 'activeWindow'
    INPUTS:
    sprites:
    chunk-sprite groups like 'Minerals'
    RETURN:
-   pg.sprits.Group of sprites inside of the window
+   pg.sprites.Group of sprites inside of the window
    """
    activeSprites = pg.sprite.Group()
-   chunkIDs = activeWindow.getChunkIDs()
+   chunkIDs = globals.activeWindow.getChunkIDs()
    for chunkID in chunkIDs:
       s = sprites.get(chunkID)
       # list of sprites for this chunk
@@ -54,6 +55,7 @@ class World:
       """
       if chunkID in self.chunks:
          return self.chunks[chunkID]
+      ## create a new chunk
       chunk = np.empty((coordinates.chunkHeight, coordinates.chunkWidth), 'int8')
       jc, ic = chunkID
       for cx in range(chunk.shape[1]):
@@ -78,6 +80,15 @@ class World:
               elif noiseval < 11:
                  chunk[cy, cx] = 4
       self.chunks[chunkID] = chunk
+      ## create minerals: sprites that do not move
+      for i in range(1):
+          chunkx, chunky = (np.random.randint(0, chunk.shape[1]),
+                            np.random.randint(0, chunk.shape[0])
+          )
+          x, y = coordinates.inchunkToWorld(chunkID, (chunkx, chunky))
+          globals.mineralGold.add(sprites.Gold(x, y))
+      globals.activeMineralGold = activeSprites(globals.mineralGold)
+      # those mineral sprites that are in activeWindow
       return chunk
 
    def put(self, chunkID, data):

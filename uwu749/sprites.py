@@ -8,6 +8,7 @@ import random
 import blocks1
 import coordinates
 import world
+import globals
 
 crazyHatImage = None
 kollImage = None
@@ -18,10 +19,8 @@ def setup(tileSize):
    crazyHatImage = pg.transform.scale(pg.image.load("pic.png"),(tileSize, tileSize))
    kuldImage = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
    kollImage = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
+      
 
-activeKraam = None
-activeKollid = None
-   
 class ChunkSprites():
    """
    Group of sprites connected to chunks and will be loaded/saved
@@ -74,7 +73,6 @@ class ChunkSprites():
       """
       remove the sprite from old chunkID and add it to newChunkID
       """
-      print("moving", (sprite.x, sprite.y), "from chunk", sprite.chunkID, "to", newChunkID) 
       chunkSprites = self.chunks.get(sprite.chunkID, [])
       try:
          chunkSprites.remove(sprite)
@@ -91,7 +89,6 @@ class ChunkSprites():
       """
       for sprite in spriteList:
          chunkID = coordinates.chunkID((sprite.x, sprite.y))
-         print("removing at", (sprite.x, sprite.y), "chunk", coordinates.chunkID((sprite.x, sprite.y))) 
          chunkSprites = self.chunks.get(chunkID, [])
          try:
             chunkSprites.remove(sprite)
@@ -115,8 +112,7 @@ class CrazyHat(pg.sprite.Sprite):
         ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self, mup, mdown, mleft, mright,
-               kraam, kollid,
-               activeWindow, screenBuffer,
+               screenBuffer,
                ground):
         y = self.y
         x = self.x
@@ -132,22 +128,22 @@ class CrazyHat(pg.sprite.Sprite):
         #     # no movement
         #     return
         winx, winy = coordinates.worldToWindow(x, y)
-        if activeWindow[(winy,winx)] in blocks1.solid:
+        if globals.activeWindow[(winy,winx)] in blocks1.solid:
            return
-        if activeWindow[(winy,winx)] in blocks1.breakable:
-            activeWindow[(winy,winx)] = blocks1.breakto[activeWindow[(winy,winx)]]
-            screenBuffer.blit( blocks1.blocks[blocks1.breakto[activeWindow[(winy,winx)]]],
+        if globals.activeWindow[(winy,winx)] in blocks1.breakable:
+            globals.activeWindow[(winy,winx)] = blocks1.breakto[globals.activeWindow[(winy,winx)]]
+            screenBuffer.blit( blocks1.blocks[blocks1.breakto[globals.activeWindow[(winy,winx)]]],
                                coordinates.worldToScreenbuffer(x, y))
         self.x, self.y = x, y
-        chunkID = activeWindow.getChunkID()
+        chunkID = globals.activeWindow.getChunkID()
         chunkID1 = coordinates.chunkID((self.x, self.y))
         if chunkID1 != chunkID:
             ## chunk changed: update activeWindow and sprites
-            activeWindow.update(ground, chunkID1)
-            activeWindow.draw(screenBuffer, blocks1.blocks)
+            globals.activeWindow.update(ground, chunkID1)
+            globals.activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            activeKraam = world.activeSprites(kraam, activeWindow)
-            activeKollid = world.activeSprites(kollid, activeWindow)
+            globals.activeMineralGold = world.activeSprites(globals.mineralGold)
+            globals.activeKollid = world.activeSprites(globals.kollid)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
@@ -159,22 +155,21 @@ class CrazyHat(pg.sprite.Sprite):
         return(self.x, self.y)
 
     def setxy(self,x,y,
-              kraam, kollid,
-              activeWindow, screenBuffer,
+              screenBuffer,
               ground):
         """
         x, y: world coordinates
         """
         self.x, self.y = x, y
-        chunkID = activeWindow.getChunkID()
+        chunkID = globals.activeWindow.getChunkID()
         chunkID1 = coordinates.chunkID((self.x, self.y))
         if chunkID1 != chunkID:
             ## chunk changed: update activeWindow and sprites
-            activeWindow.update(ground, chunkID1)
-            activeWindow.draw(screenBuffer, blocks1.blocks)
+            globals.activeWindow.update(ground, chunkID1)
+            globals.activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            activeKraam = world.activeSprites(kraam, activeWindow)
-            activeKollid = world.activeSprites(kollid, activeWindow)
+            globals.activeMineralGold = world.activeSprites(globals.mineralGold)
+            globals.activeKollid = world.activeSprites(globals.kollid)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
@@ -220,12 +215,15 @@ class Koll(pg.sprite.Sprite):
        """
        return(self.x, self.y)
    
-    def update(self, hullmyts, monsters):
+    def update(self, monsters):
         """
         moves the koll at random toward the Crazy Hat
+        monsters: list of monsters (ChunkSprites), have to update monsters in this list
+                  as self is 'activeKollid'
         """
         if np.random.randint(0,30) == 0:
-            xy = hullmyts.getxy()
+            xy = globals.hullmyts.getxy()
+            # hullmyts: CrazyHat, needed for movement direction
             delta = np.sign([self.x - xy[0], self.y - xy[1]])
             self.x -= delta[0]
             self.y -= delta[1]
@@ -235,3 +233,7 @@ class Koll(pg.sprite.Sprite):
                monsters.moveChunk(self, newChunkID)
                self.chunkID = newChunkID
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+
+
+## Define globals
+globals.mineralGold = ChunkSprites()

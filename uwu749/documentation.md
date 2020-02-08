@@ -10,13 +10,14 @@ TBD
 
 #### Related Concepts
 
-* **chunk**: a square of tiles of size `chunkSize`.  This is used to copy
+* **chunk**: a rectangle of tiles of size `chunkWidth*chunkHeight`.  This is used to copy
    tiles data from world to _active window_.
    Each chunk is identified by
-   `(iChunk, jChunk) = (x // chunkSize, y // chunkSize)`.
+   `(iChunk, jChunk) = (x // chunkWidth, y // chunkHeight)`.
    If Crazy Hat is located at `(x, y)`, this corresponds to the chunks
-   `(x // chunkSize, y // chunkSize)`.
-   This chunk, and all it's 8 neighbors are copied into _active window_.
+   `(x // chunkHeight, y // chunkWidth)`.
+   This chunk, and all it's 8 neighbors are copied into _active
+   window_.
 * **world**: this is a collection of all tiles of the world.  It
    contain the world properties (type of tile as 'int8') for every possible location.
    Technically, world is stored as a dict of of chunks where _chunk
@@ -39,7 +40,7 @@ TBD
  
 #### Coordinate systems
  
-the game uses 4 types of coordinates:
+the game uses 5 types of coordinates:
 * **world coordinates**.  These are in tiles and of unlimited size.
   Normally the center is at `(0,0)`.  The numbers grow right and
   down.  Typically denoted as `x`, `y`.
@@ -47,15 +48,18 @@ the game uses 4 types of coordinates:
   size is `3*chunkWidth` times `3*chunkHeight`.  Normally denoted `winx`, `winy`.
 * **screenBuffer coordinates**, in pixels, `(0,0)`, is top left.
   Pretty much the same thing as _active window coordinated_, just in
-  pixels.  It is a square with side length `3*chunkSize*tileSize`.
+  pixels.  It is a rectangle with side length `3*chunkWidth*tileSize`
+  and height `3*chunkHeight*tileSize`.
 * **screen coordinates** in pixels, (0,0) is top left
    these measure pixel locations on current screen.  Size is stored in
    `screenWidth`, `screenHeight`, and depends on your monitor.
    Normally called `screenx` and `screeny`.
+* **in-chunk coordinates**, location of objects (in tiles) inside each
+  chunk.  Used as `(inchunkx, inchunky)`, lower left is _(0,0)_. 
+* **chunkID** is the identifier of the chunk.  It is in form _(iChunk,
+  jChunk)_, where _iChunk_ is _row_ and _jChunk_ is _column_.  I.e. it
+  is in row/column, not in x/y form.
 
-In principle there are two more coordinate systems: one chunk-based
-(based on `(iChunk, jChunk)`), and one for each chunk.  These are
-currently not formalized.
 
 #### Coordinate translations
 
@@ -70,7 +74,7 @@ parameters:
 
 ```python
 import coordinates
-coordinates.setup(screenWidth, screenHeight, chunkSize, tileSize)
+coordinates.setup(screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize)
 ```
 This initializes the module-specific variables.
 
@@ -86,6 +90,8 @@ Hat's world coordinates).
 
 Now you can use functions
 ```python
+chunkToWorld(chunkx, chunky)
+screenToWorld(screenx, screeny)
 worldToWindow(x, y)
 worldToScreen(x, y)
 worldToScreenbuffer(x, y)
@@ -95,4 +101,20 @@ All of these take in two coordinates and return a tuple of translated
 coordinates. 
 
 
-#### Code
+### Code
+
+#### Module structure
+
+For various reasons, the code is split into different modules:
+
+* **globals**: global variables, including sprites and windows that
+  must be accessed from different points of code.  Some of the
+  globals are encapsulated in modules if they are intended to be used
+  just by corresponding functions.  This includes different coordinate
+  transformation-related variables.
+* **coordinates**: _activeWindow_ and coordinate translations
+* **uwu**: the main game
+* **sprites**: _chunkSprites_, and other sprites
+* **world**: _activeSprites_ and the world chunks related data
+  structures
+  
