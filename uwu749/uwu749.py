@@ -127,7 +127,7 @@ sprites.setup(tileSize)
 kraam = sprites.ChunkSprites()
 kollid = sprites.ChunkSprites()
 hullmyts = None
-
+speed = False
 ##
 s = None
 if s is not None:
@@ -329,6 +329,8 @@ while do:
                 title = True
             elif event.key == pg.K_o:
                 kutid.add(Tüüp(hullmyts.getxy()[0],hullmyts.getxy()[1]))
+            elif event.key == pg.K_LSHIFT:
+                speed = True
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -338,6 +340,8 @@ while do:
                 mleft = False
             elif event.key == pg.K_RIGHT:
                 mright = False
+            elif event.key == pg.K_LSHIFT:
+                speed = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             mxy = pg.mouse.get_pos()
             tol = tileSize*6
@@ -433,6 +437,12 @@ while do:
                   activeWindow, screenBuffer,
                   ground)
     player.draw(spriteBuffer)
+    ## if you are not speeding
+    if not speed:
+        mup = False
+        mdown = False
+        mleft = False
+        mright = False
     pg.display.update()
     ##
     timer.tick(60)
