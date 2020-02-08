@@ -20,9 +20,6 @@ def setup(tileSize):
    kuldImage = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
    kollImage = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
 
-activeKraam = None
-activeKollid = None
-
 class Test():
    def __init__(self):
       print("test class initializer")
@@ -152,8 +149,8 @@ class CrazyHat(pg.sprite.Sprite):
             activeWindow.update(ground, chunkID1)
             activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            activeKraam = world.activeSprites(kraam)
-            activeKollid = world.activeSprites(kollid)
+            globals.activeKraam = world.activeSprites(kraam)
+            globals.activeKollid = world.activeSprites(kollid)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
@@ -179,8 +176,8 @@ class CrazyHat(pg.sprite.Sprite):
             activeWindow.update(ground, chunkID1)
             activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            activeKraam = world.activeSprites(kraam, activeWindow)
-            activeKollid = world.activeSprites(kollid, activeWindow)
+            globals.activeKraam = world.activeSprites(kraam, activeWindow)
+            globals.activeKollid = world.activeSprites(kollid, activeWindow)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update

@@ -75,9 +75,8 @@ def updateScreen():
     update various sprites.
     these must be done here as these need access various global variables
     """
-    global activeKraam, activeKollid
-    sprites.activeKraam.update()
-    sprites.activeKollid.update(hullmyts, kollid)
+    globals.activeKraam.update()
+    globals.activeKollid.update(hullmyts, kollid)
     
 ## Screen and active window
 chunkWidth = int(np.ceil(screenWidth/2/tileSize))
@@ -150,10 +149,10 @@ globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
 coordinates.coordinateShifts(chunkID, homeX, homeY)
 globals.activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
-sprites.activeKollid = world.activeSprites(kollid)
+globals.activeKollid = world.activeSprites(kollid)
 # have to initialize this, in principle we may have a few kolls pre-created
 globals.activeWindow.draw(screenBuffer, blocks1.blocks)
-drawSprites(sprites.activeKraam, spriteBuffer)
+drawSprites(globals.activeKraam, spriteBuffer)
 
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
@@ -230,11 +229,11 @@ def killKolls(location):
     global punktid, kollid
     # punktid: (global) score
     # kollid: (global) list of monsters
-    for activeKoll in sprites.activeKollid:
+    for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
             print("removing", id(activeKoll))
             kollid.remove([activeKoll])
-            sprites.activeKollid.remove(activeKoll)
+            globals.activeKollid.remove(activeKoll)
             kollid.remove([activeKoll])
             punktid += 100
             
@@ -373,14 +372,13 @@ while do:
         winx = np.random.randint(0, globals.activeWindow.getWidth())
         winy = np.random.randint(0, globals.activeWindow.getHeight())
         kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
-        sprites.activeKollid = world.activeSprites(kollid)
-        print("-- koll:", winx, winy, sprites.activeKollid)
-    col = pg.sprite.spritecollide(hullmyts, sprites.activeKraam, False)
+        globals.activeKollid = world.activeSprites(kollid)
+    col = pg.sprite.spritecollide(hullmyts, globals.activeKraam, False)
     if len(col) > 0:
-        sprites.activeKraam.remove(col)
+        globals.activeKraam.remove(col)
         globals.kraam.remove(col)
         punktid += 100
-    col = pg.sprite.spritecollide(hullmyts, sprites.activeKollid, False)
+    col = pg.sprite.spritecollide(hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
         lifes -= 1
         aia = 30
@@ -408,11 +406,11 @@ while do:
     if seehome == 1:
         screen.blit(home, coordinates.worldToScreen(homeX, homeY))
     ## draw sprites: static: no update need, dynamic: update
-    drawSprites(sprites.activeKraam, spriteBuffer)
+    drawSprites(globals.activeKraam, spriteBuffer)
     kutid.update()
     kutid.draw(spriteBuffer)
     updateScreen()
-    drawSprites(sprites.activeKollid, spriteBuffer)
+    drawSprites(globals.activeKollid, spriteBuffer)
     player.update(mup, mdown, mleft, mright,
                   globals.kraam, kollid,
                   globals.activeWindow, screenBuffer,

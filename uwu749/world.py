@@ -81,14 +81,15 @@ class World:
                  chunk[cy, cx] = 4
       self.chunks[chunkID] = chunk
       ## create minerals: sprites that do not move
-      for i in range(10):
+      for i in range(5):
           chunkx, chunky = (np.random.randint(0, chunk.shape[1]),
                             np.random.randint(0, chunk.shape[0])
           )
           x, y = coordinates.inchunkToWorld(chunkID, chunkx, chunky)
           globals.kraam.add(sprites.Gold(x, y))
-          sprites.activeKraam = activeSprites(globals.kraam)
+          globals.activeKraam = activeSprites(globals.kraam)
           # those mineral sprites that are in activeWindow
+      globals.activeKraam.update()
       return chunk
 
    def put(self, chunkID, data):
