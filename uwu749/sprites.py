@@ -170,8 +170,8 @@ class CrazyHat(pg.sprite.Sprite):
             activeWindow.update(ground, chunkID1)
             activeWindow.draw(screenBuffer, blocks1.blocks)
             chunkID = chunkID1
-            globals.activeMineralGold = world.activeSprites(mineralGold, activeWindow)
-            globals.activeKollid = world.activeSprites(kollid, activeWindow)
+            globals.activeMineralGold = world.activeSprites(mineralGold)
+            globals.activeKollid = world.activeSprites(kollid)
             coordinates.coordinateShifts(chunkID, self.x, self.y)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
