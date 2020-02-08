@@ -125,6 +125,7 @@ player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
+speed = False
 
 ##
 s = None
@@ -317,7 +318,9 @@ while do:
             elif event.key == pg.K_t:
                 title = True
             elif event.key == pg.K_o:
-                kutid.add(Tüüp(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]))
+                kutid.add(Tüüp(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]))
+            elif event.key == pg.K_LSHIFT:
+                speed = True
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -327,6 +330,8 @@ while do:
                 mleft = False
             elif event.key == pg.K_RIGHT:
                 mright = False
+            elif event.key == pg.K_LSHIFT:
+                speed = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             mxy = pg.mouse.get_pos()
             tol = tileSize*6
@@ -420,6 +425,12 @@ while do:
                   screenBuffer,
                   ground)
     player.draw(spriteBuffer)
+    ## if you are not speeding
+    if not speed:
+        mup = False
+        mdown = False
+        mleft = False
+        mright = False
     pg.display.update()
     ##
     timer.tick(60)
