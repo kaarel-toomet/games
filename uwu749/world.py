@@ -2,6 +2,7 @@
 import numpy as np
 import noise
 import pygame as pg
+import random as r
 
 import coordinates
 
@@ -69,7 +70,9 @@ class World:
               elif noiseval < 0:
                  chunk[cy, cx] = 1
               elif noiseval < 0.3:
-                 chunk[cy, cx] = 2
+                  chunk[cy,cx] = 2
+                  if r.randint(0,100)==0:
+                      chunk[cy,cx] = 8
               elif noiseval < 0.4:
                  chunk[cy, cx] = 3
               elif noiseval < 11:

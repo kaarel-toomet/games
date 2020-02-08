@@ -9,11 +9,12 @@ LUMI = 4
 TEE = 5
 KAST = 6
 SUGAVM = 7
-BLOCK_END = 7
+PUU = 8
+BLOCK_END = 8
 
 breakable = set([])
 solid = set([KAST])
-breakto = {SUGAVM:SUGAVM, SEA:SUGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI}
+breakto = {SUGAVM:SUGAVM, SEA:SUGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU}
 
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
@@ -53,9 +54,11 @@ def loadBlocks(size):
                                 (size, size))
     odoor = pg.transform.scale(pg.image.load("blocks/odoor.png"),
                                 (size, size))
+    puu = pg.transform.scale(pg.image.load("blocks/puu.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
-               KAST:kast, KIVI:kivi, LUMI:lumi, SUGAVM:sugavv}
+               KAST:kast, KIVI:kivi, LUMI:lumi, SUGAVM:sugavv, PUU:puu}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
-        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SUGAVM:"sügav vesi"}
+        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SUGAVM:"sügav vesi", PUU:"puu"}
 
