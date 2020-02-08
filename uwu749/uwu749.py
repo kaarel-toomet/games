@@ -76,7 +76,7 @@ def updateScreen():
     these must be done here as these need access various global variables
     """
     globals.activeMineralGold.update()
-    globals.activeKollid.update(hullmyts, kollid)
+    globals.activeKollid.update(kollid)
     
 ## Screen and active window
 chunkWidth = int(np.ceil(screenWidth/2/tileSize))
@@ -122,7 +122,6 @@ player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 kollid = sprites.ChunkSprites()
-hullmyts = None
 
 ##
 s = None
@@ -176,16 +175,16 @@ def reset():
     """
     reset lifes and score
     """
-    global hullmyts, gameover, lifes, punktid, player
+    global gameover, lifes, punktid, player
     kollid
     screenBuffer, ground
     punktid = 0
     gameover = False
     lifes = 5
     player.empty()
-    hullmyts = sprites.CrazyHat(homeX, homeY)
-    player.add(hullmyts)
-    hullmyts.setxy(homeX, homeY,
+    globals.hullmyts = sprites.CrazyHat(homeX, homeY)
+    player.add(globals.hullmyts)
+    globals.hullmyts.setxy(homeX, homeY,
                    globals.mineralGold, kollid,
                    globals.activeWindow, screenBuffer,
                    ground)
@@ -277,33 +276,33 @@ while do:
                 mright = True
                 ##
             elif event.key == pg.K_a:
-                build(hullmyts.getxy()[0]-1,hullmyts.getxy()[1])
+                build(globals.hullmyts.getxy()[0]-1, globals.hullmyts.getxy()[1])
             elif event.key == pg.K_s:
-                build(hullmyts.getxy()[0],hullmyts.getxy()[1]+1)
+                build(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]+1)
             elif event.key == pg.K_d:
-                build(hullmyts.getxy()[0]+1,hullmyts.getxy()[1])
+                build(globals.hullmyts.getxy()[0]+1, globals.hullmyts.getxy()[1])
             elif event.key == pg.K_w:
-                build(hullmyts.getxy()[0],hullmyts.getxy()[1]-1)
+                build(globals.hullmyts.getxy()[0], globals.globals.hullmyts.getxy()[1]-1)
             # elif event.key == pg.K_j:
-            #     destroy(hullmyts.getxy()[0]-1,hullmyts.getxy()[1])
+            #     destroy(globals.hullmyts.getxy()[0]-1,globals.hullmyts.getxy()[1])
             # elif event.key == pg.K_k:
-            #     destroy(hullmyts.getxy()[0],hullmyts.getxy()[1]+1)
+            #     destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]+1)
             # elif event.key == pg.K_l:
-            #     destroy(hullmyts.getxy()[0]+1,hullmyts.getxy()[1])
+            #     destroy(globals.hullmyts.getxy()[0]+1,globals.hullmyts.getxy()[1])
             # elif event.key == pg.K_i:
-            #     destroy(hullmyts.getxy()[0],hullmyts.getxy()[1]-1)
+            #     destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]-1)
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
                 ## go home
-                hullmyts.setxy(homeX, homeY,
+                globals.hullmyts.setxy(homeX, homeY,
                                # setxy can change chunks, so potentially have to update all this stuff here
                                globals.mineralGold, kollid,
                                globals.activeWindow, screenBuffer,
                                ground)
             elif event.key == pg.K_h:
-                homeX = hullmyts.getxy()[0]
-                homeY = hullmyts.getxy()[1]
+                homeX = globals.hullmyts.getxy()[0]
+                homeY = globals.hullmyts.getxy()[1]
             elif event.key == pg.K_RIGHTBRACKET and bb < blocks1.BLOCK_END:
                 bb += 1
             elif event.key == pg.K_LEFTBRACKET and bb > 0:
@@ -313,13 +312,13 @@ while do:
             elif event.key == pg.K_z:
                 files1.saveWorld(world, (homeX, homeY), items)
             elif event.key == pg.K_c:
-                destroy(hullmyts.getxy()[0],hullmyts.getxy()[1])
+                destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])
             elif event.key == pg.K_g:
                 gmod = 1-gmod
             elif event.key == pg.K_t:
                 title = True
             elif event.key == pg.K_o:
-                kutid.add(Tüüp(hullmyts.getxy()[0],hullmyts.getxy()[1]))
+                kutid.add(Tüüp(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1]))
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -374,12 +373,12 @@ while do:
         winy = np.random.randint(0, globals.activeWindow.getHeight())
         kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
         globals.activeKollid = world.activeSprites(kollid)
-    col = pg.sprite.spritecollide(hullmyts, globals.activeMineralGold, False)
+    col = pg.sprite.spritecollide(globals.hullmyts, globals.activeMineralGold, False)
     if len(col) > 0:
         globals.activeMineralGold.remove(col)
         globals.mineralGold.remove(col)
         punktid += 100
-    col = pg.sprite.spritecollide(hullmyts, globals.activeKollid, False)
+    col = pg.sprite.spritecollide(globals.hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
         lifes -= 1
         aia = 30
@@ -393,8 +392,8 @@ while do:
     pg.draw.rect(screen,(0,0,0),(0,10,screenWidth,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
-             "  [x,y: " + str((hullmyts.x, hullmyts.y)) +
-             ", chunk: " + str(coordinates.chunkID((hullmyts.x, hullmyts.y))) + "]")
+             "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
+             ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
     if globals.mineralGold.getN() == 0:
         score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))

@@ -101,4 +101,20 @@ All of these take in two coordinates and return a tuple of translated
 coordinates. 
 
 
-#### Code
+### Code
+
+#### Module structure
+
+For various reasons, the code is split into different modules:
+
+* **globals**: global variables, including sprites and windows that
+  must be accessed from different points of code.  Some of the
+  globals are encapsulated in modules if they are intended to be used
+  just by corresponding functions.  This includes different coordinate
+  transformation-related variables.
+* **coordinates**: _activeWindow_ and coordinate translations
+* **uwu**: the main game
+* **sprites**: _chunkSprites_, and other sprites
+* **world**: _activeSprites_ and the world chunks related data
+  structures
+  
