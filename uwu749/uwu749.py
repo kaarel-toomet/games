@@ -145,6 +145,7 @@ else:
 
 ## create the active window, centered on home:
 chunkID = coordinates.chunkID((homeX, homeY))
+globals.kraam = sprites.ChunkSprites()
 globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
 coordinates.coordinateShifts(chunkID, homeX, homeY)
 globals.activeWindow.update(ground, chunkID)

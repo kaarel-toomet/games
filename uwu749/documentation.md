@@ -16,7 +16,8 @@ TBD
    `(iChunk, jChunk) = (x // chunkWidth, y // chunkHeight)`.
    If Crazy Hat is located at `(x, y)`, this corresponds to the chunks
    `(x // chunkHeight, y // chunkWidth)`.
-   This chunk, and all it's 8 neighbors are copied into _active window_.
+   This chunk, and all it's 8 neighbors are copied into _active
+   window_.
 * **world**: this is a collection of all tiles of the world.  It
    contain the world properties (type of tile as 'int8') for every possible location.
    Technically, world is stored as a dict of of chunks where _chunk
@@ -55,10 +56,10 @@ the game uses 5 types of coordinates:
    Normally called `screenx` and `screeny`.
 * **in-chunk coordinates**, location of objects (in tiles) inside each
   chunk.  Used as `(inchunkx, inchunky)`, lower left is _(0,0)_. 
+* **chunkID** is the identifier of the chunk.  It is in form _(iChunk,
+  jChunk)_, where _iChunk_ is _row_ and _jChunk_ is _column_.  I.e. it
+  is in row/column, not in x/y form.
 
-In principle there are two more coordinate systems: one chunk-based
-(based on `(iChunk, jChunk)`).  These are
-currently not formalized.
 
 #### Coordinate translations
 

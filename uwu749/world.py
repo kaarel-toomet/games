@@ -15,7 +15,7 @@ def activeSprites(sprites):
    sprites:
    chunk-sprite groups like 'Minerals'
    RETURN:
-   pg.sprits.Group of sprites inside of the window
+   pg.sprites.Group of sprites inside of the window
    """
    activeSprites = pg.sprite.Group()
    chunkIDs = globals.activeWindow.getChunkIDs()
@@ -81,15 +81,14 @@ class World:
                  chunk[cy, cx] = 4
       self.chunks[chunkID] = chunk
       ## create minerals: sprites that do not move
-      for i in range(5):
+      for i in range(1):
           chunkx, chunky = (np.random.randint(0, chunk.shape[1]),
                             np.random.randint(0, chunk.shape[0])
           )
-          x, y = coordinates.inchunkToWorld(chunkID, chunkx, chunky)
+          x, y = coordinates.inchunkToWorld(chunkID, (chunkx, chunky))
           globals.kraam.add(sprites.Gold(x, y))
-          globals.activeKraam = activeSprites(globals.kraam)
-          # those mineral sprites that are in activeWindow
-      globals.activeKraam.update()
+      globals.activeKraam = activeSprites(globals.kraam)
+      # those mineral sprites that are in activeWindow
       return chunk
 
    def put(self, chunkID, data):

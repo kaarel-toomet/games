@@ -19,10 +19,6 @@ def setup(tileSize):
    crazyHatImage = pg.transform.scale(pg.image.load("pic.png"),(tileSize, tileSize))
    kuldImage = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
    kollImage = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
-
-class Test():
-   def __init__(self):
-      print("test class initializer")
       
 
 class ChunkSprites():
@@ -77,7 +73,6 @@ class ChunkSprites():
       """
       remove the sprite from old chunkID and add it to newChunkID
       """
-      print("moving", (sprite.x, sprite.y), "from chunk", sprite.chunkID, "to", newChunkID) 
       chunkSprites = self.chunks.get(sprite.chunkID, [])
       try:
          chunkSprites.remove(sprite)
@@ -94,7 +89,6 @@ class ChunkSprites():
       """
       for sprite in spriteList:
          chunkID = coordinates.chunkID((sprite.x, sprite.y))
-         print("removing at", (sprite.x, sprite.y), "chunk", coordinates.chunkID((sprite.x, sprite.y))) 
          chunkSprites = self.chunks.get(chunkID, [])
          try:
             chunkSprites.remove(sprite)

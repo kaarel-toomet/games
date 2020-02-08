@@ -105,15 +105,16 @@ def chunkID(worldLoc):
    """
    return worldLoc[0] // chunkWidth, worldLoc[1] // chunkHeight
 
-def inchunkToWorld(chunkID, chunkx, chunky):
+def inchunkToWorld(chunkID, inchunkLoc):
     """
     transform in-chunk coordinates to world coordinates
     chunkID: chunk id (i, j)
-    chunkx, chunky: window coordinates (in tiles)
+    inchunkLoc = (chunkx, chunky): window coordinates (in tiles)
     returns:
     (x, y): world coordinates (in tiles)
     """
-    return (chunkID[0]*chunkWidth + chunkx, chunkID[1]*chunkHeight + chunky)
+    chunkx, chunky = inchunkLoc
+    return (chunkID[1]*chunkWidth + chunkx, chunkID[0]*chunkHeight + chunky)
    
 def coordinateShifts(chunkID, cx, cy):
     """
