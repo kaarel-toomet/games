@@ -100,6 +100,16 @@ def chunkID(worldLoc):
    worldLoc: tuple (x, y), world coordinates
    """
    return worldLoc[0] // chunkWidth, worldLoc[1] // chunkHeight
+
+def chunkToWorld(chunkID, chunkx, chunky):
+    """
+    transform chunk coordinates to world coordinates
+    chunkID: chunk id (i, j)
+    chunkx, chunky: window coordinates (in tiles)
+    returns:
+    (x, y): world coordinates (in tiles)
+    """
+    return (chunkID[0]*chunkHieght + chunky, chunkID[1]*chunkWidth + chunkx)
    
 def coordinateShifts(chunkID, cx, cy):
     """

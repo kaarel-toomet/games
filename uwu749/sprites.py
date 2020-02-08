@@ -223,6 +223,9 @@ class Koll(pg.sprite.Sprite):
     def update(self, hullmyts, monsters):
         """
         moves the koll at random toward the Crazy Hat
+        hullmyts: CrazyHat, needed for movement direction
+        monsters: list of monsters (ChunkSprites), have to update monsters in this list
+                  as self is 'activeKollid'
         """
         if np.random.randint(0,30) == 0:
             xy = hullmyts.getxy()

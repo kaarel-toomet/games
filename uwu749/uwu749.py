@@ -150,15 +150,6 @@ activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
 coordinates.coordinateShifts(chunkID, homeX, homeY)
 activeWindow.update(ground, chunkID)
 # load the world chunks into activeWindow
-## create minerals: sprites that do not move
-for i in range(30):
-    winx, winy = (np.random.randint(0, activeWindow.getWidth()),
-                  np.random.randint(0, activeWindow.getHeight())
-    )
-    x, y = coordinates.windowToWorld(winx, winy)
-    kraam.add(sprites.Gold(x, y))
-    sprites.activeKraam = world.activeSprites(kraam, activeWindow)
-    # those mineral sprites that are in activeWindow
 sprites.activeKollid = world.activeSprites(kollid, activeWindow)
 # have to initialize this, in principle we may have a few kolls pre-created
 activeWindow.draw(screenBuffer, blocks1.blocks)
@@ -233,9 +224,12 @@ def killKolls(location):
     """
     kill all kolls at (x, y).
     if the koll is not at (x, y), do nothing
+    
     location = (x, y), world coordinates
     """
     global punktid, kollid
+    # punktid: (global) score
+    # kollid: (global) list of monsters
     for activeKoll in sprites.activeKollid:
         if(activeKoll.getxy() == location):
             print("removing", id(activeKoll))

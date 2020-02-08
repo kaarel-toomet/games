@@ -10,12 +10,12 @@ TBD
 
 #### Related Concepts
 
-* **chunk**: a square of tiles of size `chunkSize`.  This is used to copy
+* **chunk**: a rectangle of tiles of size `chunkWidth*chunkHeight`.  This is used to copy
    tiles data from world to _active window_.
    Each chunk is identified by
-   `(iChunk, jChunk) = (x // chunkSize, y // chunkSize)`.
+   `(iChunk, jChunk) = (x // chunkWidth, y // chunkHeight)`.
    If Crazy Hat is located at `(x, y)`, this corresponds to the chunks
-   `(x // chunkSize, y // chunkSize)`.
+   `(x // chunkHeight, y // chunkWidth)`.
    This chunk, and all it's 8 neighbors are copied into _active window_.
 * **world**: this is a collection of all tiles of the world.  It
    contain the world properties (type of tile as 'int8') for every possible location.
@@ -47,7 +47,8 @@ the game uses 4 types of coordinates:
   size is `3*chunkWidth` times `3*chunkHeight`.  Normally denoted `winx`, `winy`.
 * **screenBuffer coordinates**, in pixels, `(0,0)`, is top left.
   Pretty much the same thing as _active window coordinated_, just in
-  pixels.  It is a square with side length `3*chunkSize*tileSize`.
+  pixels.  It is a rectangle with side length `3*chunkWidth*tileSize`
+  and height `3*chunkHeight*tileSize`.
 * **screen coordinates** in pixels, (0,0) is top left
    these measure pixel locations on current screen.  Size is stored in
    `screenWidth`, `screenHeight`, and depends on your monitor.
@@ -69,7 +70,7 @@ parameters:
 
 ```python
 import coordinates
-coordinates.setup(screenWidth, screenHeight, chunkSize, tileSize)
+coordinates.setup(screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize)
 ```
 This initializes the module-specific variables.
 

@@ -53,6 +53,7 @@ class World:
       """
       if chunkID in self.chunks:
          return self.chunks[chunkID]
+      ## create a new chunk
       chunk = np.empty((coordinates.chunkHeight, coordinates.chunkWidth), 'int8')
       jc, ic = chunkID
       for cx in range(chunk.shape[1]):
@@ -75,6 +76,15 @@ class World:
               elif noiseval < 11:
                  chunk[cy, cx] = 4
       self.chunks[chunkID] = chunk
+      ## create minerals: sprites that do not move
+      for i in range(10):
+          chunkx, chunky = (np.random.randint(0, chunk.shape[1]),
+                            np.random.randint(0, chunk.shape[0])
+          )
+          x, y = coordinates.chunkToWorld(chunkx, chunky)
+          kraam.add(sprites.Gold(x, y))
+          sprites.activeKraam = world.activeSprites(kraam, activeWindow)
+          # those mineral sprites that are in activeWindow
       return chunk
 
    def put(self, chunkID, data):
