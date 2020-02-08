@@ -25,7 +25,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- blocks ----------
-tileSize = 32
+tileSize = 31
 # block size on screen
 
 pg.init()
@@ -289,14 +289,14 @@ while do:
                 build(hullmyts.getxy()[0]+1,hullmyts.getxy()[1])
             elif event.key == pg.K_w:
                 build(hullmyts.getxy()[0],hullmyts.getxy()[1]-1)
-            elif event.key == pg.K_j:
-                destroy(hullmyts.getxy()[0]-1,hullmyts.getxy()[1])
-            elif event.key == pg.K_k:
-                destroy(hullmyts.getxy()[0],hullmyts.getxy()[1]+1)
-            elif event.key == pg.K_l:
-                destroy(hullmyts.getxy()[0]+1,hullmyts.getxy()[1])
-            elif event.key == pg.K_i:
-                destroy(hullmyts.getxy()[0],hullmyts.getxy()[1]-1)
+            # elif event.key == pg.K_j:
+            #     destroy(hullmyts.getxy()[0]-1,hullmyts.getxy()[1])
+            # elif event.key == pg.K_k:
+            #     destroy(hullmyts.getxy()[0],hullmyts.getxy()[1]+1)
+            # elif event.key == pg.K_l:
+            #     destroy(hullmyts.getxy()[0]+1,hullmyts.getxy()[1])
+            # elif event.key == pg.K_i:
+            #     destroy(hullmyts.getxy()[0],hullmyts.getxy()[1]-1)
             elif event.key == pg.K_p:
                 pause = True
             elif event.key == pg.K_r:
@@ -334,6 +334,9 @@ while do:
                 mleft = False
             elif event.key == pg.K_RIGHT:
                 mright = False
+        elif event.type == pg.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                pass
     while pause:
         for event in pg.event.get():
             if event.type == pg.QUIT:
