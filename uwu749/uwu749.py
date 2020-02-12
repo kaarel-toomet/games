@@ -60,6 +60,7 @@ blocks1.loadBlocks(tileSize)
 kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
 home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
 hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(360*tileScale, 36*tileScale))
+selslot = pg.transform.scale(pg.image.load("selslot.png"),(36*tileScale, 36*tileScale))
 ##
 bgColor = (64,64,64)
 # dark gray
@@ -128,7 +129,10 @@ kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
-
+## inventory stuff
+inventory = (0,0,0,0,0,0,0,0,0,0)
+empty = 0
+select = 0
 ##
 s = None
 if s is not None:
@@ -410,6 +414,7 @@ while do:
              "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
     screen.blit(hotbar,(0,0))
+    screen.blit(selslot,(select*18,0))
     if globals.mineralGold.getN() == 0:
         score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))
