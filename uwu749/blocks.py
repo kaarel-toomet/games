@@ -1,6 +1,7 @@
 ## Building block definitions and related code
 import pygame as pg
 
+NONE = -1
 SEA = 0
 SAND = 1
 MURU = 2
@@ -14,7 +15,7 @@ BLOCK_END = 8
 
 breakable = set([])
 solid = set([KAST])
-breakto = {SUGAVM:SUGAVM, SEA:SUGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU}
+breakto = {SUGAVM:SUGAVM, SEA:SUGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE}
 
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
@@ -56,9 +57,11 @@ def loadBlocks(size):
                                 (size, size))
     puu = pg.transform.scale(pg.image.load("blocks/puu.png"),
                                 (size, size))
+    none = pg.transform.scale(pg.image.load("blocks/na.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
-               KAST:kast, KIVI:kivi, LUMI:lumi, SUGAVM:sugavv, PUU:puu}
+               KAST:kast, KIVI:kivi, LUMI:lumi, SUGAVM:sugavv, PUU:puu, NONE:none}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
-        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SUGAVM:"sügav vesi", PUU:"puu"}
+        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SUGAVM:"sügav vesi", PUU:"puu", NONE:"eimiski"}
 

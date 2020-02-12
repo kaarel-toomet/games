@@ -59,8 +59,8 @@ if not xdotool:
 blocks.loadBlocks(tileSize)
 kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
 home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
-hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(360*tileScale, 36*tileScale))
-selslot = pg.transform.scale(pg.image.load("selslot.png"),(36*tileScale, 36*tileScale))
+hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(180*tileScale, 18*tileScale))
+selslot = pg.transform.scale(pg.image.load("selslot.png"),(18*tileScale, 18*tileScale))
 ##
 bgColor = (64,64,64)
 # dark gray
@@ -85,7 +85,7 @@ def updateScreen():
 chunkWidth = int(np.ceil(screenWidth/2/tileSize))
 chunkHeight = int(np.ceil(screenHeight/2/tileSize))
 chunkWidth = 32
-chunkHeight = 31
+chunkHeight = 32
 
 # size of tile chunks for loading/saving
 windowWidth = 3*chunkWidth  # how many tiles loaded into the active window
@@ -130,7 +130,7 @@ sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
 ## inventory stuff
-inventory = (0,0,0,0,0,0,0,0,0,0)
+inventory = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,9]
 empty = 0
 select = 0
 ##
@@ -198,17 +198,15 @@ def build(x,y):
     """
     add blocks to the position
     """
-    global bb
+    global inventory, select
     winx, winy = coordinates.worldToWindow(x, y)
-    if globals.activeWindow[(winy,winx)] in blocks.breakable:
+    if inventory[select] == -1:
         return
-    if gmod == 1:
-        ## in case of game mode 1, account for how many blocks CH has
-        if items[bb] <= 0:
-            return
-    items[bb] -= 1
-    globals.activeWindow[(winy,winx)] = bb
-    globals.screenBuffer.blit( blocks.blocks[bb], coordinates.worldToScreenbuffer(x, y)) 
+    if globals.activeWindow[(winy,winx)] in blocks1.breakable:
+        return
+    globals.activeWindow[(winy,winx)] = inventory[select]
+    globals.screenBuffer.blit( blocks1.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
+    inventory[select] = -1
 
 def destroy(x,y):
     """
@@ -223,7 +221,8 @@ def destroy(x,y):
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
     items[material] += 1
-    globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
+    inventory[empty] = material
+    globals.screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
     killKolls((x, y))
 
@@ -287,7 +286,7 @@ while do:
             elif event.key == pg.K_d:
                 build(globals.hullmyts.getxy()[0]+1, globals.hullmyts.getxy()[1])
             elif event.key == pg.K_w:
-                build(globals.hullmyts.getxy()[0], globals.globals.hullmyts.getxy()[1]-1)
+                build(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]-1)
             elif event.key == pg.K_j:
                 destroy(globals.hullmyts.getxy()[0]-1,globals.hullmyts.getxy()[1])
             elif event.key == pg.K_k:
@@ -342,6 +341,10 @@ while do:
             elif event.button == 3 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
                 build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
                 coordinates.screenToWorld(mxy[0],mxy[1])[1])
+            elif event.button == 4:
+                select -= 1
+            elif event.button == 5:
+                select += 1
     while pause:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -400,24 +403,34 @@ while do:
         aia = 30
     if aia > 0:
         aia -= 1
+    if select < 0:
+        select = 9
+    if select > 9:
+        select = 0
+    try:
+        empty = inventory.index(-1)
+    except:
+        empty = 10
     ## ---------- screen udpate ----------
     screen.fill(bgColor)
     screen.blit(globals.screenBuffer, coordinates.blitShift)
     screen.blit(spriteBuffer, coordinates.blitShift)
     ## add score and other info
-    pg.draw.rect(screen,(0,0,0),(0,36*tileScale,screenWidth,30))
+    pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
     score = ("plokk: " + blocks.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
              "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
     screen.blit(hotbar,(0,0))
-    screen.blit(selslot,(select*18,0))
+    for s in range(0,10):
+        screen.blit(blocks1.blocks[inventory[s]],(18*tileScale*s+1,tileScale))
+    screen.blit(selslot,(select*18*tileScale,0))
     if globals.mineralGold.getN() == 0:
         score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
-    text_rect.y = 36*tileScale
+    text_rect.y = 18*tileScale
     screen.blit(text,text_rect)
     ## sprite update
     spriteBuffer.fill((0,0,0,0))
