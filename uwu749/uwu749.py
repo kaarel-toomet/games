@@ -27,6 +27,7 @@ args = parser.parse_args()
 
 ## ---------- blocks ----------
 tileSize = 32
+tileScale = int(tileSize/16)
 # block size on screen, should depend on the screen resolution
 
 pg.init()
@@ -58,6 +59,7 @@ if not xdotool:
 blocks1.loadBlocks(tileSize)
 kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
 home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
+hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(360*tileScale, 36*tileScale))
 ##
 bgColor = (64,64,64)
 # dark gray
@@ -399,17 +401,18 @@ while do:
     screen.blit(screenBuffer, coordinates.blitShift)
     screen.blit(spriteBuffer, coordinates.blitShift)
     ## add score and other info
-    pg.draw.rect(screen,(0,0,0),(0,10,screenWidth,30))
+    pg.draw.rect(screen,(0,0,0),(0,36*tileScale,screenWidth,30))
     score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
              "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
+    screen.blit(hotbar,(0,0))
     if globals.mineralGold.getN() == 0:
         score += " (kõik maas kuld korjatud)"
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
-    text_rect.y = 10
+    text_rect.y = 36*tileScale
     screen.blit(text,text_rect)
     ## sprite update
     spriteBuffer.fill((0,0,0,0))

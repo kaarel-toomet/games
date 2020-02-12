@@ -208,6 +208,8 @@ class Koll(pg.sprite.Sprite):
            self.y=y
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
         self.chunkID = coordinates.chunkID((self.x, self.y))
+        self.tick = 0
+        self.delay = 30
 
     def getxy(self):
        """
@@ -217,11 +219,13 @@ class Koll(pg.sprite.Sprite):
    
     def update(self, monsters):
         """
-        moves the koll at random toward the Crazy Hat
+        moves the koll toward the CrazyHat
         monsters: list of monsters (ChunkSprites), have to update monsters in this list
                   as self is 'activeKollid'
         """
-        if np.random.randint(0,30) == 0:
+        self.tick += 1
+        if self.tick == self.delay:
+            self.tick = 0
             xy = globals.hullmyts.getxy()
             # hullmyts: CrazyHat, needed for movement direction
             delta = np.sign([self.x - xy[0], self.y - xy[1]])
