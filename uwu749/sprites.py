@@ -111,9 +111,11 @@ class CrazyHat(pg.sprite.Sprite):
         self.y=y
         ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-    def update(self, mup, mdown, mleft, mright,
-               screenBuffer,
-               ground):
+    def update(self, mup, mdown, mleft, mright):
+        """
+        use relative movements (mup, mdown...) to update
+        Crazy Hat's uposition
+        """
         y = self.y
         x = self.x
         if mup:
@@ -132,8 +134,8 @@ class CrazyHat(pg.sprite.Sprite):
             return
         if globals.activeWindow[(winy,winx)] in blocks.breakable:
             globals.activeWindow[(winy,winx)] = blocks.breakto[globals.activeWindow[(winy,winx)]]
-            screenBuffer.blit( blocks.blocks[blocks.breakto[globals.activeWindow[(winy,winx)]]],
-                               coordinates.worldToScreenbuffer(x, y))
+            globals.screenBuffer.blit( blocks.blocks[blocks.breakto[globals.activeWindow[(winy,winx)]]],
+                                       coordinates.worldToScreenbuffer(x, y))
         self.x, self.y = x, y
         chunkID = globals.activeWindow.getChunkID()
         chunkID1 = coordinates.chunkID((self.x, self.y))
@@ -149,10 +151,9 @@ class CrazyHat(pg.sprite.Sprite):
         """
         return(self.x, self.y)
 
-    def setxy(self,x,y,
-              screenBuffer,
-              ground):
+    def setxy(self,x,y):
         """
+        use world coordinates to set Crazy Hat's position
         x, y: world coordinates
         """
         self.x, self.y = x, y
@@ -160,12 +161,7 @@ class CrazyHat(pg.sprite.Sprite):
         chunkID1 = coordinates.chunkID((self.x, self.y))
         if chunkID1 != chunkID:
             ## chunk changed: update activeWindow and sprites
-            globals.activeWindow.update(ground, chunkID1)
-            globals.activeWindow.draw(screenBuffer, blocks.blocks)
-            chunkID = chunkID1
-            globals.activeMineralGold = world.activeSprites(globals.mineralGold)
-            globals.activeKollid = world.activeSprites(globals.kollid)
-            coordinates.coordinateShifts(chunkID, self.x, self.y)
+            coordinates.moveWindow((x, y))
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)

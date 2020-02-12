@@ -192,9 +192,7 @@ def reset():
     player.empty()
     globals.hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(globals.hullmyts)
-    globals.hullmyts.setxy(homeX, homeY,
-                           globals.screenBuffer,
-                           globals.ground)
+    globals.hullmyts.setxy(homeX, homeY)
     
 def build(x,y):
     global bb
@@ -299,10 +297,7 @@ while do:
                 pause = True
             elif event.key == pg.K_r:
                 ## go home
-                globals.hullmyts.setxy(homeX, homeY,
-                               # setxy can change chunks, so potentially have to update all this stuff here
-                               globals.screenBuffer,
-                               globals.ground)
+                globals.hullmyts.setxy(homeX, homeY)
             elif event.key == pg.K_h:
                 homeX = globals.hullmyts.getxy()[0]
                 homeY = globals.hullmyts.getxy()[1]
@@ -431,9 +426,7 @@ while do:
     kutid.draw(spriteBuffer)
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
-    player.update(mup, mdown, mleft, mright,
-                  globals.screenBuffer,
-                  globals.ground)
+    player.update(mup, mdown, mleft, mright)
     player.draw(spriteBuffer)
     ## if you are not speeding
     if not speed:
