@@ -226,7 +226,7 @@ def destroy(x,y):
 def killKolls(location):
     """
     kill all kolls at (x, y).
-    if the koll is not at (x, y), do nothing
+    if there is no koll at (x, y), do nothing
     
     location = (x, y), world coordinates
     """
@@ -234,10 +234,8 @@ def killKolls(location):
     # punktid: (global) score
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
-            print("removing", id(activeKoll))
             globals.kollid.remove([activeKoll])
             globals.activeKollid.remove(activeKoll)
-            globals.kollid.remove([activeKoll])
             punktid += 100
             
 
@@ -381,9 +379,14 @@ while do:
                     gameover = False
                     reset()
     if np.random.randint(0, 201) == 0:
+        # create a new monster at a random location inside activeWindow
         winx = np.random.randint(0, globals.activeWindow.getWidth())
         winy = np.random.randint(0, globals.activeWindow.getHeight())
+        # add it to the overall monster list
         globals.kollid.add(sprites.Koll(coordinates.windowToWorld(winx, winy)))
+        # .. and update the active monsters' list
+        globals.activeKollid.empty()
+        # have to empty the activeGollid group here to remove the sprites from previous window group
         globals.activeKollid = world.activeSprites(globals.kollid)
     col = pg.sprite.spritecollide(globals.hullmyts, globals.activeMineralGold, False)
     if len(col) > 0:

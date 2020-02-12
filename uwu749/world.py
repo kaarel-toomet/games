@@ -12,8 +12,7 @@ def activeSprites(sprites):
    """
    extract the sprites from 'sprites' that are inside 'activeWindow'
    INPUTS:
-   sprites:
-   chunk-sprite groups like 'Minerals'
+   sprites: chunk-sprite groups like 'Minerals', or 'Monsters'
    RETURN:
    pg.sprites.Group of sprites inside of the window
    """
