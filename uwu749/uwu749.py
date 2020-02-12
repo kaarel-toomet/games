@@ -161,7 +161,7 @@ globals.activeWindow.update(globals.ground, chunkID)
 # load the world chunks into activeWindow
 globals.activeKollid = world.activeSprites(globals.kollid)
 # have to initialize this, in principle we may have a few kolls pre-created
-globals.activeWindow.draw(globals.screenBuffer, blocks.blocks)
+globals.activeWindow.draw(None, None, blocks.blocks)
 drawSprites(globals.activeMineralGold, spriteBuffer)
 
 class Tüüp(pg.sprite.Sprite):
@@ -195,6 +195,9 @@ def reset():
     globals.hullmyts.setxy(homeX, homeY)
     
 def build(x,y):
+    """
+    add blocks to the position
+    """
     global bb
     winx, winy = coordinates.worldToWindow(x, y)
     if globals.activeWindow[(winy,winx)] in blocks.breakable:
