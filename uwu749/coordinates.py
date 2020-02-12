@@ -1,4 +1,7 @@
 import numpy as np
+import globals
+import blocks
+import world
 
 ## basic data (meant to be private)
 screenWidth, screenHeight = None, None
@@ -139,21 +142,21 @@ def coordinateShifts(chunkID, cx, cy):
     blitShift = worldToScreen(-winsx, -winsy)
 
 
-def moveWindow(loc):
+def moveWindow(worldLoc):
     """
-    move the active window into the new position centered on world coordinates
-    loc = (x, y)
+    move the active window into the new chunk position
+    centered on world coordinates worldLoc = (x, y)
     """
-    chunkID = chunkID(loc)
-    globals.activeWindow.update(globals.ground, chunkID)
-    globals.activeWindow.draw(globals.screenBuffer, blocks1.blocks)
+    chunk = chunkID(worldLoc)
+    globals.activeWindow.update(globals.ground, chunk)
+    globals.activeWindow.draw(globals.screenBuffer, blocks.blocks)
     globals.activeMineralGold.empty()
     # have to empty the group here to tell sprites they do not belong to that group
     globals.activeMineralGold = world.activeSprites(globals.mineralGold)
     globals.activeKollid.empty()
     # have to empty the group here to tell sprites they do not belong to that group
     globals.activeKollid = world.activeSprites(globals.kollid)
-    coordinates.coordinateShifts(chunkID, loc[0], loc[1])
+    coordinateShifts(chunk, worldLoc[0], worldLoc[1])
 
 
 def screenToWorld(screenx, screeny):
