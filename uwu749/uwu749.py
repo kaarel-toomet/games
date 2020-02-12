@@ -202,10 +202,10 @@ def build(x,y):
     winx, winy = coordinates.worldToWindow(x, y)
     if inventory[select] == -1:
         return
-    if globals.activeWindow[(winy,winx)] in blocks1.breakable:
+    if globals.activeWindow[(winy,winx)] in blocks.breakable:
         return
     globals.activeWindow[(winy,winx)] = inventory[select]
-    globals.screenBuffer.blit( blocks1.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
+    globals.screenBuffer.blit( blocks.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
     inventory[select] = -1
 
 def destroy(x,y):
@@ -222,7 +222,7 @@ def destroy(x,y):
         globals.mineralGold.add(sprites.Gold(x,y))
     items[material] += 1
     inventory[empty] = material
-    globals.screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
+    globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
     killKolls((x, y))
 
@@ -423,7 +423,7 @@ while do:
              ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
     screen.blit(hotbar,(0,0))
     for s in range(0,10):
-        screen.blit(blocks1.blocks[inventory[s]],(18*tileScale*s+1,tileScale))
+        screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+1,tileScale))
     screen.blit(selslot,(select*18*tileScale,0))
     if globals.mineralGold.getN() == 0:
         score += " (kõik maas kuld korjatud)"
