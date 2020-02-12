@@ -139,6 +139,23 @@ def coordinateShifts(chunkID, cx, cy):
     blitShift = worldToScreen(-winsx, -winsy)
 
 
+def moveWindow(loc):
+    """
+    move the active window into the new position centered on world coordinates
+    loc = (x, y)
+    """
+    chunkID = chunkID(loc)
+    globals.activeWindow.update(globals.ground, chunkID)
+    globals.activeWindow.draw(globals.screenBuffer, blocks1.blocks)
+    globals.activeMineralGold.empty()
+    # have to empty the group here to tell sprites they do not belong to that group
+    globals.activeMineralGold = world.activeSprites(globals.mineralGold)
+    globals.activeKollid.empty()
+    # have to empty the group here to tell sprites they do not belong to that group
+    globals.activeKollid = world.activeSprites(globals.kollid)
+    coordinates.coordinateShifts(chunkID, loc[0], loc[1])
+
+
 def screenToWorld(screenx, screeny):
     """
     transform world coordinates to screen coordinates
