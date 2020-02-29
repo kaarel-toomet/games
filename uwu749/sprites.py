@@ -114,7 +114,10 @@ class CrazyHat(pg.sprite.Sprite):
     def update(self, mup, mdown, mleft, mright):
         """
         use relative movements (mup, mdown...) to update
-        Crazy Hat's uposition
+        Crazy Hat's position
+        This means screen position is changed too,
+        potentially involving active window change and
+        chunk update
         """
         y = self.y
         x = self.x
@@ -126,9 +129,6 @@ class CrazyHat(pg.sprite.Sprite):
             x = self.x - 1
         if mright:
             x = self.x + 1
-        # if (self.x, self.y) == (x, y):
-        #     # no movement
-        #     return
         winx, winy = coordinates.worldToWindow(x, y)
         if globals.activeWindow[(winy,winx)] in blocks.solid:
             return

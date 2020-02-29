@@ -40,26 +40,37 @@ class activeWindow():
     def draw(self, dx, dy, blocks):
        """
        draws the activeWindow on screenBuffer
-       dx, dy: chunk id difference (old - new) for horizontal, vertical
+       tries to speed up stuff by scrolling the visible parts
+         inputs:
+       dx: chunk id difference (old - new) for horizontal
+           if None, draw everything
+       dy: same for vertical
        blocks: the block images corresponding to the activeWindow codes
        """
-       print(dx, dy)
-       if dx is None:
-           wxRange = range(0, 3*chunkWidth)
-       elif dx == 1:
+       ## we move all blocks we can by scrolling.
+       ## but these tiles on screen we have to update:
+       ## wxRange: which horizontal range (in tiles) to update
+       ## wyRange: vertical
+       if dx == 1:
            # moving left -> redraw left edge
            wxRange = range(0, chunkWidth)
-       else:
+       elif dx == -1:
            wxRange = range(2*chunkWidth, 3*chunkWidth)
-       if dy is None:
-           wyRange = range(0, 3*chunkHeight)
-       elif dy == 1:
+       else:
+           ## None or 0: no horizontal movement,
+           ## update everything here
+           wxRange = range(0, 3*chunkWidth)
+       if dy == 1:
            # moving up -> redraw upper edge
            wyRange = range(0, chunkHeight)
-       else:
+       elif dy == -1:
            wyRange = range(2*chunkHeight, 3*chunkHeight)
+       else:
+           ## None or 0: no vertical movement,
+           ## update everything here
+           wyRange = range(0, 3*chunkHeight)
        for wx in wxRange:
-           # note: we run over window coordinates
+           # note: we run over window coordinates (in tiles)
            for wy in wyRange:
                sbLoc = windowToScreenBuffer(wx, wy)
                globals.screenBuffer.blit(blocks[ self.matrix[wy,wx] ], sbLoc)
@@ -175,7 +186,9 @@ def moveWindow(worldLoc):
                               oldChunk[1] - newChunk[1],
                               blocks.blocks)
     globals.activeMineralGold.empty()
-    # have to empty the group here to tell sprites they do not belong to that group
+    # have to empty the group here to tell sprites they
+    # do not belong to that group.  Otherwise will belong
+    # to both to the old and new group
     globals.activeMineralGold = world.activeSprites(globals.mineralGold)
     globals.activeKollid.empty()
     # have to empty the group here to tell sprites they do not belong to that group

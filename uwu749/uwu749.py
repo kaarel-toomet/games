@@ -25,6 +25,9 @@ parser.add_argument('-y', '--height', type=int, default=64,
                     help='window height (tiles)')
 args = parser.parse_args()
 
+## ---------- params ----------
+kollProbability = 0.04
+
 ## ---------- blocks ----------
 tileSize = 32
 tileScale = int(tileSize/16)
@@ -382,7 +385,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.randint(0, 201) == 0:
+    if np.random.uniform() < kollProbability:
         # create a new monster at a random location inside activeWindow
         winx = np.random.randint(0, globals.activeWindow.getWidth())
         winy = np.random.randint(0, globals.activeWindow.getHeight())
