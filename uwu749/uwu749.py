@@ -26,7 +26,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- params ----------
-kollProbability = 0.04
+kollProbability = 0.02
 
 ## ---------- blocks ----------
 tileSize = 32
@@ -159,7 +159,7 @@ if s is not None:
 else:
     ## ---------- Build a new world ----------
     ## variables
-    globals.ground = world.World(50, 50, 20, 0.5, 2, 1024, 1024, 0)
+    globals.ground = world.World((50, 50, 20, 0.5, 2, 1024, 1024, 0))
     ## where Crazy Hat has her home:
     homeX, homeY = 0, 0
 

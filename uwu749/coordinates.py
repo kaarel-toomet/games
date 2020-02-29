@@ -69,11 +69,9 @@ class activeWindow():
            ## None or 0: no vertical movement,
            ## update everything here
            wyRange = range(0, 3*chunkHeight)
-       for wx in wxRange:
-           # note: we run over window coordinates (in tiles)
-           for wy in wyRange:
-               sbLoc = windowToScreenBuffer(wx, wy)
-               globals.screenBuffer.blit(blocks[ self.matrix[wy,wx] ], sbLoc)
+       w = ((blocks[ self.matrix[wy,wx] ], windowToScreenBuffer(wx, wy))
+            for wy in wyRange for wx in wxRange)
+       globals.screenBuffer.blits(w)
 
     def getChunkID(self):
         """

@@ -36,12 +36,13 @@ class World:
    You have to set up coordinates before you set up the world
    That initializes chunkWidth, chunkHeight and such
    """
-   def __init__(self, freqX, freqY, a, b, c, d, e, f):
+   def __init__(self, altitudeParam):
       """
       read parameters and set up and empty world
       freqX, freqY: Perline noise frequency
       a,b,c,d,e,f: other noise params, please rename appropriately!
       """
+      freqX, freqY, a, b, c, d, e, f = altitudeParam
       self.chunks = {}
       self.freqX, self.freqY = freqX, freqY
       self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
