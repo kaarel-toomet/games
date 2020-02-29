@@ -68,6 +68,17 @@ selslot = pg.transform.scale(pg.image.load("selslot.png"),(18*tileScale, 18*tile
 bgColor = (64,64,64)
 # dark gray
 
+font = pg.font.SysFont("Times", 24)
+dfont = pg.font.SysFont("Times", 32)
+pfont = pg.font.SysFont("Times", 50)
+tfont = pg.font.SysFont("Times",100)
+
+def textrender(text,x,y,font=font):
+    text = font.render(text, True, (255,255,255))
+    text_rect = text.get_rect()
+    text_rect.x = x
+    text_rect.y = y
+    screen.blit(text,text_rect)
 
 def drawSprites(sprites, spriteBuffer):
     """
@@ -114,10 +125,6 @@ mright = False
 timer = pg.time.Clock()
 lifes = 5
 punktid = 0
-font = pg.font.SysFont("Times", 24)
-dfont = pg.font.SysFont("Times", 32)
-pfont = pg.font.SysFont("Times", 50)
-tfont = pg.font.SysFont("Times",100)
 pause = False
 gameover = False
 bb = 1
@@ -133,7 +140,8 @@ sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
 ## inventory stuff
-inventory = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,9]
+inventory = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 empty = 0
 select = 0
 ##
@@ -209,7 +217,7 @@ def build(x,y):
         return
     globals.activeWindow[(winy,winx)] = inventory[select]
     globals.screenBuffer.blit( blocks.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
-    inventory[select] = -1
+    amounts[select] -= 1
 
 def destroy(x,y):
     """
@@ -223,7 +231,12 @@ def destroy(x,y):
     ## if gold and destroyable material
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
-    items[material] += 1
+    try:
+        items[inventory.index(material)] = material
+        amounts[inventory.index(material)] += 1
+    except:
+        items[empty] = material
+        amounts[empty] += 1
     inventory[empty] = material
     globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
@@ -410,6 +423,9 @@ while do:
         select = 9
     if select > 9:
         select = 0
+    for s in range(0,10):
+        if amounts[s] <= 0:
+            inventory[s] = -1
     try:
         empty = inventory.index(-1)
     except:
@@ -424,17 +440,17 @@ while do:
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
              "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
-    screen.blit(hotbar,(0,0))
-    for s in range(0,10):
-        screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+1,tileScale))
-    screen.blit(selslot,(select*18*tileScale,0))
-    if globals.mineralGold.getN() == 0:
-        score += " (kõik maas kuld korjatud)"
+    
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx
     text_rect.y = 18*tileScale
     screen.blit(text,text_rect)
+    screen.blit(hotbar,(0,0))
+    screen.blit(selslot,(select*18*tileScale,0))
+    for s in range(0,10):
+        screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
+        textrender(str(amounts[s]),18*tileScale*s+tileScale, tileScale)
     ## sprite update
     spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
