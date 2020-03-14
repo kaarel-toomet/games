@@ -6,7 +6,7 @@ import sys
 import subprocess
 import time
 
-import blocks1
+import blocks
 import coordinates
 import files1
 import sprites
@@ -24,6 +24,9 @@ parser.add_argument('-y', '--height', type=int, default=64,
                     dest='height',
                     help='window height (tiles)')
 args = parser.parse_args()
+
+## ---------- params ----------
+kollProbability = 0.02
 
 ## ---------- blocks ----------
 tileSize = 32
@@ -56,7 +59,7 @@ if not xdotool:
     screenHeight = screen.get_height()
 
 ## load config and all that
-blocks1.loadBlocks(tileSize)
+blocks.loadBlocks(tileSize)
 kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
 home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
 hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(180*tileScale, 18*tileScale))
@@ -103,8 +106,8 @@ windowWidth = 3*chunkWidth  # how many tiles loaded into the active window
 windowHeight = 3*chunkHeight
 
 coordinates.setup(screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize)
-screenBuffer = pg.Surface(size=(windowWidth*tileSize, windowHeight*tileSize))
-screenBuffer.fill(bgColor)
+globals.screenBuffer = pg.Surface(size=(windowWidth*tileSize, windowHeight*tileSize))
+globals.screenBuffer.fill(bgColor)
 spriteBuffer = pg.Surface([windowWidth*tileSize, windowHeight*tileSize], pg.SRCALPHA, 32)
 # this is the buffer where movement-related drawing is done,
 # afterwards it is copied to the screen
@@ -152,12 +155,12 @@ if s is not None:
         items = {x[0]:x[1] for x in s["stuff"]}
     except:
         items = {}
-    if len(items.keys()) != blocks1.BLOCK_END:
+    if len(items.keys()) != blocks.BLOCK_END:
         items = oitems
 else:
     ## ---------- Build a new world ----------
     ## variables
-    ground = world.World(50, 50, 20, 0.5, 2, 1024, 1024, 0)
+    globals.ground = world.World((50, 50, 20, 0.5, 2, 1024, 1024, 0))
     ## where Crazy Hat has her home:
     homeX, homeY = 0, 0
 
@@ -166,11 +169,11 @@ chunkID = coordinates.chunkID((homeX, homeY))
 globals.mineralGold = sprites.ChunkSprites()
 globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
 coordinates.coordinateShifts(chunkID, homeX, homeY)
-globals.activeWindow.update(ground, chunkID)
+globals.activeWindow.update(globals.ground, chunkID)
 # load the world chunks into activeWindow
 globals.activeKollid = world.activeSprites(globals.kollid)
 # have to initialize this, in principle we may have a few kolls pre-created
-globals.activeWindow.draw(screenBuffer, blocks1.blocks)
+globals.activeWindow.draw(None, None, blocks.blocks)
 drawSprites(globals.activeMineralGold, spriteBuffer)
 
 class Tüüp(pg.sprite.Sprite):
@@ -195,27 +198,27 @@ def reset():
     reset lifes and score
     """
     global gameover, lifes, punktid, player
-    screenBuffer, ground
     punktid = 0
     gameover = False
     lifes = 5
     player.empty()
     globals.hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(globals.hullmyts)
-    globals.hullmyts.setxy(homeX, homeY,
-                           screenBuffer,
-                           ground)
+    globals.hullmyts.setxy(homeX, homeY)
     
 def build(x,y):
+    """
+    add blocks to the position
+    """
     global inventory, select
     winx, winy = coordinates.worldToWindow(x, y)
     if inventory[select] == -1:
         return
-    if globals.activeWindow[(winy,winx)] in blocks1.breakable:
+    if globals.activeWindow[(winy,winx)] in blocks.breakable:
         return
     globals.activeWindow[(winy,winx)] = inventory[select]
-    screenBuffer.blit( blocks1.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
-    amounts[select] -=1
+    globals.screenBuffer.blit( blocks.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
+    amounts[select] -= 1
 
 def destroy(x,y):
     """
@@ -225,7 +228,7 @@ def destroy(x,y):
     """
     winx, winy = coordinates.worldToWindow(x, y)
     material = globals.activeWindow[(winy,winx)]
-    breakto = blocks1.breakto[ material]
+    breakto = blocks.breakto[ material]
     ## if gold and destroyable material
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
@@ -236,7 +239,7 @@ def destroy(x,y):
         items[empty] = material
         amounts[empty] += 1
     inventory[empty] = material
-    screenBuffer.blit( blocks1.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
+    globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
     killKolls((x, y))
 
@@ -314,14 +317,11 @@ while do:
                 pause = True
             elif event.key == pg.K_r:
                 ## go home
-                globals.hullmyts.setxy(homeX, homeY,
-                               # setxy can change chunks, so potentially have to update all this stuff here
-                               screenBuffer,
-                               ground)
+                globals.hullmyts.setxy(homeX, homeY)
             elif event.key == pg.K_h:
                 homeX = globals.hullmyts.getxy()[0]
                 homeY = globals.hullmyts.getxy()[1]
-            elif event.key == pg.K_RIGHTBRACKET and bb < blocks1.BLOCK_END:
+            elif event.key == pg.K_RIGHTBRACKET and bb < blocks.BLOCK_END:
                 bb += 1
             elif event.key == pg.K_LEFTBRACKET and bb > 0:
                 bb -= 1
@@ -400,7 +400,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.randint(0, 201) == 0 and len(globals.activeKollid) <= 12:
+    if np.random.uniform() < kollProbability:
         kollin += 1
         # create a new monster at a random location inside activeWindow
         winx = np.random.randint(0, globals.activeWindow.getWidth())
@@ -435,11 +435,11 @@ while do:
         empty = 10
     ## ---------- screen udpate ----------
     screen.fill(bgColor)
-    screen.blit(screenBuffer, coordinates.blitShift)
+    screen.blit(globals.screenBuffer, coordinates.blitShift)
     screen.blit(spriteBuffer, coordinates.blitShift)
     ## add score and other info
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
-    score = ("plokk: " + blocks1.bn[bb] + "*" + str(items[bb]) +
+    score = ("plokk: " + blocks.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
              "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
@@ -452,7 +452,7 @@ while do:
     screen.blit(hotbar,(0,0))
     screen.blit(selslot,(select*18*tileScale,0))
     for s in range(0,10):
-        screen.blit(blocks1.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
+        screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
         textrender(str(amounts[s]),18*tileScale*s+tileScale, tileScale)
     ## sprite update
     spriteBuffer.fill((0,0,0,0))
@@ -464,9 +464,7 @@ while do:
     kutid.draw(spriteBuffer)
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
-    player.update(mup, mdown, mleft, mright,
-                  screenBuffer,
-                  ground)
+    player.update(mup, mdown, mleft, mright)
     player.draw(spriteBuffer)
     ## if you are not speeding
     if not speed:

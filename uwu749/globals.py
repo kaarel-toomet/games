@@ -17,3 +17,9 @@ activeMineralGold = None
 kollid = None
 # monsters in the active window
 activeKollid = None
+
+# tiles for the ground
+ground = None
+
+# memory are where drawing is done, and part of which is showed on monitor
+screenBuffer = None
