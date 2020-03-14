@@ -26,7 +26,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- params ----------
-kollProbability = 0.02
+kollProbability = 0.005
 
 ## ---------- blocks ----------
 tileSize = 32
@@ -141,7 +141,7 @@ sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
 ## inventory stuff
-inventory = [blocks1.KAST,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+inventory = [blocks.KAST,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
 amounts = [11111111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 empty = 0
 select = 0
@@ -337,7 +337,7 @@ while do:
                 title = True
             elif event.key == pg.K_o:
                 kutid.add(Tüüp(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]))
-            elif event.key == pg.K_LSHIFT:
+            elif event.key == pg.K_RSHIFT:
                 speed = True
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
@@ -348,7 +348,7 @@ while do:
                 mleft = False
             elif event.key == pg.K_RIGHT:
                 mright = False
-            elif event.key == pg.K_LSHIFT:
+            elif event.key == pg.K_RSHIFT:
                 speed = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             mxy = pg.mouse.get_pos()
@@ -400,7 +400,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.uniform() < kollProbability:
+    if np.random.uniform() < kollProbability and len(globals.activeKollid)<=12:
         kollin += 1
         # create a new monster at a random location inside activeWindow
         winx = np.random.randint(0, globals.activeWindow.getWidth())

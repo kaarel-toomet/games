@@ -220,7 +220,7 @@ class Koll(pg.sprite.Sprite):
             # hullmyts: CrazyHat, needed for movement direction
             delta = np.sign([self.x - xy[0], self.y - xy[1]])
             winx, winy = coordinates.worldToWindow(self.x-delta[0],self.y-delta[1])
-            if globals.activeWindow[(winy,winx)] in blocks1.solid:
+            if globals.activeWindow[(winy,winx)] in blocks.solid:
                return
             self.x -= delta[0]
             self.y -= delta[1]
