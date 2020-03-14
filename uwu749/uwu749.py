@@ -131,14 +131,15 @@ gmods = {0:"creative",1:"survival"}
 items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
 oitems = items
 aia = 0
+kollin = 0
 player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
 ## inventory stuff
-inventory = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inventory = [blocks1.KAST,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+amounts = [11111111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 empty = 0
 select = 0
 ##
@@ -246,13 +247,14 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global punktid
+    global punktid, kollin
     # punktid: (global) score
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
             globals.kollid.remove([activeKoll])
             globals.activeKollid.remove(activeKoll)
             punktid += 100
+            kollin -= 1
             
 
 ## initialize player        
@@ -398,7 +400,8 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
-    if np.random.randint(0, 201) == 0:
+    if np.random.randint(0, 201) == 0 and len(globals.activeKollid) <= 12:
+        kollin += 1
         # create a new monster at a random location inside activeWindow
         winx = np.random.randint(0, globals.activeWindow.getWidth())
         winy = np.random.randint(0, globals.activeWindow.getHeight())

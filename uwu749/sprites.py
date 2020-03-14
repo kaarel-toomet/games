@@ -194,7 +194,6 @@ class Gold(pg.sprite.Sprite):
     def update(self):
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
 
-
 class Koll(pg.sprite.Sprite):
     def __init__(self, x, y=None):
         """
@@ -221,7 +220,7 @@ class Koll(pg.sprite.Sprite):
        """
        return(self.x, self.y)
    
-    def update(self, monsters):
+    def update(self, monsters): 
         """
         moves the koll toward the CrazyHat
         monsters: list of monsters (ChunkSprites), have to update monsters in this list
@@ -233,6 +232,9 @@ class Koll(pg.sprite.Sprite):
             xy = globals.hullmyts.getxy()
             # hullmyts: CrazyHat, needed for movement direction
             delta = np.sign([self.x - xy[0], self.y - xy[1]])
+            winx, winy = coordinates.worldToWindow(self.x-delta[0],self.y-delta[1])
+            if globals.activeWindow[(winy,winx)] in blocks1.solid:
+               return
             self.x -= delta[0]
             self.y -= delta[1]
             newChunkID = coordinates.chunkID((self.x, self.y))
