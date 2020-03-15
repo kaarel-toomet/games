@@ -102,13 +102,12 @@ class ChunkSprites():
 
 
 class CrazyHat(pg.sprite.Sprite):
-    def __init__(self,x,y):
+    def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
         self.image = crazyHatImage
         self.rect = self.image.get_rect()
         ## location in world coordinates
-        self.x=x
-        self.y=y
+        self.x, self.y = x, y
         ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     def update(self, mup, mdown, mleft, mright):
@@ -119,8 +118,7 @@ class CrazyHat(pg.sprite.Sprite):
         potentially involving active window change and
         chunk update
         """
-        y = self.y
-        x = self.x
+        x, y = self.x, self.y
         if mup:
             y = self.y - 1
         if mdown:

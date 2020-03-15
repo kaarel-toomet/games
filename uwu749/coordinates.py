@@ -191,7 +191,6 @@ def moveWindow(worldLoc):
     globals.activeKollid.empty()
     # have to empty the group here to tell sprites they do not belong to that group
     globals.activeKollid = world.activeSprites(globals.kollid)
-    coordinateShifts(newChunk, worldLoc[0], worldLoc[1])
 
 
 def screenToWorld(screenx, screeny):

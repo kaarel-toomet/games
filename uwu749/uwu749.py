@@ -136,6 +136,7 @@ oitems = items
 aia = 0
 kollin = 0
 player = pg.sprite.Group()
+# sprite group for crazy hat
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
@@ -282,7 +283,6 @@ while do:
     ##        text_rect.centerx = screen.get_rect().centerx
     ##        text_rect.y = screenHeight/2
     ##        screen.blit(text,text_rect)
-    ##        screen.blit(uwu,(screenWidth/2-f*8,screenHeight/4-f*2))
     for event in pg.event.get():
         if event.type == pg.QUIT:
             do = False
@@ -434,9 +434,7 @@ while do:
     except:
         empty = 10
     ## ---------- screen udpate ----------
-    screen.fill(bgColor)
     screen.blit(globals.screenBuffer, coordinates.blitShift)
-    screen.blit(spriteBuffer, coordinates.blitShift)
     ## add score and other info
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
     score = ("plokk: " + blocks.bn[bb] + "*" + str(items[bb]) +
@@ -465,7 +463,11 @@ while do:
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
     player.update(mup, mdown, mleft, mright)
+    # update crazy hat
     player.draw(spriteBuffer)
+    # add sprites to spritebuffer.  this will be blitted
+    # to the screen in the next loop
+    screen.blit(spriteBuffer, coordinates.blitShift)
     ## if you are not speeding
     if not speed:
         mup = False
@@ -475,5 +477,4 @@ while do:
     pg.display.update()
     ##
     timer.tick(60)
-
 pg.quit()
