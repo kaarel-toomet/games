@@ -27,6 +27,7 @@ args = parser.parse_args()
 
 ## ---------- params ----------
 kollProbability = 0.005
+#kollProbability = 0.0
 
 ## ---------- blocks ----------
 tileSize = 32
@@ -135,7 +136,6 @@ items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:
 oitems = items
 aia = 0
 kollin = 0
-player = pg.sprite.Group()
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
@@ -197,13 +197,13 @@ def reset():
     """
     reset lifes and score
     """
-    global gameover, lifes, punktid, player
+    global gameover, lifes, punktid
     punktid = 0
     gameover = False
     lifes = 5
-    player.empty()
+    globals.player.empty()
     globals.hullmyts = sprites.CrazyHat(homeX, homeY)
-    player.add(globals.hullmyts)
+    globals.player.add(globals.hullmyts)
     globals.hullmyts.setxy(homeX, homeY)
     
 def build(x,y):
@@ -258,7 +258,6 @@ def killKolls(location):
             globals.activeKollid.remove(activeKoll)
             punktid += 100
             kollin -= 1
-            
 
 ## initialize player        
 reset()
@@ -282,7 +281,6 @@ while do:
     ##        text_rect.centerx = screen.get_rect().centerx
     ##        text_rect.y = screenHeight/2
     ##        screen.blit(text,text_rect)
-    ##        screen.blit(uwu,(screenWidth/2-f*8,screenHeight/4-f*2))
     for event in pg.event.get():
         if event.type == pg.QUIT:
             do = False
@@ -434,9 +432,7 @@ while do:
     except:
         empty = 10
     ## ---------- screen udpate ----------
-    screen.fill(bgColor)
     screen.blit(globals.screenBuffer, coordinates.blitShift)
-    screen.blit(spriteBuffer, coordinates.blitShift)
     ## add score and other info
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
     score = ("plokk: " + blocks.bn[bb] + "*" + str(items[bb]) +
@@ -455,6 +451,8 @@ while do:
         screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
         textrender(str(amounts[s]),18*tileScale*s+tileScale, tileScale)
     ## sprite update
+    globals.player.update(mup, mdown, mleft, mright)
+    # update crazy hat
     spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
         screen.blit(home, coordinates.worldToScreen(homeX, homeY))
@@ -464,8 +462,10 @@ while do:
     kutid.draw(spriteBuffer)
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
-    player.update(mup, mdown, mleft, mright)
-    player.draw(spriteBuffer)
+    globals.player.draw(spriteBuffer)
+    # add sprites to spritebuffer.  this will be blitted
+    # to the screen in the next loop
+    screen.blit(spriteBuffer, coordinates.blitShift)
     ## if you are not speeding
     if not speed:
         mup = False
@@ -475,5 +475,4 @@ while do:
     pg.display.update()
     ##
     timer.tick(60)
-
 pg.quit()
