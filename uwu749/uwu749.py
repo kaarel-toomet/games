@@ -29,7 +29,7 @@ args = parser.parse_args()
 kollProbability = 0.005
 
 ## ---------- blocks ----------
-tileSize = 32
+tileSize = 16
 tileScale = int(tileSize/16)
 # block size on screen, should depend on the screen resolution
 
@@ -200,7 +200,7 @@ def reset():
     global gameover, lifes, punktid, player
     punktid = 0
     gameover = False
-    lifes = 5
+    lifes = 500
     player.empty()
     globals.hullmyts = sprites.CrazyHat(homeX, homeY)
     player.add(globals.hullmyts)
@@ -381,6 +381,7 @@ while do:
         screen.blit(ptext,ptext_rect)
         screen.blit(text,text_rect)
         pg.display.update()
+        timer.tick(10)
     if lifes == 0:
         uded = "SA SURID ÄRA"
         dtext = dfont.render(uded, True, (255,0,0))
@@ -400,6 +401,7 @@ while do:
                 if event.key == pg.K_r:
                     gameover = False
                     reset()
+        timer.tick(10)
     if np.random.uniform() < kollProbability and len(globals.activeKollid)<=12:
         kollin += 1
         # create a new monster at a random location inside activeWindow
@@ -464,6 +466,7 @@ while do:
     kutid.draw(spriteBuffer)
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
+    player.update(mup, mdown, mleft, mright)
     player.update(mup, mdown, mleft, mright)
     player.draw(spriteBuffer)
     ## if you are not speeding

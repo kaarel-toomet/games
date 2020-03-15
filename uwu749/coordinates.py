@@ -159,7 +159,7 @@ def coordinateShifts(chunkID, cx, cy):
     """
     global winsx, winsy, sbsx, sbsy, ssx, ssy, blitShift
     iChunk, jChunk = chunkID
-    winsx = -(iChunk - 1)*chunkWidth
+    winsx = -(iChunk - 1)*chunkWidth ## winsx/y : world origin coords in activewindow
     winsy = -(jChunk - 1)*chunkHeight
     ssx = int(screenWidth/2) - cx*tileSize
     # note: we can directly translate b/w world and screen w/o need for window!
@@ -175,6 +175,7 @@ def moveWindow(worldLoc):
     newChunk = chunkID(worldLoc)
     ## scroll the old part of screen accordingly
     oldChunk = globals.activeWindow.getChunkID()
+
     dx = (oldChunk[0] - newChunk[0])*chunkWidth*tileSize
     dy = (oldChunk[1] - newChunk[1])*chunkHeight*tileSize
     globals.screenBuffer.scroll(dx, dy)
@@ -192,6 +193,7 @@ def moveWindow(worldLoc):
     # have to empty the group here to tell sprites they do not belong to that group
     globals.activeKollid = world.activeSprites(globals.kollid)
     coordinateShifts(newChunk, worldLoc[0], worldLoc[1])
+
 
 
 def screenToWorld(screenx, screeny):
