@@ -27,6 +27,7 @@ args = parser.parse_args()
 
 ## ---------- params ----------
 kollProbability = 0.005
+#kollProbability = 0.0
 
 ## ---------- blocks ----------
 tileSize = 32
@@ -135,8 +136,6 @@ items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:
 oitems = items
 aia = 0
 kollin = 0
-player = pg.sprite.Group()
-# sprite group for crazy hat
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
@@ -198,13 +197,13 @@ def reset():
     """
     reset lifes and score
     """
-    global gameover, lifes, punktid, player
+    global gameover, lifes, punktid
     punktid = 0
     gameover = False
     lifes = 5
-    player.empty()
+    globals.player.empty()
     globals.hullmyts = sprites.CrazyHat(homeX, homeY)
-    player.add(globals.hullmyts)
+    globals.player.add(globals.hullmyts)
     globals.hullmyts.setxy(homeX, homeY)
     
 def build(x,y):
@@ -259,7 +258,6 @@ def killKolls(location):
             globals.activeKollid.remove(activeKoll)
             punktid += 100
             kollin -= 1
-            
 
 ## initialize player        
 reset()
@@ -453,6 +451,8 @@ while do:
         screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
         textrender(str(amounts[s]),18*tileScale*s+tileScale, tileScale)
     ## sprite update
+    globals.player.update(mup, mdown, mleft, mright)
+    # update crazy hat
     spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
         screen.blit(home, coordinates.worldToScreen(homeX, homeY))
@@ -462,9 +462,7 @@ while do:
     kutid.draw(spriteBuffer)
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
-    player.update(mup, mdown, mleft, mright)
-    # update crazy hat
-    player.draw(spriteBuffer)
+    globals.player.draw(spriteBuffer)
     # add sprites to spritebuffer.  this will be blitted
     # to the screen in the next loop
     screen.blit(spriteBuffer, coordinates.blitShift)

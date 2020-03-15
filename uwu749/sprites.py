@@ -15,90 +15,90 @@ kollImage = None
 kuldImage = None
 
 def setup(tileSize):
-   global kuldImage, kollImage, crazyHatImage
-   crazyHatImage = pg.transform.scale(pg.image.load("pic.png"),(tileSize, tileSize))
-   kuldImage = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
-   kollImage = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
+    global kuldImage, kollImage, crazyHatImage
+    crazyHatImage = pg.transform.scale(pg.image.load("pic.png"),(tileSize, tileSize))
+    kuldImage = pg.transform.scale(pg.image.load("kuld.png"),(tileSize, tileSize))
+    kollImage = pg.transform.scale(pg.image.load("koll.png"),(tileSize, tileSize))
       
 
 class ChunkSprites():
-   """
-   Group of sprites connected to chunks and will be loaded/saved
-   when one updates chunk location.
-   This is the base class w/o update, the actual classes have to
-   implement update, including eventual movement
+    """
+    Group of sprites connected to chunks and will be loaded/saved
+    when one updates chunk location.
+    This is the base class w/o update, the actual classes have to
+    implement update, including eventual movement
 
-   central data structure is a dict
-   { chunkID -> list of sprites }
-   empty list: this has been initialized
-   None: it has not been initialized
-   
-   If the sprite moves, one has to remove it from the previous chunkID
-   and add it to the new chunkID in case of crossing chunk boundaries
-   """
-   def __init__(self):
-      self.chunks = {}
-      self.N = 0
-      # total number of minerals across all chunks
-   def add(self, sprite):
-      """
-      add new sprite at it's (world) coordinates
-      """
-      chunkID = coordinates.chunkID((sprite.x, sprite.y))
-      ## add the sprite to the chunk-specific list
-      chunkSprites = self.chunks.get(chunkID, [])
-      # when adding a sprite, we do not care about initialization flag,
-      # hence we only pull in the list
-      chunkSprites.append(sprite)
-      self.chunks[chunkID] = chunkSprites
-      # adding even a single sprite marks this list as initialized
-      self.N += 1
+    central data structure is a dict
+    { chunkID -> list of sprites }
+    empty list: this has been initialized
+    None: it has not been initialized
+    
+    If the sprite moves, one has to remove it from the previous chunkID
+    and add it to the new chunkID in case of crossing chunk boundaries
+    """
+    def __init__(self):
+       self.chunks = {}
+       self.N = 0
+       # total number of minerals across all chunks
+    def add(self, sprite):
+       """
+       add new sprite at it's (world) coordinates
+       """
+       chunkID = coordinates.chunkID((sprite.x, sprite.y))
+       ## add the sprite to the chunk-specific list
+       chunkSprites = self.chunks.get(chunkID, [])
+       # when adding a sprite, we do not care about initialization flag,
+       # hence we only pull in the list
+       chunkSprites.append(sprite)
+       self.chunks[chunkID] = chunkSprites
+       # adding even a single sprite marks this list as initialized
+       self.N += 1
 
-   def get(self, chunkID):
-      """
-      return the list of sprites at this chunkID
-      None if not initialized
-      empty list if initialized but everything removed
-      """
-      sprites = self.chunks.get(chunkID, None)
-      return sprites
+    def get(self, chunkID):
+       """
+       return the list of sprites at this chunkID
+       None if not initialized
+       empty list if initialized but everything removed
+       """
+       sprites = self.chunks.get(chunkID, None)
+       return sprites
 
-   def getN(self):
-      """
-      how many items in total across all chunks
-      """
-      return self.N
+    def getN(self):
+       """
+       how many items in total across all chunks
+       """
+       return self.N
 
-   def moveChunk(self, sprite, newChunkID):
-      """
-      remove the sprite from old chunkID and add it to newChunkID
-      """
-      chunkSprites = self.chunks.get(sprite.chunkID, [])
-      try:
-         chunkSprites.remove(sprite)
-         self.chunks[sprite.chunkID] = chunkSprites
-      except:
-         print("cannot remove sprite", id(sprite), "from chunk", sprite.chunkID)
-      chunkSprites = self.chunks.get(newChunkID, [])
-      chunkSprites.append(sprite)
-      self.chunks[newChunkID] = chunkSprites
-   
-   def remove(self, spriteList):
-      """
-      remove these sprites from ChunkSprites
-      """
-      for sprite in spriteList:
-         chunkID = coordinates.chunkID((sprite.x, sprite.y))
-         chunkSprites = self.chunks.get(chunkID, [])
-         try:
-            chunkSprites.remove(sprite)
-            self.N -= 1
-            self.chunks[chunkID] = chunkSprites
-         except ValueError:
-            print("sprite not in list", id(sprite))
-            print(len(chunkSprites), "chunkSprites:", chunkSprites)
-            for cm in chunkSprites:
-               print("but there is chunk sprites id:", id(cm))
+    def moveChunk(self, sprite, newChunkID):
+       """
+       remove the sprite from old chunkID and add it to newChunkID
+       """
+       chunkSprites = self.chunks.get(sprite.chunkID, [])
+       try:
+          chunkSprites.remove(sprite)
+          self.chunks[sprite.chunkID] = chunkSprites
+       except:
+          print("cannot remove sprite", id(sprite), "from chunk", sprite.chunkID)
+       chunkSprites = self.chunks.get(newChunkID, [])
+       chunkSprites.append(sprite)
+       self.chunks[newChunkID] = chunkSprites
+    
+    def remove(self, spriteList):
+       """
+       remove these sprites from ChunkSprites
+       """
+       for sprite in spriteList:
+          chunkID = coordinates.chunkID((sprite.x, sprite.y))
+          chunkSprites = self.chunks.get(chunkID, [])
+          try:
+             chunkSprites.remove(sprite)
+             self.N -= 1
+             self.chunks[chunkID] = chunkSprites
+          except ValueError:
+             print("sprite not in list", id(sprite))
+             print(len(chunkSprites), "chunkSprites:", chunkSprites)
+             for cm in chunkSprites:
+                print("but there is chunk sprites id:", id(cm))
 
 
 class CrazyHat(pg.sprite.Sprite):
@@ -140,6 +140,7 @@ class CrazyHat(pg.sprite.Sprite):
         if chunkID1 != chunkID:
             ## chunk changed: update activeWindow and sprites
             coordinates.moveWindow((x, y))
+            chunkID = chunkID1
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
