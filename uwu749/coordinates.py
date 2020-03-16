@@ -10,7 +10,7 @@ chunkWidth = None
 chunkHeight = None
 tileSize = None
 ## shifts: 
-winsx = None  # window
+winsx = None  # window relative to world
 winsy = None
 sbsx = None  # screenBuffer
 sbsy = None
@@ -21,6 +21,8 @@ blitShift = None, None  # blit whole screen
 class activeWindow():
     """
     data related to the activeWindow: a square of the 9 cunks, centered at Crazy Hat
+    local variables:
+    matrix: height x width, tile id-s inside of the window
     """
     def __init__(self, width, height):
        self.matrix = np.empty((height, width), 'int8')
@@ -29,6 +31,7 @@ class activeWindow():
     def __getitem__(self, key):
        """
        return the tile code in window
+       key: tuple winy, winx
        None if out of range
        """
        try:
@@ -192,7 +195,7 @@ def moveWindow(worldLoc):
     globals.activeKollid.empty()
     # have to empty the group here to tell sprites they do not belong to that group
     globals.activeKollid = world.activeSprites(globals.kollid)
-    coordinateShifts(newChunk, worldLoc[0], worldLoc[1])
+    # globals.player.update(False, False, False, False)
 
 
 

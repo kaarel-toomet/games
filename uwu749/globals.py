@@ -4,11 +4,15 @@ global variables that need to be accessed in different modules
 these are just variable declarations, these must
 be initialized in uwu, or in the corresponding module
 """
+import pygame as pg
+
+## CrazyHat: the player
+hullmyts = None
+## sprite group for crazy hat
+player = pg.sprite.Group()
 
 # the window that contains active chunks
 activeWindow = None
-# CrazyHat: the player
-hullmyts = None
 # mineral gold: mineral means it is not movin
 mineralGold = None
 # mineral gold in active window
