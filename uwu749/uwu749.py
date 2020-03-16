@@ -5,10 +5,11 @@ import numpy as np
 import sys
 import subprocess
 import time
+import noise
 
 import blocks
 import coordinates
-import files1
+import files
 import sprites
 import world
 import globals
@@ -26,7 +27,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- params ----------
-kollProbability = 0.005
+kollProbability = 0.005   #default is 0.005
 #kollProbability = 0.0
 
 ## ---------- blocks ----------
@@ -113,7 +114,7 @@ spriteBuffer = pg.Surface([windowWidth*tileSize, windowHeight*tileSize], pg.SRCA
 # this is the buffer where movement-related drawing is done,
 # afterwards it is copied to the screen
 do = True
-title = False  # start with main menu?
+title = True  # start with main menu?
 dist = 1
 up = True
 down = True
@@ -132,17 +133,54 @@ bb = 1
 seehome = 1
 gmod = 0
 gmods = {0:"creative",1:"survival"}
-items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0}
-oitems = items
-aia = 0
-kollin = 0
+
+def newGame():
+    """
+    Re-create everything, including terrain, monsters
+    reset lives, score, inventory
+    """
+    global inventory, amounts, homeX, homeY
+    ## inventory stuff
+    inventory = [blocks.KAST,blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+    amounts = [1, 15, 0, 0, 0, 0, 0, 0, 0, 0,  0]
+    globals.ground = world.World(globals.groundNoiseParams)
+    homeX, homeY = 0, 0  # where Crazy Hat has her home:
+    ## create the active window, centered on home:
+    chunkID = coordinates.chunkID((homeX, homeY))
+    globals.mineralGold = sprites.ChunkSprites()
+    globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
+    coordinates.coordinateShifts(chunkID, homeX, homeY)
+    globals.activeWindow.update(globals.ground, chunkID)
+    # load the world chunks into activeWindow
+    globals.activeKollid = world.activeSprites(globals.kollid)
+    # have to initialize this, in principle we may have a few kolls pre-created
+    globals.activeWindow.draw(None, None, blocks.blocks)
+    drawSprites(globals.activeMineralGold, spriteBuffer)
+    reset()
+
+def reset():
+    """
+    reset lives, score etc to the original state
+    leave the world geography untouched
+    """
+    global gameover, lifes, punktid, aia
+    punktid = 0
+    gameover = False
+    lifes = 10
+    aia = 0
+    # counter for immunity: after a monster hits you, you will be immune
+    # agains new hits for this many ticks.
+    globals.player.empty()
+    globals.hullmyts = sprites.CrazyHat(homeX, homeY)
+    globals.player.add(globals.hullmyts)
+    globals.hullmyts.setxy(homeX, homeY)
+
+
+kollin = 0  # how many mosters
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
-## inventory stuff
-inventory = [blocks.KAST,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-amounts = [11111111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 empty = 0
 select = 0
 ##
@@ -159,22 +197,8 @@ if s is not None:
         items = oitems
 else:
     ## ---------- Build a new world ----------
-    ## variables
-    globals.ground = world.World((50, 50, 20, 0.5, 2, 1024, 1024, 0))
-    ## where Crazy Hat has her home:
-    homeX, homeY = 0, 0
+    newGame()
 
-## create the active window, centered on home:
-chunkID = coordinates.chunkID((homeX, homeY))
-globals.mineralGold = sprites.ChunkSprites()
-globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
-coordinates.coordinateShifts(chunkID, homeX, homeY)
-globals.activeWindow.update(globals.ground, chunkID)
-# load the world chunks into activeWindow
-globals.activeKollid = world.activeSprites(globals.kollid)
-# have to initialize this, in principle we may have a few kolls pre-created
-globals.activeWindow.draw(None, None, blocks.blocks)
-drawSprites(globals.activeMineralGold, spriteBuffer)
 
 class Tüüp(pg.sprite.Sprite):
     def __init__(self,x,y):
@@ -191,20 +215,6 @@ class Tüüp(pg.sprite.Sprite):
             self.x += np.random.randint(-1,1)
             self.y += np.random.randint(-1,1)
             self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-
-
-def reset():
-    """
-    reset lifes and score
-    """
-    global gameover, lifes, punktid
-    punktid = 0
-    gameover = False
-    lifes = 10
-    globals.player.empty()
-    globals.hullmyts = sprites.CrazyHat(homeX, homeY)
-    globals.player.add(globals.hullmyts)
-    globals.hullmyts.setxy(homeX, homeY)
     
 def build(x,y):
     """
@@ -235,13 +245,7 @@ def destroy(x,y):
         return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
-    try:
-        items[inventory.index(material)] = material
-        amounts[inventory.index(material)] += 1
-    except:
-        items[empty] = material
-        amounts[empty] += 1
-    inventory[empty] = material
+    get(blocks.drops[material])
     globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
     
@@ -262,25 +266,40 @@ def killKolls(location):
             punktid += 100
             kollin -= 1
 
+def get(item):
+    global inventory, amounts, empty
+    try:
+        inventory[inventory.index(item)] = item
+        amounts[inventory.index(item)] += 1
+    except:
+        inventory[empty] = item
+        amounts[empty] += 1
 ## initialize player        
 reset()
 
 while do:
     while title:
+        ## main menu
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 title = False
                 do = False
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_s:
-                    gmod = 1
+                if event.key == pg.K_l:
+                    w = files.loadWorld()
+                    title = False
+                elif event.key == pg.K_s:
+                    gmod = 0
                     title = False
                 elif event.key == pg.K_c:
                     gmod = 0
                     title = False
         textrender("press C to create new world, L to load world from file, S to save",
                    screenWidth/2, screenHeight/2)
+        pg.display.update()
+        timer.tick(5)  # low fps enough for the main menu
     for event in pg.event.get():
+        ## main game loop
         if event.type == pg.QUIT:
             do = False
         elif event.type == pg.KEYDOWN:
@@ -324,8 +343,6 @@ while do:
                 bb -= 1
             elif event.key == pg.K_x:
                 seehome = 1-seehome
-            elif event.key == pg.K_z:
-                files1.saveWorld(world, (homeX, homeY), items)
             elif event.key == pg.K_c:
                 destroy(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])
             elif event.key == pg.K_g:
@@ -339,6 +356,9 @@ while do:
             elif event.key == pg.K_y:
                 # go to the main menu
                 title = True;
+            elif event.key == pg.K_SEMICOLON and inventory[select] == blocks.PUIT:
+                amounts[select] -= 1
+                get(blocks.KAST)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -352,13 +372,19 @@ while do:
                 speed = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             mxy = pg.mouse.get_pos()
+            hxy = globals.hullmyts.getxy()
             tol = tileSize*6
             if event.button == 1 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
                 destroy(coordinates.screenToWorld(mxy[0],mxy[1])[0],
                 coordinates.screenToWorld(mxy[0],mxy[1])[1])
-            elif event.button == 3 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
-                build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
-                coordinates.screenToWorld(mxy[0],mxy[1])[1])
+            elif event.button == 3:
+                if mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
+                    build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
+                    coordinates.screenToWorld(mxy[0],mxy[1])[1])
+                if inventory[select] == blocks.MQQK:
+                    for x in range(-3,4):
+                        for y in range(-3,4):
+                            killKolls((hxy[0]+x, hxy[1]+y))
             elif event.button == 4:
                 select -= 1
             elif event.button == 5:
@@ -439,8 +465,7 @@ while do:
     screen.blit(globals.screenBuffer, coordinates.blitShift)
     ## add score and other info
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
-    score = ("plokk: " + blocks.bn[bb] + "*" + str(items[bb]) +
-             ", punktid: " + str(punktid) + " elud: " + str(lifes) +
+    score = ("punktid: " + str(punktid) + " elud: " + str(lifes) +
              "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
              ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
     
@@ -453,7 +478,7 @@ while do:
     screen.blit(selslot,(select*18*tileScale,0))
     for s in range(0,10):
         screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
-        textrender(str(amounts[s]),18*tileScale*s+tileScale, tileScale)
+        textrender(str(amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
     globals.player.update(mup, mdown, mleft, mright)
     # update crazy hat
@@ -480,3 +505,4 @@ while do:
     ##
     timer.tick(60)
 pg.quit()
+print("lendan õhku")

@@ -24,6 +24,8 @@ activeKollid = None
 
 # tiles for the ground
 ground = None
+# Berlin noise data for ground
+groundNoiseParams = (50, 50, 10, 0.5, 2, 1024, 1024, 0)
 
 # memory are where drawing is done, and part of which is showed on monitor
 screenBuffer = None

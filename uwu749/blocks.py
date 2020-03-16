@@ -9,14 +9,16 @@ KIVI = 3
 LUMI = 4
 TEE = 5
 KAST = 6
-SUGAVM = 7
+SYGAVM = 7
 PUU = 8
-BLOCK_END = 8
+MQQK = 9
+PUIT = 10
+BLOCK_END = 10
 
-unbreakable = set([SUGAVM])
+unbreakable = set([SYGAVM])
 solid = set([KAST])
-breakto = {SUGAVM:SUGAVM, SEA:SUGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE}
-
+breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU}
+drops = {NONE:NONE, SEA:SEA, SAND:SAND, MURU:MURU, KIVI:KIVI, LUMI:LUMI, TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUIT, MQQK:MQQK, PUIT:PUIT}
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
 # as soon as we know the size
@@ -43,7 +45,7 @@ def loadBlocks(size):
                                 (size, size))
     lumi = pg.transform.scale(pg.image.load("blocks/☃.png"),
                                 (size, size))
-    sugavv = pg.transform.scale(pg.image.load("blocks/deepw.png"),
+    sygavv = pg.transform.scale(pg.image.load("blocks/deepw.png"),
                                 (size, size))
     window = pg.transform.scale(pg.image.load("blocks/window.png"),
                                 (size, size))
@@ -59,9 +61,13 @@ def loadBlocks(size):
                                 (size, size))
     none = pg.transform.scale(pg.image.load("blocks/na.png"),
                                 (size, size))
+    mqqk = pg.transform.scale(pg.image.load("blocks/sword.png"),
+                                (size, size))
+    puit = pg.transform.scale(pg.image.load("blocks/wood.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
-               KAST:kast, KIVI:kivi, LUMI:lumi, SUGAVM:sugavv, PUU:puu, NONE:none}
+               KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv, PUU:puu, NONE:none, MQQK:mqqk, PUIT:puit}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
-        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SUGAVM:"sügav vesi", PUU:"puu", NONE:"eimiski"}
+        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi", PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit"}
 

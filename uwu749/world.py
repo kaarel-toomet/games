@@ -7,6 +7,7 @@ import random as r
 import coordinates
 import globals
 import sprites
+import blocks
 
 def activeSprites(sprites):
    """
@@ -66,19 +67,19 @@ class World:
               noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
                                        self.a, self.b, self.c, self.d, self.e, self.f,)
               if noiseval < -0.3:
-                 chunk[cy, cx] = 7
+                 chunk[cy, cx] = blocks.SYGAVM
               elif noiseval < -0.05:
-                 chunk[cy, cx] = 0
+                 chunk[cy, cx] = blocks.SEA
               elif noiseval < 0:
-                 chunk[cy, cx] = 1
+                 chunk[cy, cx] = blocks.SAND
               elif noiseval < 0.3:
-                  chunk[cy,cx] = 2
+                  chunk[cy,cx] = blocks.MURU
                   if r.randint(0,100)==0:
-                      chunk[cy,cx] = 8
+                      chunk[cy,cx] = blocks.PUU
               elif noiseval < 0.4:
-                 chunk[cy, cx] = 3
+                 chunk[cy, cx] = blocks.KIVI
               elif noiseval < 11:
-                 chunk[cy, cx] = 4
+                 chunk[cy, cx] = blocks.LUMI
       self.chunks[chunkID] = chunk
       ## create minerals: sprites that do not move
       for i in range(1):
