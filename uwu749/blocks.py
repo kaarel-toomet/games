@@ -13,7 +13,7 @@ SUGAVM = 7
 PUU = 8
 BLOCK_END = 8
 
-breakable = set([])
+unbreakable = set([SUGAVM])
 solid = set([KAST])
 breakto = {SUGAVM:SUGAVM, SEA:SUGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE}
 

@@ -214,7 +214,7 @@ def build(x,y):
     winx, winy = coordinates.worldToWindow(x, y)
     if inventory[select] == -1:
         return
-    if globals.activeWindow[(winy,winx)] in blocks.breakable:
+    if blocks.breakto[inventory[select]] != globals.activeWindow[(winy,winx)]:
         return
     globals.activeWindow[(winy,winx)] = inventory[select]
     globals.screenBuffer.blit( blocks.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
@@ -230,6 +230,9 @@ def destroy(x,y):
     material = globals.activeWindow[(winy,winx)]
     breakto = blocks.breakto[ material]
     ## if gold and destroyable material
+    killKolls((x, y))
+    if globals.activeWindow[(winy,winx)] in blocks.unbreakable:
+        return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
     try:
@@ -241,7 +244,7 @@ def destroy(x,y):
     inventory[empty] = material
     globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
-    killKolls((x, y))
+    
 
 def killKolls(location):
     """

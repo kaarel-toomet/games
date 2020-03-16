@@ -130,10 +130,6 @@ class CrazyHat(pg.sprite.Sprite):
         winx, winy = coordinates.worldToWindow(x, y)
         if globals.activeWindow[(winy,winx)] in blocks.solid:
             return
-        if globals.activeWindow[(winy,winx)] in blocks.breakable:
-            globals.activeWindow[(winy,winx)] = blocks.breakto[globals.activeWindow[(winy,winx)]]
-            globals.screenBuffer.blit( blocks.blocks[blocks.breakto[globals.activeWindow[(winy,winx)]]],
-                                       coordinates.worldToScreenbuffer(x, y))
         self.x, self.y = x, y
         chunkID = globals.activeWindow.getChunkID()
         chunkID1 = coordinates.chunkID((self.x, self.y))
