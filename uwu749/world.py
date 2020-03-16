@@ -68,7 +68,7 @@ class World:
                                        self.a, self.b, self.c, self.d, self.e, self.f,)
               noiseval2 = noise.snoise2(x/(self.freqX*2) + 10, y/(self.freqY*2) + 10,
                                        self.a, self.b, self.c, self.d, self.e, self.f,)
-              biome1 = r.uniform(0,0.5)
+              biome1 = r.uniform(-0.1,0.5)
               biome2 = r.uniform(-0.2,0)
               if noiseval < -0.3:
                  chunk[cy, cx] = blocks.SYGAVM

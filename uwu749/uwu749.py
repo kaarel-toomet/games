@@ -142,8 +142,8 @@ sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
 ## inventory stuff
-inventory = [blocks.KAST,blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-amounts = [1, 15, 0, 0, 0, 0, 0, 0, 0, 0,  0]
+inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
 empty = 0
 select = 0
 ##
