@@ -12,12 +12,13 @@ KAST = 6
 SYGAVM = 7
 PUU = 8
 MQQK = 9
-BLOCK_END = 9
+PUIT = 10
+BLOCK_END = 10
 
 unbreakable = set([SYGAVM])
 solid = set([KAST])
-breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK}
-
+breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU}
+drops = {NONE:NONE, SEA:SEA, SAND:SAND, MURU:MURU, KIVI:KIVI, LUMI:LUMI, TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUIT, MQQK:MQQK, PUIT:PUIT}
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
 # as soon as we know the size
@@ -62,9 +63,11 @@ def loadBlocks(size):
                                 (size, size))
     mqqk = pg.transform.scale(pg.image.load("blocks/sword.png"),
                                 (size, size))
+    puit = pg.transform.scale(pg.image.load("blocks/wood.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
-               KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv, PUU:puu, NONE:none, MQQK:mqqk}
+               KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv, PUU:puu, NONE:none, MQQK:mqqk, PUIT:puit}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
-        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi", PUU:"puu", NONE:"eimiski", MQQK: "mõõk"}
+        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi", PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit"}
 

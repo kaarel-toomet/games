@@ -27,7 +27,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- params ----------
-kollProbability = 1   #default is 0.005
+kollProbability = 0.005   #default is 0.005
 #kollProbability = 0.0
 
 ## ---------- blocks ----------
@@ -236,6 +236,7 @@ def destroy(x,y):
         return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
+    material = blocks.drops[material]
     try:
         items[inventory.index(material)] = material
         amounts[inventory.index(material)] += 1
