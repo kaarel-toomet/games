@@ -350,6 +350,9 @@ while do:
                 elif inventory[select] == blocks.KAST:
                     amounts[select] -= 1
                     get(blocks.KUKS)
+                elif inventory[select] == blocks.MURU:
+                    amounts[select] -= 1
+                    get(blocks.TEE)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
