@@ -343,7 +343,7 @@ while do:
                 kutid.add(Tüüp(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]))
             elif event.key == pg.K_RSHIFT:
                 speed = True
-            elif event.key == pg.K_SEMICOLON:
+            elif event.key == pg.K_PERIOD:
                 if inventory[select] == blocks.PUIT:
                     amounts[select] -= 1
                     get(blocks.KAST)

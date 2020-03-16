@@ -66,6 +66,9 @@ class World:
               y = jc*coordinates.chunkHeight + cy
               noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
                                        self.a, self.b, self.c, self.d, self.e, self.f,)
+              noiseval2 = noise.snoise2(x/self.freqX + 10, y/self.freqY + 10,
+                                       self.a, self.b, self.c, self.d, self.e, self.f,)
+              biome = r.uniform(-0.2,0.2)
               if noiseval < -0.3:
                  chunk[cy, cx] = blocks.SYGAVM
               elif noiseval < -0.05:
@@ -74,7 +77,7 @@ class World:
                  chunk[cy, cx] = blocks.SAND
               elif noiseval < 0.3:
                   chunk[cy,cx] = blocks.MURU
-                  if r.randint(0,100)==0:
+                  if r.uniform(0,0.2) < noiseval2:
                       chunk[cy,cx] = blocks.PUU
               elif noiseval < 0.4:
                  chunk[cy, cx] = blocks.KIVI
