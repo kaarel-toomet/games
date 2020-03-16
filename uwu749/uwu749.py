@@ -137,6 +137,8 @@ items = {0:0, 1:5, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:
 oitems = items
 aia = 0
 kollin = 0
+kuld = 0
+kollivaremed = 0
 kutid = pg.sprite.Group()
 sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
@@ -248,7 +250,7 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global punktid, kollin
+    global punktid, kollin, kollivaremed
     # punktid: (global) score
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
@@ -256,6 +258,7 @@ def killKolls(location):
             globals.activeKollid.remove(activeKoll)
             punktid += 100
             kollin -= 1
+            kollivaremed += 1
 
 def get(item):
     global inventory, amounts, empty
@@ -353,6 +356,9 @@ while do:
                 elif inventory[select] == blocks.MURU:
                     amounts[select] -= 1
                     get(blocks.TEE)
+                elif inventory[select] == blocks.PUU:
+                    amounts[select] -= 1
+                    get(blocks.PUIT)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -446,6 +452,7 @@ while do:
         globals.activeMineralGold.remove(col)
         globals.mineralGold.remove(col)
         punktid += 100
+        kuld += 1
     col = pg.sprite.spritecollide(globals.hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
         lifes -= 1
@@ -456,6 +463,13 @@ while do:
         select = 9
     if select > 9:
         select = 0
+    if kuld >= 10:
+        kuld -= 10
+        get(blocks.KULD)
+    if kollivaremed >= 10:
+        kollivaremed -= 10
+        get(blocks.KOLLIV)
+    
     for s in range(0,10):
         if amounts[s] <= 0:
             inventory[s] = -1
@@ -469,8 +483,7 @@ while do:
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
     score = ("plokk: " + blocks.bn[bb] + "*" + str(items[bb]) +
              ", punktid: " + str(punktid) + " elud: " + str(lifes) +
-             "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
-             ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
+             " Kuld:" + str(kuld) + " Kolli varemed:" + str(kollivaremed))
     
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
