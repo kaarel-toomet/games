@@ -343,9 +343,13 @@ while do:
                 kutid.add(Tüüp(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]))
             elif event.key == pg.K_RSHIFT:
                 speed = True
-            elif event.key == pg.K_SEMICOLON and inventory[select] == blocks.PUIT:
-                amounts[select] -= 1
-                get(blocks.KAST)
+            elif event.key == pg.K_SEMICOLON:
+                if inventory[select] == blocks.PUIT:
+                    amounts[select] -= 1
+                    get(blocks.KAST)
+                elif inventory[select] == blocks.KAST:
+                    amounts[select] -= 1
+                    get(blocks.KUKS)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -366,8 +370,16 @@ while do:
                 coordinates.screenToWorld(mxy[0],mxy[1])[1])
             elif event.button == 3:
                 if mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
-                    build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
-                    coordinates.screenToWorld(mxy[0],mxy[1])[1])
+                    mxw = coordinates.screenToWorld(mxy[0],mxy[1])[0]
+                    myw = coordinates.screenToWorld(mxy[0],mxy[1])[1]
+                    build(mxw, myw)
+                    winx, winy = coordinates.worldToWindow(mxw, myw)
+                    if globals.activeWindow[winy, winx] == blocks.KUKS:
+                        globals.activeWindow[winy, winx] = blocks.LUKS
+                        globals.screenBuffer.blit(blocks.blocks[blocks.LUKS], coordinates.windowToScreenBuffer(winx, winy))  
+                    elif globals.activeWindow[winy, winx] == blocks.LUKS:
+                        globals.activeWindow[winy, winx] = blocks.KUKS
+                        globals.screenBuffer.blit(blocks.blocks[blocks.KUKS], coordinates.windowToScreenBuffer(winx, winy)) 
                 if inventory[select] == blocks.MQQK:
                     for x in range(-3,4):
                         for y in range(-3,4):

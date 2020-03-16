@@ -13,12 +13,15 @@ SYGAVM = 7
 PUU = 8
 MQQK = 9
 PUIT = 10
-BLOCK_END = 10
+KUKS = 11
+LUKS = 12
+BLOCK_END = 12
 
 unbreakable = set([SYGAVM])
-solid = set([KAST])
-breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND, KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU}
-drops = {NONE:NONE, SEA:SEA, SAND:SAND, MURU:MURU, KIVI:KIVI, LUMI:LUMI, TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUIT, MQQK:MQQK, PUIT:PUIT}
+solid = set([KAST, KUKS])
+breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:SAND, KAST:SAND,
+            KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU, KUKS:SAND, LUKS:SAND}
+drops = {NONE:NONE, SEA:SEA, SAND:SAND, MURU:MURU, KIVI:KIVI, LUMI:LUMI, TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUIT, MQQK:MQQK, PUIT:PUIT, KUKS:KUKS, LUKS:KUKS}
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
 # as soon as we know the size
@@ -67,7 +70,9 @@ def loadBlocks(size):
                                 (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
-               KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv, PUU:puu, NONE:none, MQQK:mqqk, PUIT:puit}
+               KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv, PUU:puu, NONE:none, MQQK:mqqk, PUIT:puit, KUKS:cdoor, LUKS:odoor}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
-        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi", PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit"}
+        KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi",
+        PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit", KUKS:"kinnis uks",
+        LUKS:"lahtis uks"}
 
