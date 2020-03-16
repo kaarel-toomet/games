@@ -5,6 +5,7 @@ import numpy as np
 import sys
 import subprocess
 import time
+import noise
 
 import blocks
 import coordinates
@@ -26,7 +27,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- params ----------
-kollProbability = 0.005
+kollProbability = 1   #default is 0.005
 #kollProbability = 0.0
 
 ## ---------- blocks ----------
@@ -141,8 +142,8 @@ sprites.setup(tileSize)
 globals.kollid = sprites.ChunkSprites()
 speed = False
 ## inventory stuff
-inventory = [blocks.KAST,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-amounts = [11111111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inventory = [blocks.KAST,blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+amounts = [999999, 15, 0, 0, 0, 0, 0, 0, 0, 0,  0]
 empty = 0
 select = 0
 ##
@@ -160,7 +161,7 @@ if s is not None:
 else:
     ## ---------- Build a new world ----------
     ## variables
-    globals.ground = world.World((50, 50, 20, 0.5, 2, 1024, 1024, 0))
+    globals.ground = world.World((50, 50, 10, 0.5, 2, 1024, 1024, 0))
     ## where Crazy Hat has her home:
     homeX, homeY = 0, 0
 
@@ -353,13 +354,20 @@ while do:
                 speed = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             mxy = pg.mouse.get_pos()
+            hxy = globals.hullmyts.getxy()
             tol = tileSize*6
             if event.button == 1 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
                 destroy(coordinates.screenToWorld(mxy[0],mxy[1])[0],
                 coordinates.screenToWorld(mxy[0],mxy[1])[1])
-            elif event.button == 3 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
-                build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
-                coordinates.screenToWorld(mxy[0],mxy[1])[1])
+            elif event.button == 3:
+                if mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
+                    build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
+                    coordinates.screenToWorld(mxy[0],mxy[1])[1])
+                if inventory[select] == blocks.MQQK:
+                    for x in range(-3,4):
+                        for y in range(-3,4):
+                            killKolls((hxy[0]+x, hxy[1]+y))
+                            print(hxy[0]+x, hxy[1]+y)
             elif event.button == 4:
                 select -= 1
             elif event.button == 5:
@@ -454,7 +462,7 @@ while do:
     screen.blit(selslot,(select*18*tileScale,0))
     for s in range(0,10):
         screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
-        textrender(str(amounts[s]),18*tileScale*s+tileScale, tileScale)
+        textrender(str(amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
     globals.player.update(mup, mdown, mleft, mright)
     # update crazy hat
