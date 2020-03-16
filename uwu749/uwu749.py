@@ -143,7 +143,7 @@ globals.kollid = sprites.ChunkSprites()
 speed = False
 ## inventory stuff
 inventory = [blocks.KAST,blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-amounts = [999999, 15, 0, 0, 0, 0, 0, 0, 0, 0,  0]
+amounts = [1, 15, 0, 0, 0, 0, 0, 0, 0, 0,  0]
 empty = 0
 select = 0
 ##
@@ -236,14 +236,7 @@ def destroy(x,y):
         return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
-    material = blocks.drops[material]
-    try:
-        items[inventory.index(material)] = material
-        amounts[inventory.index(material)] += 1
-    except:
-        items[empty] = material
-        amounts[empty] += 1
-    inventory[empty] = material
+    get(blocks.drops[material])
     globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
     
@@ -264,6 +257,14 @@ def killKolls(location):
             punktid += 100
             kollin -= 1
 
+def get(item):
+    global inventory, amounts, empty
+    try:
+        inventory[inventory.index(item)] = item
+        amounts[inventory.index(item)] += 1
+    except:
+        inventory[empty] = item
+        amounts[empty] += 1
 ## initialize player        
 reset()
 
@@ -342,6 +343,9 @@ while do:
                 kutid.add(Tüüp(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]))
             elif event.key == pg.K_RSHIFT:
                 speed = True
+            elif event.key == pg.K_SEMICOLON and inventory[select] == blocks.PUIT:
+                amounts[select] -= 1
+                get(blocks.KAST)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -368,7 +372,6 @@ while do:
                     for x in range(-3,4):
                         for y in range(-3,4):
                             killKolls((hxy[0]+x, hxy[1]+y))
-                            print(hxy[0]+x, hxy[1]+y)
             elif event.button == 4:
                 select -= 1
             elif event.button == 5:
@@ -490,3 +493,4 @@ while do:
     ##
     timer.tick(60)
 pg.quit()
+print("lendan õhku")
