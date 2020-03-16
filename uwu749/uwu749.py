@@ -74,7 +74,7 @@ dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
 tfont = pg.font.SysFont("Times",100)
 
-def textrender(text,x,y,font=font):
+def textrender(text, x, y, font=font):
     text = font.render(text, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.x = x
@@ -113,7 +113,7 @@ spriteBuffer = pg.Surface([windowWidth*tileSize, windowHeight*tileSize], pg.SRCA
 # this is the buffer where movement-related drawing is done,
 # afterwards it is copied to the screen
 do = True
-title = True
+title = False  # start with main menu?
 dist = 1
 up = True
 down = True
@@ -266,24 +266,20 @@ def killKolls(location):
 reset()
 
 while do:
-    ##    while title:
-    ##        for event in pg.event.get():
-    ##            if event.type == pg.QUIT:
-    ##                title = False
-    ##                do = False
-    ##            elif event.type == pg.KEYDOWN:
-    ##                if event.key == pg.K_s:
-    ##                    gmod = 1
-    ##                    title = False
-    ##                elif event.key == pg.K_c:
-    ##                    gmod = 0
-    ##                    title = False
-    ##        score = ("press C for creative mode, press S for survival(WIP)")
-    ##        text = tfont.render(score, True, (0,255,0))
-    ##        text_rect = text.get_rect()
-    ##        text_rect.centerx = screen.get_rect().centerx
-    ##        text_rect.y = screenHeight/2
-    ##        screen.blit(text,text_rect)
+    while title:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                title = False
+                do = False
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_s:
+                    gmod = 1
+                    title = False
+                elif event.key == pg.K_c:
+                    gmod = 0
+                    title = False
+        textrender("press C to create new world, L to load world from file, S to save",
+                   screenWidth/2, screenHeight/2)
     for event in pg.event.get():
         if event.type == pg.QUIT:
             do = False
@@ -340,6 +336,9 @@ while do:
                 kutid.add(Tüüp(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]))
             elif event.key == pg.K_RSHIFT:
                 speed = True
+            elif event.key == pg.K_y:
+                # go to the main menu
+                title = True;
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
