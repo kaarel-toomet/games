@@ -229,6 +229,7 @@ def destroy(x,y):
     if there is a koll at (x, y), kill it and give 100 points
     x, y: world coordinates
     """
+    global inventory, empty
     winx, winy = coordinates.worldToWindow(x, y)
     material = globals.activeWindow[(winy,winx)]
     breakto = blocks.breakto[ material]
@@ -236,6 +237,11 @@ def destroy(x,y):
     killKolls((x, y))
     if globals.activeWindow[(winy,winx)] in blocks.unbreakable:
         return
+    try:
+        amounts[inventory.index(material)] += 0
+    except:
+        if empty == 10:
+            return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
     get(blocks.drops[material])
@@ -260,14 +266,22 @@ def killKolls(location):
             kollin -= 1
             kollivaremed += 1
 
-def get(item):
+def get(item, cost=blocks.NONE):
     global inventory, amounts, empty
+    try:
+        amounts[inventory.index(cost)] -= 1
+        if cost == blocks.NONE:
+            amounts[inventory.index(cost)] += 1
+    except:
+        if empty == 10:
+            return
     try:
         inventory[inventory.index(item)] = item
         amounts[inventory.index(item)] += 1
     except:
         inventory[empty] = item
         amounts[empty] += 1
+        print(amounts[empty], inventory[empty], empty)
 ## initialize player        
 reset()
 
@@ -348,17 +362,13 @@ while do:
                 speed = True
             elif event.key == pg.K_PERIOD:
                 if inventory[select] == blocks.PUIT:
-                    amounts[select] -= 1
-                    get(blocks.KAST)
+                    get(blocks.KAST,blocks.PUIT)
                 elif inventory[select] == blocks.KAST:
-                    amounts[select] -= 1
-                    get(blocks.KUKS)
+                    get(blocks.KUKS,blocks.KAST)
                 elif inventory[select] == blocks.MURU:
-                    amounts[select] -= 1
-                    get(blocks.TEE)
+                    get(blocks.TEE,blocks.MURU)
                 elif inventory[select] == blocks.PUU:
-                    amounts[select] -= 1
-                    get(blocks.PUIT)
+                    get(blocks.PUIT,blocks.PUU)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -463,16 +473,18 @@ while do:
         select = 9
     if select > 9:
         select = 0
-    if kuld >= 10:
+    if kuld >= 10 and empty != 10:
         kuld -= 10
         get(blocks.KULD)
-    if kollivaremed >= 10:
+    if kollivaremed >= 10 and empty != 10:
         kollivaremed -= 10
         get(blocks.KOLLIV)
     
     for s in range(0,10):
         if amounts[s] <= 0:
             inventory[s] = -1
+        if inventory[s] == -1:
+            amounts[s] = 0
     try:
         empty = inventory.index(-1)
     except:
