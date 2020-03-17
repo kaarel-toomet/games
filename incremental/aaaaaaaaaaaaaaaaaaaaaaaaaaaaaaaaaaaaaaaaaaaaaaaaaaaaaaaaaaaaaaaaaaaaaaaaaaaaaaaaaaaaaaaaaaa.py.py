@@ -35,6 +35,8 @@ stkm = 0
 laser = 0
 llvl = 0
 prokoli = 0
+bx = 0
+by = 0
 #txt = ("l", "厨房", str(3**clvl*200), str(10*1.1**stkm), str(1000*2**slvl), str(100*1.1**laser))
 font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
@@ -42,42 +44,54 @@ pfont = pg.font.SysFont("Times", 50)
 pause = False
 button = pg.sprite.Group()
 class Button(pg.sprite.Sprite):
-    def __init__(self,x,y, pic, n, clr=(64, 64, 64), size=21):
+    def __init__(self,x,y, pic, n, clr=(64, 64, 64), size=21, still=False):
         pg.sprite.Sprite.__init__(self)
         self.image = pic
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.x = x
+        self.y = y
         self.clr = clr
         self.fontsize = size
         self.n=n
+        self.still = still
     def update(self):
         global txt
-        rtxt(self.rect.centerx, self.rect.centery, txt[self.n], self.clr, self.fontsize)
+        rtxt(self.rect.centerx, self.rect.centery, txt[self.n],
+             self.clr, self.fontsize, True)
+        if not self.still:
+            self.rect.x = self.x-bx
+            self.rect.y = self.y-by
     def clicked(self):
         global c
         c=self.n
-    def move(self, n):
-        self.rect.x += n*screenw
 def reset():
     lifes = 5
     player.empty()
     hullmyts = Player(screenw/2,screenh/2)
     player.add(hullmyts)
-def rtxt(x,y,txt,color,size=20):
-    font = pg.font.SysFont("FreeSans", size)
+def rtxt(x,y,txt,color,size=20,still=False):
+    global bx,by
+    font = pg.font.SysFont("DejaVu Sans Mono", size)
     text = font.render(txt, True, color)
     text_rect = text.get_rect()
-    text_rect.centerx = x
-    text_rect.centery = y
+    if still:
+        text_rect.centerx = x
+        text_rect.centery = y
+    else:
+        text_rect.centerx = x-bx
+        text_rect.centery = y-by
     screen.blit(text,text_rect)
-button.add(Button(screenw/2-100, screenh/2-100, thing, 1, (128, 128, 128), 30))
-button.add(Button(100,100,btn,2,(255,255,255),20))
-button.add(Button(screenw-400,100,btn,3,(255,255,255),20))
-button.add(Button(100,200,btn,4,(255,255,255),20))
-button.add(Button(screenw-400,200,btn,5,(255,255,255),20))
-button.add(Button(100,300,btn,6,(255,255,255),20))
-button.add(Button(screenw/2-100,screenh-100,btn,7,(255,0,0),20))
+button.add(Button(screenw/2-100, screenh/2-100, thing, 1, (128, 128, 128), 30, True))#köök
+button.add(Button(100,100,btn,2,(255,255,255),20)) #click lvl
+button.add(Button(screenw-400,100,btn,3,(255,255,255),20))#stkm
+button.add(Button(100,200,btn,4,(255,255,255),20)) #stkm lvl
+button.add(Button(screenw-400,200,btn,5,(255,255,255),20)) #lasers
+button.add(Button(100,300,btn,6,(255,255,255),20)) #nonexist
+button.add(Button(screenw/2-100,screenh-100,btn,7,(255,0,0),20))#prestige
+button.add(Button(screenw-300,screenh-100,btn,8,(255,255,255),50)) # prokoli upgs
+button.add(Button(screenw+100,screenh-100,btn,9,(255,255,255),50)) # back
 while do:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -126,7 +140,7 @@ while do:
         pg.display.update()
     txt = ("l", "厨房", str(3**clvl*200), str(int(10*1.1**stkm)),
            str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
-           "+" + str(int(np.log(h+0.1))-10) + " prokolit")
+           "+" + str(int(np.log(h+0.1))-10) + " prokolit", ">","<")
     mc = pg.mouse.get_pos()
     bhps = (stkm*2**slvl + laser*(10+laser*llvl))*(1+prokoli/10)
     h+=bhps/60
@@ -160,6 +174,10 @@ while do:
         slvl = 0
         stkm = 0
         laser = 0
+    if c == 8 and prokoli >= 0:
+        bx = screenw
+    if c == 9:
+        bx = 0
     rtxt(200,60,"richer kitchens: " + str(clvl),(255,255,255))
     rtxt(200,80,"doubles click base",(255,255,255))
     rtxt(200,160,"better axes: " + str(slvl),(255,255,255))
@@ -177,6 +195,8 @@ while do:
     rtxt(screenw/2,50,"h/click: " + str(2**clvl),(255,255,255))
     rtxt(screenw/2,70,"prokoli: " + str(prokoli),(255,255,255))
     rtxt(screenw/2,screenh-150,"PRESTIGE",(255,255,255))
+    rtxt(screenw-200,screenh-150,"prokoli upgrades",(255,255,255))
+    rtxt(screenw+200,screenh-150,"back",(255,255,255))
     c=0
     click = False
     button.draw(screen)
