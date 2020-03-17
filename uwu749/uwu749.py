@@ -133,6 +133,7 @@ bb = 1
 seehome = 1
 gmod = 0
 gmods = {0:"creative",1:"survival"}
+gameState = globals.GameState()  # current running game data
 
 def newGame():
     """
@@ -163,8 +164,8 @@ def reset():
     reset lives, score etc to the original state
     leave the world geography untouched
     """
-    global gameover, lifes, punktid, aia, kuld, kollivaremed
-    punktid = 0
+    global gameState, gameover, lifes, aia, kuld, kollivaremed
+    gameState = globals.GameState()
     gameover = False
     lifes = 10
     aia = 0
@@ -265,13 +266,12 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global punktid, kollin, kollivaremed
-    # punktid: (global) score
+    global gameState, kollin, kollivaremed
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
             globals.kollid.remove([activeKoll])
             globals.activeKollid.remove(activeKoll)
-            punktid += 100
+            gameState.punktid += 100
             kollin -= 1
             kollivaremed += 1
 
@@ -303,10 +303,10 @@ while do:
                 do = False
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_l:
-                    w = files.loadWorld()
+                    gameState = files.loadWorld()
                     title = False
                 elif event.key == pg.K_s:
-                    gmod = 0
+                    files.saveWorld(world, gameState)
                     title = False
                 elif event.key == pg.K_c:
                     newGame()
@@ -474,7 +474,7 @@ while do:
     if len(col) > 0:
         globals.activeMineralGold.remove(col)
         globals.mineralGold.remove(col)
-        punktid += 100
+        gameState.punktid += 100
         kuld += 1
     col = pg.sprite.spritecollide(globals.hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
@@ -506,7 +506,7 @@ while do:
     screen.blit(globals.screenBuffer, coordinates.blitShift)
     ## add score and other info
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
-    score = ("punktid: " + str(punktid) + " elud: " + str(lifes) +
+    score = ("punktid: " + str(gameState.punktid) + " elud: " + str(lifes) +
              " Kuld:" + str(kuld) + " Kolli varemed:" + str(kollivaremed))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()

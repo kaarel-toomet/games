@@ -29,3 +29,12 @@ groundNoiseParams = (50, 50, 10, 0.5, 2, 1024, 1024, 0)
 
 # memory are where drawing is done, and part of which is showed on monitor
 screenBuffer = None
+
+class GameState():
+    """
+    contains information on the current state of the game,
+    including lives, points, inventory, current location,
+    home, etc
+    """
+    def __init__(self):
+        self.punktid = 0
