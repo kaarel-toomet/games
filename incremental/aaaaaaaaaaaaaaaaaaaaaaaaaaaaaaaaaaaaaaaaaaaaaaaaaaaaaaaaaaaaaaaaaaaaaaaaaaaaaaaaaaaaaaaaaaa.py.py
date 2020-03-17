@@ -4,10 +4,12 @@ import numpy as np
 import re
 def num(x):
     x = float(x)
-
-scode = list(input("Enter your save code, or 'x' for a new game:").split(",")) # 11 numbers separated by commas
+    if x == x//1:
+        x = int(x)
+    return x
+scode = list(input("Enter your save code, or 'x' for a new game:").split(",")) # 10 numbers separated by commas
 try:
-    scode = [float(x) for x in scode]
+    scode = [num(x) for x in scode]
     h = scode[0]
     clvl = scode[1]
     slvl = scode[2]
@@ -16,10 +18,9 @@ try:
     llvl = scode[5]
     prokoli = scode[6]
     prkbase = scode[7]
-    prkbasecost = scode[8]
-    prkbaselvl = scode[9]
-    hlvl = scode[10]
-    hblvl = scode[11]
+    prkbaselvl = scode[8]
+    hlvl = scode[9]
+    hblvl = scode[10]
 except:
     print("except")
     h=0   
@@ -30,10 +31,9 @@ except:
     llvl = 0
     prokoli = 0
     prkbase = 10 # the base of the log function used to generate prokoli amounts
-    prkbasecost = 2
     prkbaselvl = 0
     hlvl = 0  #hold level- 0=no holding, 1=hold to buy, 2=can hold on kitchen
-    hblvl = 0 # 
+    hblvl = 0 # helper bonus level
 pg.init()
 pg.mixer.init()
 btn = pg.image.load("button2.png")
@@ -54,6 +54,7 @@ hold = False
 bx = 0
 by = 0
 holdable = 0
+prkbasecost = 2
 #txt = ("l", "厨房", str(3**clvl*200), str(10*1.1**stkm), str(1000*2**slvl), str(100*1.1**laser))
 font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
@@ -61,7 +62,7 @@ pfont = pg.font.SysFont("Times", 50)
 pause = False
 button = pg.sprite.Group()
 class Button(pg.sprite.Sprite):
-    def __init__(self,x,y, pic, n, clr=(64, 64, 64), size=21, still=False, onetime = False):
+    def __init__(self,x,y, pic, n, clr=(64, 64, 64), size=21, still=False, minhold=1):
         pg.sprite.Sprite.__init__(self)
         self.image = pic
         self.rect = self.image.get_rect()
@@ -73,7 +74,7 @@ class Button(pg.sprite.Sprite):
         self.fontsize = size
         self.n=n
         self.still = still
-        self.ot = onetime
+        self.minhold = minhold
     def update(self):
         global txt
         rtxt(self.rect.centerx, self.rect.centery, txt[self.n],
@@ -84,9 +85,6 @@ class Button(pg.sprite.Sprite):
     def clicked(self):
         global c
         c=self.n
-        if self.ot:
-            global button
-            button.remove(self)
 def rtxt(x,y,txt,color,size=20,still=False):
     global bx,by
     font = pg.font.Font("Aleo-Regular.otf", size)
@@ -99,7 +97,7 @@ def rtxt(x,y,txt,color,size=20,still=False):
         text_rect.centerx = x-bx
         text_rect.centery = y-by
     screen.blit(text,text_rect)
-b1 = Button(screenw/2-100, screenh/2-100, thing, 1, (128, 128, 128), 30, True)#köök
+b1 = Button(screenw/2-100, screenh/2-100, thing, 1, (128, 128, 128), 30, True,2)#köök
 b2 = Button(100,100,btn,2,(255,255,255),20) #click lvl
 b3 = Button(screenw-400,100,btn,3,(255,255,255),20)#stkm
 b4 = Button(100,200,btn,4,(255,255,255),20) #stkm lvl
@@ -111,14 +109,15 @@ b9 = Button(screenw+100,screenh-100,btn,9,(255,255,255),50) # back
 b10 = Button(screenw+100,100,btn,10,(255,255,255),20) #prokoli logbase upg
 b11 = Button(screenw+100,150,btn,11,(255,255,255),20,False) #prokoli hold upg buy
 b12 = Button(screenw+100,200,btn,12,(255,255,255),20,False) #prokoli hold upg köök
-b13 = Button(screenw+100,250,btn,13,(255,255,255),20,False) #prokoli click boost
+b13 = Button(screenw+100,300,btn,13,(255,255,255),20,False) #prokoli click boost
 button.add(b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13)
+blist = (b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13)
 while do:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             do = False
         elif event.type == pg.KEYDOWN:
-            if event.key == h:
+            if event.key == pg.K_h:
                 holdable = 1-holdable
         elif event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -148,6 +147,10 @@ while do:
     if click:
         for b in button:
             if b.rect.collidepoint(mc):
+                b.clicked()
+    if hold and holdable == 1:
+        for b in button:
+            if b.rect.collidepoint(mc) and b.minhold <= hlvl:
                 b.clicked()
     if c == 1:
         h += 2**clvl
@@ -181,21 +184,20 @@ while do:
         bx = 0
     if c == 10 and prokoli >= prkbasecost:
         prokoli -= prkbasecost
-        prkbasecost = int(prkbasecost*1.5)
         prkbase = 1 + (prkbase-1)*0.9
         prkbaselvl += 1
-    if c == 11 and prokoli >= 5:
-        prokoli -= 5
+        prkbasecost = 2*1.5**prkbaselvl
+    if c == 11 and prokoli >= 3:
+        prokoli -= 3
         hlvl = 1
         button.remove(b11)
-    if c == 12 and prokoli >= 10:
+    if c == 12 and prokoli >= 10 and hlvl == 1:
         prokoli -= 10
         hlvl = 2
         button.remove(b12)
-    if c == 13 and prokoli >= 10:
-        prokoli -= 10
-        hlvl = 2
-        button.remove(b12)
+    if c == 13 and prokoli >= 1.5**hblvl:
+        prokoli -= 1.5**hblvl
+        hblvl += 1
     rtxt(200,60,"richer kitchens: " + str(clvl),(255,255,255))
     rtxt(200,80,"doubles click base",(255,255,255))
     rtxt(200,160,"better axes: " + str(slvl),(255,255,255))
@@ -212,11 +214,12 @@ while do:
     rtxt(screenw/2,30,"hps: " + str(int(bhps)),(255,255,255),20,True)
     rtxt(screenw/2,50,"h/click: " + str(2**clvl),(255,255,255),20,True)
     rtxt(screenw/2,70,"prokoli: " + str(prokoli),(255,255,255),20,True)
-    rtxt(screenw/2,90,"holdable: " + holdable*"yes"+(1-holdable)*"no" + " (H)",(255,255,255),20,True)
+    rtxt(screenw/2,90,"holdable: " + (holdable*"yes")+((1-holdable)*"no") + " (H)",(255,255,255),20,True)
     rtxt(screenw/2,screenh-150,"PRESTIGE",(255,0,0),20,True)
     rtxt(screenw-200,screenh-150,"prokoli upgrades",(255,255,255))
     rtxt(screenw+200,screenh-150,"back",(255,255,255))
     rtxt(screenw+200,50,"Reduce prokoli logarithm base - 1 by 10%" + ":" + str(prkbaselvl),(255,255,255))
+    rtxt(screenw+200,275,"Double clicks per 10 of any helper: " + str(hblvl),(255,255,255))
     c=0
     click = False
     button.draw(screen)
