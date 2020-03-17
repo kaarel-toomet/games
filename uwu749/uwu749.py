@@ -170,6 +170,8 @@ def reset():
     aia = 0
     # counter for immunity: after a monster hits you, you will be immune
     # agains new hits for this many ticks.
+    kuld = 0
+    kollivaremed = 0
     globals.player.empty()
     globals.hullmyts = sprites.CrazyHat(homeX, homeY)
     globals.player.add(globals.hullmyts)
@@ -236,6 +238,7 @@ def destroy(x,y):
     if there is a koll at (x, y), kill it and give 100 points
     x, y: world coordinates
     """
+    global inventory, empty
     winx, winy = coordinates.worldToWindow(x, y)
     material = globals.activeWindow[(winy,winx)]
     breakto = blocks.breakto[ material]
@@ -243,6 +246,11 @@ def destroy(x,y):
     killKolls((x, y))
     if globals.activeWindow[(winy,winx)] in blocks.unbreakable:
         return
+    try:
+        amounts[inventory.index(material)] += 0
+    except:
+        if empty == 10:
+            return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
     get(blocks.drops[material])
@@ -257,7 +265,7 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global punktid, kollin
+    global punktid, kollin, kollivaremed
     # punktid: (global) score
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
@@ -265,15 +273,24 @@ def killKolls(location):
             globals.activeKollid.remove(activeKoll)
             punktid += 100
             kollin -= 1
+            kollivaremed += 1
 
-def get(item):
+def get(item, cost=blocks.NONE):
     global inventory, amounts, empty
+    try:
+        amounts[inventory.index(cost)] -= 1
+        if cost == blocks.NONE:
+            amounts[inventory.index(cost)] += 1
+    except:
+        if empty == 10:
+            return
     try:
         inventory[inventory.index(item)] = item
         amounts[inventory.index(item)] += 1
     except:
         inventory[empty] = item
         amounts[empty] += 1
+        print(amounts[empty], inventory[empty], empty)
 ## initialize player        
 reset()
 
@@ -356,9 +373,15 @@ while do:
             elif event.key == pg.K_y:
                 # go to the main menu
                 title = True;
-            elif event.key == pg.K_SEMICOLON and inventory[select] == blocks.PUIT:
-                amounts[select] -= 1
-                get(blocks.KAST)
+            elif event.key == pg.K_PERIOD:
+                if inventory[select] == blocks.PUIT:
+                    get(blocks.KAST,blocks.PUIT)
+                elif inventory[select] == blocks.KAST:
+                    get(blocks.KUKS,blocks.KAST)
+                elif inventory[select] == blocks.MURU:
+                    get(blocks.TEE,blocks.MURU)
+                elif inventory[select] == blocks.PUU:
+                    get(blocks.PUIT,blocks.PUU)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -379,8 +402,16 @@ while do:
                 coordinates.screenToWorld(mxy[0],mxy[1])[1])
             elif event.button == 3:
                 if mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
-                    build(coordinates.screenToWorld(mxy[0],mxy[1])[0],
-                    coordinates.screenToWorld(mxy[0],mxy[1])[1])
+                    mxw = coordinates.screenToWorld(mxy[0],mxy[1])[0]
+                    myw = coordinates.screenToWorld(mxy[0],mxy[1])[1]
+                    build(mxw, myw)
+                    winx, winy = coordinates.worldToWindow(mxw, myw)
+                    if globals.activeWindow[winy, winx] == blocks.KUKS:
+                        globals.activeWindow[winy, winx] = blocks.LUKS
+                        globals.screenBuffer.blit(blocks.blocks[blocks.LUKS], coordinates.windowToScreenBuffer(winx, winy))  
+                    elif globals.activeWindow[winy, winx] == blocks.LUKS:
+                        globals.activeWindow[winy, winx] = blocks.KUKS
+                        globals.screenBuffer.blit(blocks.blocks[blocks.KUKS], coordinates.windowToScreenBuffer(winx, winy)) 
                 if inventory[select] == blocks.MQQK:
                     for x in range(-3,4):
                         for y in range(-3,4):
@@ -444,6 +475,7 @@ while do:
         globals.activeMineralGold.remove(col)
         globals.mineralGold.remove(col)
         punktid += 100
+        kuld += 1
     col = pg.sprite.spritecollide(globals.hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
         lifes -= 1
@@ -454,9 +486,18 @@ while do:
         select = 9
     if select > 9:
         select = 0
+    if kuld >= 10 and empty != 10:
+        kuld -= 10
+        get(blocks.KULD)
+    if kollivaremed >= 10 and empty != 10:
+        kollivaremed -= 10
+        get(blocks.KOLLIV)
+    
     for s in range(0,10):
         if amounts[s] <= 0:
             inventory[s] = -1
+        if inventory[s] == -1:
+            amounts[s] = 0
     try:
         empty = inventory.index(-1)
     except:
@@ -466,9 +507,7 @@ while do:
     ## add score and other info
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
     score = ("punktid: " + str(punktid) + " elud: " + str(lifes) +
-             "  [x,y: " + str((globals.hullmyts.x, globals.hullmyts.y)) +
-             ", chunk: " + str(coordinates.chunkID((globals.hullmyts.x, globals.hullmyts.y))) + "]")
-    
+             " Kuld:" + str(kuld) + " Kolli varemed:" + str(kollivaremed))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx

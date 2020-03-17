@@ -37,9 +37,9 @@ gameover = False
 player = pg.sprite.Group()
 stars = pg.sprite.Group()
 thingies = 0
-arrowfaces = 0
+arrowfaces = 500
 arrowfacep = 10
-derpbits = 0
+derpbits = 100
 derpchance = 5
 derpbots = 0
 dgoo = 0
@@ -159,7 +159,7 @@ while do:
     dgoo += 0.05/60*derpbots
     asdf += 0.05/60*stuffers
     stick += 1
-    if stick >= sspawn:
+    if stick >= sspawn/(dwalls+1) and len(stars) <= 50:
         stars.add(Star(r.randint(0,screenw-120),r.randint(0,screenh-148)))
         stick = 0
     col = pg.sprite.spritecollide(hullmyts,stars,False)
