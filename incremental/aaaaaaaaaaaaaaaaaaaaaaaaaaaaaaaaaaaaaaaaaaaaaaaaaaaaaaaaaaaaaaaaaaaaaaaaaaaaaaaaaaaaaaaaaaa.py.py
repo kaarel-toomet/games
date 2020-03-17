@@ -1,5 +1,6 @@
 import pygame as pg
 import random as r
+import numpy as np
 pg.init()
 pg.mixer.init()
 btn = pg.image.load("button2.png")
@@ -33,6 +34,7 @@ hold = False
 stkm = 0
 laser = 0
 llvl = 0
+prokoli = 0
 #txt = ("l", "厨房", str(3**clvl*200), str(10*1.1**stkm), str(1000*2**slvl), str(100*1.1**laser))
 font = pg.font.SysFont("Times", 24)
 dfont = pg.font.SysFont("Times", 32)
@@ -55,6 +57,8 @@ class Button(pg.sprite.Sprite):
     def clicked(self):
         global c
         c=self.n
+    def move(self, n):
+        self.rect.x += n*screenw
 def reset():
     lifes = 5
     player.empty()
@@ -73,6 +77,7 @@ button.add(Button(screenw-400,100,btn,3,(255,255,255),20))
 button.add(Button(100,200,btn,4,(255,255,255),20))
 button.add(Button(screenw-400,200,btn,5,(255,255,255),20))
 button.add(Button(100,300,btn,6,(255,255,255),20))
+button.add(Button(screenw/2-100,screenh-100,btn,7,(255,0,0),20))
 while do:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -120,9 +125,10 @@ while do:
         screen.blit(ptext,ptext_rect)
         pg.display.update()
     txt = ("l", "厨房", str(3**clvl*200), str(int(10*1.1**stkm)),
-           str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500))
+           str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
+           "+" + str(int(np.log(h+0.1))-10) + " prokolit")
     mc = pg.mouse.get_pos()
-    bhps = (stkm*2**slvl + laser*(10+laser*llvl))
+    bhps = (stkm*2**slvl + laser*(10+laser*llvl))*(1+prokoli/10)
     h+=bhps/60
     if click:
         for b in button:
@@ -144,13 +150,21 @@ while do:
         h -= 100*1.1**laser
         laser += 1
     if c == 6 and h >= 2**llvl*500:
-        h -= 2**llvl*500
+        h -= 2**llvl*500-10
         llvl += 1
+    if c == 7 and h >= 10000:
+        prokoli += int(np.log(h))
+        h = 0
+        llvl = 0
+        clvl = 0
+        slvl = 0
+        stkm = 0
+        laser = 0
     rtxt(200,60,"richer kitchens: " + str(clvl),(255,255,255))
     rtxt(200,80,"doubles click base",(255,255,255))
     rtxt(200,160,"better axes: " + str(slvl),(255,255,255))
     rtxt(200,180,"doubles stickman hps",(255,255,255))
-    rtxt(200,260,"non-exist: " + str(slvl),(255,255,255))
+    rtxt(200,260,"non-exist: " + str(llvl),(255,255,255))
     rtxt(200,280,"+10% laser hps per laser",(255,255,255))
     rtxt(200,20,"UPGRADES",(255,255,255), 50)
     rtxt(screenw-300,60,"helping stickman: " + str(stkm),(255,255,255))
@@ -161,6 +175,8 @@ while do:
     rtxt(screenw/2,10,"h: " + str(int(h)),(255,255,255))
     rtxt(screenw/2,30,"hps: " + str(int(bhps)),(255,255,255))
     rtxt(screenw/2,50,"h/click: " + str(2**clvl),(255,255,255))
+    rtxt(screenw/2,70,"prokoli: " + str(prokoli),(255,255,255))
+    rtxt(screenw/2,screenh-150,"PRESTIGE",(255,255,255))
     c=0
     click = False
     button.draw(screen)
