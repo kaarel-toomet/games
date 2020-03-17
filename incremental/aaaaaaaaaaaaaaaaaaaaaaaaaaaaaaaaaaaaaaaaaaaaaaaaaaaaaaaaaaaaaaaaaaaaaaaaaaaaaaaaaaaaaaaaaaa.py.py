@@ -84,14 +84,9 @@ class Button(pg.sprite.Sprite):
         if self.ot:
             global button
             button.remove(self)
-def reset():
-    lifes = 5
-    player.empty()
-    hullmyts = Player(screenw/2,screenh/2)
-    player.add(hullmyts)
 def rtxt(x,y,txt,color,size=20,still=False):
     global bx,by
-    font = pg.font.SysFont("DejaVu Sans", size)
+    font = pg.font.Font("Aleo-Regular.otf", size)
     text = font.render(txt, True, color)
     text_rect = text.get_rect()
     if still:
@@ -139,21 +134,6 @@ while do:
                 mleft = False
             elif event.key == pg.K_RIGHT:
                 mright = False
-    while pause:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pause = False
-                do = False
-            elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_p:
-                    pause = False
-        pd = "PAUSED"
-        ptext = dfont.render(pd, True, (127,127,127))
-        ptext_rect = ptext.get_rect()
-        ptext_rect.centerx = screen.get_rect().centerx
-        ptext_rect.y = 50
-        screen.blit(ptext,ptext_rect)
-        pg.display.update()
     txt = ("l", "厨房", str(3**clvl*200), str(int(10*1.1**stkm)),
            str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
            "+" + str(int(np.log(h+0.1)/np.log(prkbase))-3) + " prokolit",
@@ -229,7 +209,7 @@ while do:
     rtxt(screenw/2,30,"hps: " + str(int(bhps)),(255,255,255),20,True)
     rtxt(screenw/2,50,"h/click: " + str(2**clvl),(255,255,255),20,True)
     rtxt(screenw/2,70,"prokoli: " + str(prokoli),(255,255,255),20,True)
-    rtxt(screenw/2,70,"holdable: " + holdable*"yes"+(1-holdable)*"no" + " (H)",(255,255,255),20,True)
+    rtxt(screenw/2,90,"holdable: " + holdable*"yes"+(1-holdable)*"no" + " (H)",(255,255,255),20,True)
     rtxt(screenw/2,screenh-150,"PRESTIGE",(255,0,0),20,True)
     rtxt(screenw-200,screenh-150,"prokoli upgrades",(255,255,255))
     rtxt(screenw+200,screenh-150,"back",(255,255,255))
@@ -245,5 +225,5 @@ while do:
     timer.tick(60)
 
 pg.quit()
-scode = (int(h),clvl,slvl,stkm,laser,llvl,prokoli,prkbase,prkbasecost,prkbaselvl,hlvl)
-print("Here's your save code (without parentheses):",scode)
+scode = (int(h),clvl,slvl,stkm,laser,llvl,prokoli,prkbase,prkbasecost,prkbaselvl,hlvl,hblvl)
+print("Here's your save code (don't copy parentheses):",scode)
