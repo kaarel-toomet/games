@@ -104,6 +104,7 @@ class activeWindow():
         world: the World object
         chunkID: chunkID for the new center
         """
+        ## save the chunks.  Maybe separate into a 'sync' method?
         if not self.chunkID is None:
             ## put back modified chunks
             iChunk, jChunk = self.chunkID

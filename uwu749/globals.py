@@ -38,3 +38,10 @@ class GameState():
     """
     def __init__(self):
         self.punktid = 0
+        self.homeX = 0  # where Crazy Hat has her home
+        self.homeY = 0
+    def __str__(self):
+        s = "GameState object:\n" +\
+        " punktid: " + str(self.punktid) + "\n" +\
+        " homeX, homeY: " + str((self.homeX, self.homeY))
+        return s

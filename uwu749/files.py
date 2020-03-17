@@ -50,17 +50,27 @@ def fileChooser(save):
 def loadWorld():
     response, fName = fileChooser(False)
     if response == Gtk.ResponseType.OK:
-        gameState = pickle.load(open(fName, "rb"))
-        return gameState
+        file = open(fName, "rb")
+        world = pickle.load(file)
+        gameState = pickle.load(file)
+        file.close()
+        return world, gameState
     else:
         # cancel pressed
         return None
         
 def saveWorld(world, gameState):
+    """
+    worlds: should contain terrain and such
+    gameState: points and such
+    """
     response, fName = fileChooser(True)
     if response == Gtk.ResponseType.OK:
-        pickler = pickle.Pickler(open(fName, "wb"))
+        file = open(fName, "wb")
+        pickler = pickle.Pickler(file)
+        pickler.dump(world)
         pickler.dump(gameState)
+        file.close()
 
 ## Global window
 gtkRootWin = Gtk.Window(title="File chooser GTK parent")

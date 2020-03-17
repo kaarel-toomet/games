@@ -135,29 +135,36 @@ gmod = 0
 gmods = {0:"creative",1:"survival"}
 gameState = globals.GameState()  # current running game data
 
-def newGame():
+def newGame(terrain=None, state=None):
     """
     Re-create everything, including terrain, monsters
     reset lives, score, inventory
     """
-    global inventory, amounts, homeX, homeY
-    globals.ground = world.World(globals.groundNoiseParams)
-    homeX, homeY = 0, 0  # where Crazy Hat has her home:
-    ## create the active window, centered on home:
-    chunkID = coordinates.chunkID((homeX, homeY))
-    globals.mineralGold = sprites.ChunkSprites()
+    global gameState, inventory, amounts
+    ## global params
+    if terrain is None:
+        globals.ground = world.World(globals.groundNoiseParams)
+    else:
+        globals.ground = terrain
     globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
-    coordinates.coordinateShifts(chunkID, homeX, homeY)
+    ## create the active window, centered at 0,0 as we don't
+    ## have the CH coordinates yet:
+    chunkID = coordinates.chunkID((0, 0))
+    globals.mineralGold = sprites.ChunkSprites()
+    coordinates.coordinateShifts(chunkID, gameState.homeX, gameState.homeY)
     globals.activeWindow.update(globals.ground, chunkID)
     # load the world chunks into activeWindow
     globals.activeKollid = world.activeSprites(globals.kollid)
     # have to initialize this, in principle we may have a few kolls pre-created
     globals.activeWindow.draw(None, None, blocks.blocks)
     drawSprites(globals.activeMineralGold, spriteBuffer)
+    ## set the game state first: we have to know the initial location
+    reset()
+    if state is not None:
+        gameState = state
     ## inventory stuff
     inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
     amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
-    reset()
 
 def reset():
     """
@@ -166,6 +173,7 @@ def reset():
     """
     global gameState, gameover, lifes, aia, kuld, kollivaremed
     gameState = globals.GameState()
+    print(gameState)
     gameover = False
     lifes = 10
     aia = 0
@@ -174,10 +182,9 @@ def reset():
     kuld = 0
     kollivaremed = 0
     globals.player.empty()
-    globals.hullmyts = sprites.CrazyHat(homeX, homeY)
+    globals.hullmyts = sprites.CrazyHat(gameState.homeX, gameState.homeY)
     globals.player.add(globals.hullmyts)
-    globals.hullmyts.setxy(homeX, homeY)
-
+    globals.hullmyts.setxy(gameState.homeX, gameState.homeY)
 
 kollin = 0  # how many mosters
 kutid = pg.sprite.Group()
@@ -187,20 +194,8 @@ speed = False
 empty = 0
 select = 0
 ##
-s = None
-if s is not None:
-    world = s['world']
-    homeX = s['home'][0]
-    homeY = s['home'][1]
-    try:
-        items = {x[0]:x[1] for x in s["stuff"]}
-    except:
-        items = {}
-    if len(items.keys()) != blocks.BLOCK_END:
-        items = oitems
-else:
-    ## ---------- Build a new world ----------
-    newGame()
+
+newGame()
 
 
 class Tüüp(pg.sprite.Sprite):
@@ -303,10 +298,14 @@ while do:
                 do = False
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_l:
-                    gameState = files.loadWorld()
+                    terrain, gameState = files.loadWorld()
+                    newGame(terrain, gameState)
                     title = False
                 elif event.key == pg.K_s:
-                    files.saveWorld(world, gameState)
+                    globals.activeWindow.update(globals.ground,
+                                                (coordinates.chunkID(globals.hullmyts.getxy())))
+                    # sync data
+                    files.saveWorld(globals.ground, gameState)
                     title = False
                 elif event.key == pg.K_c:
                     newGame()
@@ -350,10 +349,10 @@ while do:
                 pause = True
             elif event.key == pg.K_r:
                 ## go home
-                globals.hullmyts.setxy(homeX, homeY)
+                globals.hullmyts.setxy(gameState.homeX, gameState.homeY)
             elif event.key == pg.K_h:
-                homeX = globals.hullmyts.getxy()[0]
-                homeY = globals.hullmyts.getxy()[1]
+                gameState.homeX = globals.hullmyts.getxy()[0]
+                gameState.homeY = globals.hullmyts.getxy()[1]
             elif event.key == pg.K_RIGHTBRACKET and bb < blocks.BLOCK_END:
                 bb += 1
             elif event.key == pg.K_LEFTBRACKET and bb > 0:
@@ -523,7 +522,7 @@ while do:
     # update crazy hat
     spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
-        screen.blit(home, coordinates.worldToScreen(homeX, homeY))
+        screen.blit(home, coordinates.worldToScreen(gameState.homeX, gameState.homeY))
     ## draw sprites: static: no update need, dynamic: update
     drawSprites(globals.activeMineralGold, spriteBuffer)
     kutid.update()
