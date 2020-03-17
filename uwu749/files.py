@@ -56,13 +56,13 @@ def loadWorld():
         # cancel pressed
         return None
         
-def saveWorld(world, home, stuff):
+def saveWorld(world, gameState):
     response, fName = fileChooser(True)
     if response == Gtk.ResponseType.OK:
         np.savez_compressed(fName,
                             world=world,
-                            home = np.array(home),
-                            stuff = np.array([x for x in stuff.items()]))
+                            home = np.array(gameState.home)
+        )
 
 ## Global window
 gtkRootWin = Gtk.Window(title="File chooser GTK parent")

@@ -140,9 +140,6 @@ def newGame():
     reset lives, score, inventory
     """
     global inventory, amounts, homeX, homeY
-    ## inventory stuff
-    inventory = [blocks.KAST,blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-    amounts = [1, 15, 0, 0, 0, 0, 0, 0, 0, 0,  0]
     globals.ground = world.World(globals.groundNoiseParams)
     homeX, homeY = 0, 0  # where Crazy Hat has her home:
     ## create the active window, centered on home:
@@ -156,6 +153,9 @@ def newGame():
     # have to initialize this, in principle we may have a few kolls pre-created
     globals.activeWindow.draw(None, None, blocks.blocks)
     drawSprites(globals.activeMineralGold, spriteBuffer)
+    ## inventory stuff
+    inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+    amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
     reset()
 
 def reset():
@@ -163,7 +163,7 @@ def reset():
     reset lives, score etc to the original state
     leave the world geography untouched
     """
-    global gameover, lifes, punktid, aia
+    global gameover, lifes, punktid, aia, kuld, kollivaremed
     punktid = 0
     gameover = False
     lifes = 10
@@ -309,7 +309,7 @@ while do:
                     gmod = 0
                     title = False
                 elif event.key == pg.K_c:
-                    gmod = 0
+                    newGame()
                     title = False
         textrender("press C to create new world, L to load world from file, S to save",
                    screenWidth/2, screenHeight/2)
