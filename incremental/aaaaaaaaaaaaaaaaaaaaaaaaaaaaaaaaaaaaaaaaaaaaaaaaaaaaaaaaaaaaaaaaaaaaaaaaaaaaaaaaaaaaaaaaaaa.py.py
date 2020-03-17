@@ -139,7 +139,7 @@ while do:
                 mright = False
     txt = ("l", "köök", str(3**clvl*200), str(int(10*1.1**stkm)),
            str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
-           "+" + str(int(np.log(h+0.1)/np.log(prkbase))-3) + " prokolit",
+           "+" + str(max(int(np.log(h+0.1)/np.log(prkbase))-3),0) + " prokolit",
             ">","<", str(prkbasecost),"holdable buttons:3","holdable kitchen:10",
             "helper click bonus:10")
     mc = pg.mouse.get_pos()
