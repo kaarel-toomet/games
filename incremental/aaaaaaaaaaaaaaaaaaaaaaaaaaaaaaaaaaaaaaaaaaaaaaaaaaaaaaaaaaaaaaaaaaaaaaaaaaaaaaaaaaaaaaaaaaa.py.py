@@ -34,6 +34,7 @@ except:
     prkbaselvl = 0
     hlvl = 0  #hold level- 0=no holding, 1=hold to buy, 2=can hold on kitchen
     hblvl = 0 # helper bonus level
+prkbasecost = 2*(1.5**prkbaselvl)
 pg.init()
 pg.font.init()
 pg.mixer.init()
@@ -139,12 +140,12 @@ while do:
                 mright = False
     txt = ("l", "köök", str(3**clvl*200), str(int(10*1.1**stkm)),
            str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
-           "+" + str(max(int(np.log(h+0.1)/np.log(prkbase))-3),0) + " prokolit",
-            ">","<", str(prkbasecost),"holdable buttons:3","holdable kitchen:10",
-            "helper click bonus:10")
+           "+" + str(max((int(np.log(h+0.1)/np.log(prkbase))-3),0)) + " prokolit",
+           ">","<", str(prkbasecost),"holdable buttons:3","holdable kitchen:10",
+           "helper click bonus:10")
     mc = pg.mouse.get_pos()
     bhps = (stkm*2**slvl + laser*(10+laser*llvl))*(1+prokoli/10)
-    h+=bhps/60
+    h+=bhps/30
     if click:
         for b in button:
             if b.rect.collidepoint(mc):
@@ -171,14 +172,25 @@ while do:
     if c == 6 and h >= 2**llvl*500:
         h -= 2**llvl*500-10
         llvl += 1
-    if c == 7 and int(np.log(h)/np.log(prkbase))-3 >= 1:
-        prokoli += int(np.log(h)/np.log(prkbase))-3
-        h = 0
-        llvl = 0
-        clvl = 0
-        slvl = 0
-        stkm = 0
-        laser = 0
+    try:
+        if c == 7 and h >= prkbase**4:
+            prokoli += int(np.log(h)/np.log(prkbase))-3
+            h = 0
+            llvl = 0
+            clvl = 0
+            slvl = 0
+            stkm = 0
+            laser = 0
+    except:
+        print("exception in c7")
+        if c == 7:
+            prokoli += int(np.log(h)/np.log(prkbase))-3
+            h = 0
+            llvl = 0
+            clvl = 0
+            slvl = 0
+            stkm = 0
+            laser = 0
     if c == 8 and prokoli >= 0:
         bx = screenw
     if c == 9:
@@ -187,7 +199,6 @@ while do:
         prokoli -= prkbasecost
         prkbase = 1 + (prkbase-1)*0.9
         prkbaselvl += 1
-        prkbasecost = 2*1.5**prkbaselvl
     if c == 11 and prokoli >= 3:
         prokoli -= 3
         hlvl = 1
@@ -221,6 +232,7 @@ while do:
     rtxt(screenw+200,screenh-150,"back",(255,255,255))
     rtxt(screenw+200,50,"Reduce prokoli logarithm base - 1 by 10%" + ":" + str(prkbaselvl),(255,255,255))
     rtxt(screenw+200,275,"Double clicks per 10 of any helper: " + str(hblvl),(255,255,255))
+    prkbasecost = int(2*(1.5**prkbaselvl))
     c=0
     click = False
     button.draw(screen)
@@ -229,7 +241,7 @@ while do:
     screen.blit(caxe,(screenw/2-32,screenh/2-160))
     pg.display.update()
     screen.fill((128,128,128))
-    timer.tick(60)
+    timer.tick(30)
 
 pg.quit()
 scode = (int(h),clvl,slvl,stkm,laser,llvl,prokoli,prkbase,prkbaselvl,hlvl,hblvl)
