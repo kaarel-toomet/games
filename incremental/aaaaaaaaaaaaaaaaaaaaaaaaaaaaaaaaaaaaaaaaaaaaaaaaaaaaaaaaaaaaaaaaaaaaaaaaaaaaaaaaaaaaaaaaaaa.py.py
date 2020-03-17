@@ -35,6 +35,7 @@ except:
     hlvl = 0  #hold level- 0=no holding, 1=hold to buy, 2=can hold on kitchen
     hblvl = 0 # helper bonus level
 pg.init()
+pg.font.init()
 pg.mixer.init()
 btn = pg.image.load("button2.png")
 thing = pg.image.load("kitchen1.png")
@@ -87,7 +88,7 @@ class Button(pg.sprite.Sprite):
         c=self.n
 def rtxt(x,y,txt,color,size=20,still=False):
     global bx,by
-    font = pg.font.Font("Aleo-Regular.otf", size)
+    font = pg.font.SysFont("Times", size)
     text = font.render(txt, True, color)
     text_rect = text.get_rect()
     if still:
@@ -136,7 +137,7 @@ while do:
                 mleft = False
             elif event.key == pg.K_RIGHT:
                 mright = False
-    txt = ("l", "厨房", str(3**clvl*200), str(int(10*1.1**stkm)),
+    txt = ("l", "köök", str(3**clvl*200), str(int(10*1.1**stkm)),
            str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
            "+" + str(int(np.log(h+0.1)/np.log(prkbase))-3) + " prokolit",
             ">","<", str(prkbasecost),"holdable buttons:3","holdable kitchen:10",
@@ -153,7 +154,7 @@ while do:
             if b.rect.collidepoint(mc) and b.minhold <= hlvl:
                 b.clicked()
     if c == 1:
-        h += 2**clvl
+        h += 2**(clvl+hblvl*(stkm//10+laser//10))
         caxe = haxe
     if c == 2 and h >= 3**clvl*200:
         h -= 3**clvl*200
@@ -212,7 +213,7 @@ while do:
     rtxt(screenw-300,20,"SHOP",(255,255,255), 50)
     rtxt(screenw/2,10,"h: " + str(int(h)),(255,255,255),20,True)
     rtxt(screenw/2,30,"hps: " + str(int(bhps)),(255,255,255),20,True)
-    rtxt(screenw/2,50,"h/click: " + str(2**clvl),(255,255,255),20,True)
+    rtxt(screenw/2,50,"h/click: " + str(2**(clvl+hblvl*(stkm//10+laser//10))),(255,255,255),20,True)
     rtxt(screenw/2,70,"prokoli: " + str(prokoli),(255,255,255),20,True)
     rtxt(screenw/2,90,"holdable: " + (holdable*"yes")+((1-holdable)*"no") + " (H)",(255,255,255),20,True)
     rtxt(screenw/2,screenh-150,"PRESTIGE",(255,0,0),20,True)
@@ -231,5 +232,5 @@ while do:
     timer.tick(60)
 
 pg.quit()
-scode = (int(h),clvl,slvl,stkm,laser,llvl,prokoli,prkbase,prkbasecost,prkbaselvl,hlvl,hblvl)
+scode = (int(h),clvl,slvl,stkm,laser,llvl,prokoli,prkbase,prkbaselvl,hlvl,hblvl)
 print("Here's your save code (don't copy parentheses):",scode)
