@@ -2,9 +2,12 @@ import pygame as pg
 import random as r
 import numpy as np
 import re
+def num(x):
+    x = float(x)
+
 scode = list(input("Enter your save code, or 'x' for a new game:").split(",")) # 11 numbers separated by commas
 try:
-    scode = [int(x) for x in scode]
+    scode = [float(x) for x in scode]
     h = scode[0]
     clvl = scode[1]
     slvl = scode[2]
