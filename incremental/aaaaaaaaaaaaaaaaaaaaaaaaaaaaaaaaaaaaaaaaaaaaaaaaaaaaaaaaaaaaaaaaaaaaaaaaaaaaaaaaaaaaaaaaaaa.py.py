@@ -114,6 +114,10 @@ b12 = Button(screenw+100,200,btn,12,(255,255,255),20,False) #prokoli hold upg kÃ
 b13 = Button(screenw+100,300,btn,13,(255,255,255),20,False) #prokoli click boost
 button.add(b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13)
 blist = (b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13)
+if hlvl >= 1:
+    button.remove(b11)
+if hlvl == 2:
+    button.remove(b12)
 while do:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -142,7 +146,7 @@ while do:
            str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
            "+" + str(max((int(np.log(h+0.1)/np.log(prkbase))-3),0)) + " prokolit",
            ">","<", str(prkbasecost),"holdable buttons:3","holdable kitchen:10",
-           "helper click bonus:10")
+           str(1.5**hblvl*10))
     mc = pg.mouse.get_pos()
     bhps = (stkm*2**slvl + laser*(10+laser*llvl))*(1+prokoli/10)
     h+=bhps/30
@@ -155,7 +159,7 @@ while do:
             if b.rect.collidepoint(mc) and b.minhold <= hlvl:
                 b.clicked()
     if c == 1:
-        h += 2**(clvl+hblvl*(stkm//10+laser//10))
+        h += (2**(clvl))*(hblvl*((stkm//10+laser//10))+1)
         caxe = haxe
     if c == 2 and h >= 3**clvl*200:
         h -= 3**clvl*200
@@ -199,7 +203,7 @@ while do:
         prokoli -= prkbasecost
         prkbase = 1 + (prkbase-1)*0.9
         prkbaselvl += 1
-    if c == 11 and prokoli >= 3:
+    if c == 11 and prokoli >= 3 and hlvl == 0:
         prokoli -= 3
         hlvl = 1
         button.remove(b11)
@@ -207,8 +211,8 @@ while do:
         prokoli -= 10
         hlvl = 2
         button.remove(b12)
-    if c == 13 and prokoli >= 1.5**hblvl:
-        prokoli -= 1.5**hblvl
+    if c == 13 and prokoli >= 10*(1.5**hblvl):
+        prokoli -= 10*(1.5**hblvl)
         hblvl += 1
     rtxt(200,60,"richer kitchens: " + str(clvl),(255,255,255))
     rtxt(200,80,"doubles click base",(255,255,255))
@@ -223,15 +227,15 @@ while do:
     rtxt(screenw-300,180,"good for breaking kitchens, + " + str(10+laser*llvl) + " hps",(255,255,255))
     rtxt(screenw-300,20,"SHOP",(255,255,255), 50)
     rtxt(screenw/2,10,"h: " + str(int(h)),(255,255,255),20,True)
-    rtxt(screenw/2,30,"hps: " + str(int(bhps)),(255,255,255),20,True)
-    rtxt(screenw/2,50,"h/click: " + str(2**(clvl+hblvl*(stkm//10+laser//10))),(255,255,255),20,True)
+    rtxt(screenw/2,30,"h/s: " + str(int(bhps)),(255,255,255),20,True)
+    rtxt(screenw/2,50,"h/click: " + str((2**(clvl))*(hblvl*((stkm//10+laser//10))+1)),(255,255,255),20,True)
     rtxt(screenw/2,70,"prokoli: " + str(prokoli),(255,255,255),20,True)
     rtxt(screenw/2,90,"holdable: " + (holdable*"yes")+((1-holdable)*"no") + " (H)",(255,255,255),20,True)
     rtxt(screenw/2,screenh-150,"PRESTIGE",(255,0,0),20,True)
     rtxt(screenw-200,screenh-150,"prokoli upgrades",(255,255,255))
     rtxt(screenw+200,screenh-150,"back",(255,255,255))
     rtxt(screenw+200,50,"Reduce prokoli logarithm base - 1 by 10%" + ":" + str(prkbaselvl),(255,255,255))
-    rtxt(screenw+200,275,"Double clicks per 10 of any helper: " + str(hblvl),(255,255,255))
+    rtxt(screenw+200,275,"+100% click h per 10 of any helper: " + str(hblvl),(255,255,255))
     prkbasecost = int(2*(1.5**prkbaselvl))
     c=0
     click = False
