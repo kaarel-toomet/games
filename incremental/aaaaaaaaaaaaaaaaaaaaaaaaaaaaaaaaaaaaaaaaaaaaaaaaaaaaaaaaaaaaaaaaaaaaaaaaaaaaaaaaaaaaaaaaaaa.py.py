@@ -146,7 +146,7 @@ while do:
            str(1000*3**slvl),str(int(100*1.1**laser)), str(2**llvl*500),
            "+" + str(max((int(np.log(h+0.1)/np.log(prkbase))-3),0)) + " prokolit",
            ">","<", str(prkbasecost),"holdable buttons:3","holdable kitchen:10",
-           str(1.5**hblvl*10))
+           str(int(1.5**hblvl*10)))
     mc = pg.mouse.get_pos()
     bhps = (stkm*2**slvl + laser*(10+laser*llvl))*(1+prokoli/10)
     h+=bhps/30
@@ -211,8 +211,8 @@ while do:
         prokoli -= 10
         hlvl = 2
         button.remove(b12)
-    if c == 13 and prokoli >= 10*(1.5**hblvl):
-        prokoli -= 10*(1.5**hblvl)
+    if c == 13 and prokoli >= int(10*(1.5**hblvl)):
+        prokoli -= int(10*(1.5**hblvl))
         hblvl += 1
     rtxt(200,60,"richer kitchens: " + str(clvl),(255,255,255))
     rtxt(200,80,"doubles click base",(255,255,255))
