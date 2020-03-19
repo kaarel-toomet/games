@@ -140,7 +140,7 @@ def newGame(terrain=None, state=None):
     Re-create everything, including terrain, monsters
     reset lives, score, inventory
     """
-    global gameState, inventory, amounts
+    global gameState
     ## global params
     if terrain is None:
         globals.ground = world.World(globals.groundNoiseParams)
@@ -162,9 +162,6 @@ def newGame(terrain=None, state=None):
     reset()
     if state is not None:
         gameState = state
-    ## inventory stuff
-    inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-    amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
 
 def reset():
     """
@@ -218,15 +215,14 @@ def build(x,y):
     """
     add blocks to the position
     """
-    global inventory, select
     winx, winy = coordinates.worldToWindow(x, y)
-    if inventory[select] == -1:
+    if gameState.inventory[select] == -1:
         return
-    if blocks.breakto[inventory[select]] != globals.activeWindow[(winy,winx)]:
+    if blocks.breakto[gameState.inventory[select]] != globals.activeWindow[(winy,winx)]:
         return
-    globals.activeWindow[(winy,winx)] = inventory[select]
-    globals.screenBuffer.blit( blocks.blocks[inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
-    amounts[select] -= 1
+    globals.activeWindow[(winy,winx)] = gameState.inventory[select]
+    globals.screenBuffer.blit( blocks.blocks[gameState.inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
+    gameState.amounts[select] -= 1
 
 def destroy(x,y):
     """
@@ -234,7 +230,6 @@ def destroy(x,y):
     if there is a koll at (x, y), kill it and give 100 points
     x, y: world coordinates
     """
-    global inventory, empty
     winx, winy = coordinates.worldToWindow(x, y)
     material = globals.activeWindow[(winy,winx)]
     breakto = blocks.breakto[ material]
@@ -243,7 +238,7 @@ def destroy(x,y):
     if globals.activeWindow[(winy,winx)] in blocks.unbreakable:
         return
     try:
-        amounts[inventory.index(material)] += 0
+        gameState.amounts[gameState.inventory.index(material)] += 0
     except:
         if empty == 10:
             return
@@ -271,21 +266,20 @@ def killKolls(location):
             kollivaremed += 1
 
 def get(item, cost=blocks.NONE):
-    global inventory, amounts, empty
     try:
-        amounts[inventory.index(cost)] -= 1
+        gameState.amounts[gameState.inventory.index(cost)] -= 1
         if cost == blocks.NONE:
-            amounts[inventory.index(cost)] += 1
+            gameState.amounts[gameState.inventory.index(cost)] += 1
     except:
         if empty == 10:
             return
     try:
-        inventory[inventory.index(item)] = item
-        amounts[inventory.index(item)] += 1
+        gameState.inventory[gameState.inventory.index(item)] = item
+        gameState.amounts[gameState.inventory.index(item)] += 1
     except:
-        inventory[empty] = item
-        amounts[empty] += 1
-        print(amounts[empty], inventory[empty], empty)
+        gameState.inventory[empty] = item
+        gameState.amounts[empty] += 1
+        print(gameState.amounts[empty], gameState.inventory[empty], empty)
 ## initialize player        
 reset()
 
@@ -373,13 +367,13 @@ while do:
                 # go to the main menu
                 title = True;
             elif event.key == pg.K_PERIOD:
-                if inventory[select] == blocks.PUIT:
+                if gameState.inventory[select] == blocks.PUIT:
                     get(blocks.KAST,blocks.PUIT)
-                elif inventory[select] == blocks.KAST:
+                elif gameState.inventory[select] == blocks.KAST:
                     get(blocks.KUKS,blocks.KAST)
-                elif inventory[select] == blocks.MURU:
+                elif gameState.inventory[select] == blocks.MURU:
                     get(blocks.TEE,blocks.MURU)
-                elif inventory[select] == blocks.PUU:
+                elif gameState.inventory[select] == blocks.PUU:
                     get(blocks.PUIT,blocks.PUU)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
@@ -411,7 +405,7 @@ while do:
                     elif globals.activeWindow[winy, winx] == blocks.LUKS:
                         globals.activeWindow[winy, winx] = blocks.KUKS
                         globals.screenBuffer.blit(blocks.blocks[blocks.KUKS], coordinates.windowToScreenBuffer(winx, winy)) 
-                if inventory[select] == blocks.MQQK:
+                if gameState.inventory[select] == blocks.MQQK:
                     for x in range(-3,4):
                         for y in range(-3,4):
                             killKolls((hxy[0]+x, hxy[1]+y))
@@ -493,12 +487,12 @@ while do:
         get(blocks.KOLLIV)
     
     for s in range(0,10):
-        if amounts[s] <= 0:
-            inventory[s] = -1
-        if inventory[s] == -1:
-            amounts[s] = 0
+        if gameState.amounts[s] <= 0:
+            gameState.inventory[s] = -1
+        if gameState.inventory[s] == -1:
+            gameState.amounts[s] = 0
     try:
-        empty = inventory.index(-1)
+        empty = gameState.inventory.index(-1)
     except:
         empty = 10
     ## ---------- screen udpate ----------
@@ -515,8 +509,8 @@ while do:
     screen.blit(hotbar,(0,0))
     screen.blit(selslot,(select*18*tileScale,0))
     for s in range(0,10):
-        screen.blit(blocks.blocks[inventory[s]],(18*tileScale*s+tileScale,tileScale))
-        textrender(str(amounts[s]),18*tileScale*s+tileScale, tileSize)
+        screen.blit(blocks.blocks[gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
+        textrender(str(gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
     globals.player.update(mup, mdown, mleft, mright)
     # update crazy hat

@@ -5,6 +5,7 @@ these are just variable declarations, these must
 be initialized in uwu, or in the corresponding module
 """
 import pygame as pg
+import blocks
 
 ## CrazyHat: the player
 hullmyts = None
@@ -40,6 +41,9 @@ class GameState():
         self.punktid = 0
         self.homeX = 0  # where Crazy Hat has her home
         self.homeY = 0
+        ## inventory stuff
+        self.inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+        self.amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
     def __str__(self):
         s = "GameState object:\n" +\
         " punktid: " + str(self.punktid) + "\n" +\
