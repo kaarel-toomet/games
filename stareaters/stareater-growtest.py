@@ -13,7 +13,7 @@ pg.font
 screen = pg.display.set_mode((0,0), pg.RESIZABLE)
 screenw = screen.get_width()
 screenh = screen.get_height()
-pg.display.set_caption("Star Eater")
+pg.display.set_caption("Star Heater")
 do = True
 dist = 5
 up = True
@@ -70,7 +70,7 @@ class Thing(pg.sprite.Sprite):
         self.rect.y = int(self.y)
         self.xvel = xvel
         self.yvel = yvel
-    def update(self,newspeed = False, b = False):
+    def update(self,newspeed = False, b = False, nl = False):
         vel = 10
         if newspeed:
             self.xvel = r.randint(-vel,vel)
@@ -88,6 +88,9 @@ class Thing(pg.sprite.Sprite):
             self.rect.y = int(self.y)
         else:
             self.yvel = -self.yvel*speedf
+        if nl:
+            self.x = r.randint(0,screenw-40)
+            self.y = r.randint(0,screenh-40)
 def reset():
     global starseaten, lifes, gameover, hullmyts, stars, thingy, blub
     gameover = False
@@ -180,7 +183,7 @@ while do:
     player.draw(screen)
     stars.update(True, True)
     stars.draw(screen)
-    thingy.update(False,  True)
+    thingy.update(False,  True, True)
     thingy.draw(screen)
     blub.update()
     blub.draw(screen)
@@ -205,15 +208,12 @@ while do:
         tick = 0
         time += 60
         blip.play()
-    mcol = pg.sprite.groupcollide(thingy, stars, True, True)
+    mcol = pg.sprite.groupcollide(thingy, stars, True, False)
     for s in mcol.keys():
         if len(mcol[s]) > 0:
             stars.add(Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
                       0,0, star))
-            stars.add(Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
-                      0,0, star))
-            thingy.add(Thing(s.rect.x,s.rect.y,
-                       r.randint(-10,10),r.randint(-10,10), thing))
+            print("rdFG")
     bcol = pg.sprite.groupcollide(blub, stars, False, True)
     for s in bcol.keys():
         if len(bcol[s]) > 0:
@@ -221,15 +221,22 @@ while do:
                        r.randint(-10,10),r.randint(-10,10), thing)
             thingy.add(bob)
             blub.add(Thing(s.rect.x,s.rect.y,r.randint(-1,1),r.randint(-1,1), blu))
-    if len(stars) > 0:
-        time -= 1
+    rcol = pg.sprite.groupcollide(blub, thingy, True, False)
+    for s in rcol.keys():
+        if len(rcol[s]) > 0:
+            s.remove(blub)
+            bob = Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
+                       r.randint(-10,10),r.randint(-10,10), thing)
+            thingy.add(bob)
+    if len(stars) == 0:
+        stars.add(Thing(r.randint(10,screenw-90),r.randint(10,screenh-90),0,0, star))
     if len(stars) == 0:
         tick += 1
-    if tick == 1:
-        tick = 0
-        stars.add(Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
-                       0,0, star))
-    thingy.empty()  ###############ASFDSFADFASDFADFADdsfasdf
+    if len(thingy) == 0:
+        bob = Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
+                       r.randint(-10,10),r.randint(-10,10), thing)
+        thingy.add(bob)
+    #thingy.empty()  ###############ASFDSFADFASDFADFADdsfasdf
     if len(thingy) == 0:
         bob = Thing(r.randint(20,screenw-100),r.randint(20,screenh-90),
                        r.randint(-10,10),r.randint(-10,10), thing)

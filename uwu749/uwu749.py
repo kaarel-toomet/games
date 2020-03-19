@@ -169,7 +169,6 @@ def reset():
     """
     global gameState, gameover, aia
     gameState = globals.GameState()
-    print(gameState)
     gameover = False
     aia = 0
     # counter for immunity: after a monster hits you, you will be immune
@@ -240,6 +239,7 @@ def destroy(x,y):
             return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
+        globals.activeMineralGold = world.activeSprites(globals.mineralGold)
     get(blocks.drops[material])
     globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
     globals.activeWindow[(winy, winx)] = breakto
@@ -275,7 +275,6 @@ def get(item, cost=blocks.NONE):
     except:
         gameState.inventory[empty] = item
         gameState.amounts[empty] += 1
-        print(gameState.amounts[empty], gameState.inventory[empty], empty)
 ## initialize player        
 reset()
 
@@ -405,6 +404,10 @@ while do:
                     for x in range(-3,4):
                         for y in range(-3,4):
                             killKolls((hxy[0]+x, hxy[1]+y))
+                if gameState.inventory[select] == blocks.KIRKA:
+                    for x in range(-3,4):
+                        for y in range(-3,4):
+                            destroy(hxy[0]+x, hxy[1]+y)
             elif event.button == 4:
                 select -= 1
             elif event.button == 5:
