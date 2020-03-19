@@ -281,7 +281,6 @@ def get(item, cost=blocks.NONE):
     except:
         inventory[empty] = item
         amounts[empty] += 1
-        print(amounts[empty], inventory[empty], empty)
 ## initialize player        
 reset()
 
