@@ -65,16 +65,18 @@ class World:
               x = ic*coordinates.chunkWidth + cx
               y = jc*coordinates.chunkHeight + cy
               noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
-                                       self.a, self.b, self.c, self.d, self.e, self.f,)
-              noiseval2 = noise.snoise2(x/(self.freqX*2) + 10, y/(self.freqY*2) + 10,
-                                       self.a, self.b, self.c, self.d, self.e, self.f,)
+                                       self.a, self.b, self.c, self.d,
+                                       self.e, self.f,) + 1*noise.snoise2(x/1500,y/1500,20,0.5,2,1024,1024,0)
+              noiseval2 = 0.7*noise.snoise2(x/(self.freqX*2) + 10, y/(self.freqY*2) + 10,
+                                       self.a, self.b, self.c, self.d,
+                                       self.e, self.f,) + 0.7*noise.snoise2((x/3000)+10,(y/3000)+10,20,0.5,2,1024,1024,0)
               biome1 = r.uniform(-0.1,0.5)
               biome2 = r.uniform(-0.2,0)
               if noiseval < -0.3:
                  chunk[cy, cx] = blocks.SYGAVM
               elif noiseval < 0:
                  chunk[cy, cx] = blocks.SEA
-              elif noiseval < 0.05:
+              elif noiseval < 0.07:
                  chunk[cy, cx] = blocks.SAND
               elif noiseval < 0.3:
                   chunk[cy,cx] = blocks.MURU
