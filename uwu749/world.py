@@ -72,9 +72,9 @@ class World:
               biome2 = r.uniform(-0.2,0)
               if noiseval < -0.3:
                  chunk[cy, cx] = blocks.SYGAVM
-              elif noiseval < -0.05:
-                 chunk[cy, cx] = blocks.SEA
               elif noiseval < 0:
+                 chunk[cy, cx] = blocks.SEA
+              elif noiseval < 0.05:
                  chunk[cy, cx] = blocks.SAND
               elif noiseval < 0.3:
                   chunk[cy,cx] = blocks.MURU
