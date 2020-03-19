@@ -404,6 +404,10 @@ while do:
                     for x in range(-3,4):
                         for y in range(-3,4):
                             killKolls((hxy[0]+x, hxy[1]+y))
+                if gameState.inventory[select] == blocks.KIRKA:
+                    for x in range(-3,4):
+                        for y in range(-3,4):
+                            destroy(hxy[0]+x, hxy[1]+y)
             elif event.button == 4:
                 select -= 1
             elif event.button == 5:

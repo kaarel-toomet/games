@@ -18,16 +18,17 @@ LUKS = 12
 KAKTUS = 13
 KOLLIV = 14
 KULD = 15
-BLOCK_END = 15
+KIRKA = 16
+BLOCK_END = 16
 
 unbreakable = set([SYGAVM])
 solid = set([KAST, KUKS, KOLLIV, KULD])
 breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:MURU, KAST:SAND,
             KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU,
-           KUKS:SAND, LUKS:SAND, KAKTUS:SAND, KOLLIV:MURU, KULD:MURU}
+           KUKS:SAND, LUKS:SAND, KAKTUS:SAND, KOLLIV:MURU, KULD:MURU, KIRKA:KIRKA}
 drops = {NONE:NONE, SEA:SEA, SAND:SAND, MURU:MURU, KIVI:KIVI, LUMI:LUMI,
          TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUU, MQQK:MQQK, PUIT:PUIT,
-         KUKS:KUKS, LUKS:KUKS, KAKTUS:KAKTUS, KOLLIV:KOLLIV, KULD:KULD}
+         KUKS:KUKS, LUKS:KUKS, KAKTUS:KAKTUS, KOLLIV:KOLLIV, KULD:KULD, KIRKA:KIRKA}
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
 # as soon as we know the size
@@ -80,15 +81,17 @@ def loadBlocks(size):
                                 (size, size))
     kolliv = pg.transform.scale(pg.image.load("blocks/kollivaremed.png"),
                                 (size, size))
+    kirka = pg.transform.scale(pg.image.load("blocks/kirka.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
                KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv,
                PUU:puu, NONE:none, MQQK:mqqk, PUIT:puit,
                KUKS:cdoor, LUKS:odoor, KAKTUS:kaktus, KOLLIV:kolliv,
-               KULD:kuld}
+               KULD:kuld, KIRKA:kirka}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
         KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi",
         PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit",
         KUKS:"kinnis uks", LUKS:"lahtis uks", KAKTUS:"kaktus",
-        KOLLIV: "Kolli varemed", KULD: "kullaplokk"}
+        KOLLIV: "Kolli varemed", KULD: "kullaplokk", KIRKA:"kirka"}
 

@@ -42,8 +42,8 @@ class GameState():
         self.homeX = 0  # where Crazy Hat has her home
         self.homeY = 0
         ## inventory stuff
-        self.inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
-        self.amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
+        self.inventory = [blocks.MQQK,blocks.KIRKA,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+        self.amounts = [1, 1, 0, 0, 0, 0, 0, 0, 0, 0,  0]
         self.lifes = 10
         self.kuld = 0
         self.kollivaremed = 0
