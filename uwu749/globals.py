@@ -5,6 +5,7 @@ these are just variable declarations, these must
 be initialized in uwu, or in the corresponding module
 """
 import pygame as pg
+import blocks
 
 ## CrazyHat: the player
 hullmyts = None
@@ -24,6 +25,30 @@ activeKollid = None
 
 # tiles for the ground
 ground = None
+# Berlin noise data for ground
+groundNoiseParams = (50, 50, 10, 0.5, 2, 1024, 1024, 0)
 
 # memory are where drawing is done, and part of which is showed on monitor
 screenBuffer = None
+
+class GameState():
+    """
+    contains information on the current state of the game,
+    including lives, points, inventory, current location,
+    home, etc
+    """
+    def __init__(self):
+        self.punktid = 0
+        self.homeX = 0  # where Crazy Hat has her home
+        self.homeY = 0
+        ## inventory stuff
+        self.inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
+        self.amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
+        self.lifes = 10
+        self.kuld = 0
+        self.kollivaremed = 0
+    def __str__(self):
+        s = "GameState object:\n" +\
+        " punktid: " + str(self.punktid) + "\n" +\
+        " homeX, homeY: " + str((self.homeX, self.homeY))
+        return s
