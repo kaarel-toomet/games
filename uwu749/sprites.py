@@ -37,16 +37,18 @@ class ChunkSprites():
     and add it to the new chunkID in case of crossing chunk boundaries
     """
     def __init__(self):
-       self.chunks = {}
+       self.chunks = {}  # dict: chunkID : list of sprites
        self.N = 0
        # total number of minerals across all chunks
     def add(self, sprite):
        """
-       add new sprite at it's (world) coordinates
+       add new sprite at it's (world) coordinates:
+       load the list of existing ones and add append the new one
        """
        chunkID = coordinates.chunkID((sprite.x, sprite.y))
        ## add the sprite to the chunk-specific list
        chunkSprites = self.chunks.get(chunkID, [])
+       # NB! dict get: if missing, return []
        # when adding a sprite, we do not care about initialization flag,
        # hence we only pull in the list
        chunkSprites.append(sprite)

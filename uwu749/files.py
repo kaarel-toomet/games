@@ -1,14 +1,14 @@
 ### load/save files, file dialogs and all that
-import numpy as np
+import pickle
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 
 def add_filters(dialog):
-    filter_npz = Gtk.FileFilter()
-    filter_npz.set_name("compressed numpy file .npz")
-    filter_npz.add_pattern("*.npz")
-    dialog.add_filter(filter_npz)
+    filter_wrld = Gtk.FileFilter()
+    filter_wrld.set_name("CrazyHat world file .wrld")
+    filter_wrld.add_pattern("*.wrld")
+    dialog.add_filter(filter_wrld)
     ##
     filter_any = Gtk.FileFilter()
     filter_any.set_name("all files")
@@ -30,7 +30,7 @@ def fileChooser(save):
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         dialog.set_do_overwrite_confirmation(True)
-        dialog.set_current_name("crazy-world.npz")
+        dialog.set_current_name("crazy-world.wrld")
     else:
         dialog = Gtk.FileChooserDialog("World to load:", gtkRootWin,
                                        Gtk.FileChooserAction.OPEN,
@@ -50,19 +50,27 @@ def fileChooser(save):
 def loadWorld():
     response, fName = fileChooser(False)
     if response == Gtk.ResponseType.OK:
-        s = np.load(fName)
-        return s
+        file = open(fName, "rb")
+        world = pickle.load(file)
+        gameState = pickle.load(file)
+        file.close()
+        return world, gameState
     else:
         # cancel pressed
         return None
         
-def saveWorld(world, home, stuff):
+def saveWorld(world, gameState):
+    """
+    worlds: should contain terrain and such
+    gameState: points and such
+    """
     response, fName = fileChooser(True)
     if response == Gtk.ResponseType.OK:
-        np.savez_compressed(fName,
-                            world=world,
-                            home = np.array(home),
-                            stuff = np.array([x for x in stuff.items()]))
+        file = open(fName, "wb")
+        pickler = pickle.Pickler(file)
+        pickler.dump(world)
+        pickler.dump(gameState)
+        file.close()
 
 ## Global window
 gtkRootWin = Gtk.Window(title="File chooser GTK parent")
