@@ -40,41 +40,74 @@ class activeWindow():
            return None
     def __setitem__(self, key, value):
        self.matrix[key[0], key[1]] = value
+
     def draw(self, dx, dy, blocks):
-       """
-       draws the activeWindow on screenBuffer
-       tries to speed up stuff by scrolling the visible parts
-         inputs:
-       dx: chunk id difference (old - new) for horizontal
-           if None, draw everything
-       dy: same for vertical
-       blocks: the block images corresponding to the activeWindow codes
-       """
-       ## we move all blocks we can by scrolling.
-       ## but these tiles on screen we have to update:
-       ## wxRange: which horizontal range (in tiles) to update
-       ## wyRange: vertical
-       if dx == 1:
-           # moving left -> redraw left edge
-           wxRange = range(0, chunkWidth)
-       elif dx == -1:
-           wxRange = range(2*chunkWidth, 3*chunkWidth)
-       else:
-           ## None or 0: no horizontal movement,
-           ## update everything here
-           wxRange = range(0, 3*chunkWidth)
-       if dy == 1:
-           # moving up -> redraw upper edge
-           wyRange = range(0, chunkHeight)
-       elif dy == -1:
-           wyRange = range(2*chunkHeight, 3*chunkHeight)
-       else:
-           ## None or 0: no vertical movement,
-           ## update everything here
-           wyRange = range(0, 3*chunkHeight)
-       w = ((blocks[ self.matrix[wy,wx] ], windowToScreenBuffer(wx, wy))
-            for wy in wyRange for wx in wxRange)
-       globals.screenBuffer.blits(w)
+        """
+        draws the activeWindow on screenBuffer
+        tries to speed up stuff by scrolling the visible parts
+          inputs:
+        dx: chunk id difference (new - old) for horizontal
+            if None, draw everything
+            it is normally in (-1, 0, 1), but in jumps to home or such these may be quite large
+        dy: same for vertical
+        blocks: the block images corresponding to the activeWindow codes
+        """
+        ## we move all blocks we can by scrolling.
+        ## but these tiles on screen we have to update:
+        ## wxRange: which horizontal range (in tiles) to update
+        ## wyRange: vertical
+        ## ----- Initial draw, discarding everything from earlier -----
+        ## ----- or a long jump--still redraw everything -----
+        if (dx is None and dy is None) or (np.abs(dx) > 1 or np.abs(dy) > 1):
+            w = [(blocks[ self.matrix[wy,wx] ], windowToScreenBuffer((wx, wy)) )
+                 for wy in range(3*chunkHeight) 
+                 for wx in range(3*chunkWidth)]
+            globals.screenBuffer.blits(w)
+            return
+        ## ---------- scrolling ----------
+        ## first scroll the old part of screen accordingly
+        scrollx = -dx*chunkWidth*tileSize
+        scrolly = -dy*chunkHeight*tileSize
+        globals.screenBuffer.scroll(scrollx, scrolly)
+        ## ----- Diagonal scrolling: -----
+        ## check for left/right up/down scroll.  We have to update
+        ## 5 chunks, and their location depends on that.
+        if (dx != 0) and (dy != 0):
+            corneri, cornerj = 1 + dx, 1 + dy
+            # corner that is to be updated coordinates
+            updatelist = ((corneri - 2*dx, cornerj), (corneri - dx, cornerj), (corneri, cornerj), 
+                          (corneri, cornerj - dy), (corneri, cornerj - 2*dy))
+            # chunks to be updated
+            for i, j in updatelist:
+                wxrange = range(i*chunkWidth, (i+1)*chunkWidth)
+                wyrange = range(j*chunkHeight, (j+1)*chunkHeight)
+                w = ((blocks[ self.matrix[wy,wx] ], windowToScreenBuffer((wx, wy)) )
+                     for wy in wyrange
+                     for wx in wxrange)
+                globals.screenBuffer.blits(w)
+            return 
+        ## ----- horizontal/vertical scrolling -----
+        if dx == 1:
+            # moving left -> redraw left edge
+            wxRange = range(2*chunkWidth, 3*chunkWidth)
+        elif dx == -1:
+            wxRange = range(0, chunkWidth)
+        else:
+            ## None or 0: no horizontal movement,
+            ## update everything here
+            wxRange = range(0, 3*chunkWidth)
+        if dy == 1:
+            # moving up -> redraw upper edge
+            wyRange = range(2*chunkHeight, 3*chunkHeight)
+        elif dy == -1:
+            wyRange = range(0, chunkHeight)
+        else:
+            ## None or 0: no vertical movement,
+            ## update everything here
+            wyRange = range(0, 3*chunkHeight)
+        w = ((blocks[ self.matrix[wy,wx] ], windowToScreenBuffer((wx, wy)) )
+             for wy in wyRange for wx in wxRange)
+        globals.screenBuffer.blits(w)
 
     def getChunkID(self):
         """
@@ -123,19 +156,19 @@ class activeWindow():
         # set new chunkid after doing all updates
     
 def setup(screenw, screenh, chunkwidth, chunkheight, tilesize):
-   global screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize
-   screenWidth, screenHeight = screenw, screenh
-   chunkWidth = chunkwidth
-   chunkHeight = chunkheight
-   tileSize = tilesize
+    global screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize
+    screenWidth, screenHeight = screenw, screenh
+    chunkWidth = chunkwidth
+    chunkHeight = chunkheight
+    tileSize = tilesize
 
 def chunkID(worldLoc):
-   """
-   return chunkID based on worldLoc = (x,y)
-   inputs:
-   worldLoc: tuple (x, y), world coordinates
-   """
-   return worldLoc[0] // chunkWidth, worldLoc[1] // chunkHeight
+    """
+    return chunkID based on worldLoc = (x,y)
+    inputs:
+    worldLoc: tuple (x, y), world coordinates
+    """
+    return worldLoc[0] // chunkWidth, worldLoc[1] // chunkHeight
 
 def inchunkToWorld(chunkID, inchunkLoc):
     """
@@ -177,17 +210,13 @@ def moveWindow(worldLoc):
     centered on world coordinates worldLoc = (x, y)
     """
     newChunk = chunkID(worldLoc)
-    ## scroll the old part of screen accordingly
     oldChunk = globals.activeWindow.getChunkID()
-
-    dx = (oldChunk[0] - newChunk[0])*chunkWidth*tileSize
-    dy = (oldChunk[1] - newChunk[1])*chunkHeight*tileSize
-    globals.screenBuffer.scroll(dx, dy)
     ## draw the new missing pieces
     globals.activeWindow.update(globals.ground, newChunk)
-    globals.activeWindow.draw(oldChunk[0] - newChunk[0],
-                              oldChunk[1] - newChunk[1],
+    globals.activeWindow.draw(newChunk[0] - oldChunk[0],
+                              newChunk[1] - oldChunk[1],
                               blocks.blocks)
+    ## fix sprites and such
     globals.activeMineralGold.empty()
     # have to empty the group here to tell sprites they
     # do not belong to that group.  Otherwise will belong
@@ -247,8 +276,9 @@ def worldToScreenbuffer(x, y):
     """
     return((winsx + x)*tileSize, (winsy + y)*tileSize)
  
-def windowToScreenBuffer(wx, wy):
+def windowToScreenBuffer(windowLoc):
     """
     translate from window coordinates to screenBuffer coordinates
     """
+    wx, wy = windowLoc
     return wx*tileSize, wy*tileSize

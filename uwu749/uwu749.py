@@ -28,7 +28,7 @@ args = parser.parse_args()
 
 ## ---------- params ----------
 kollProbability = 0.005   #default is 0.005
-#kollProbability = 0.0
+# kollProbability = 0.0
 
 ## ---------- blocks ----------
 tileSize = 32
@@ -155,7 +155,7 @@ def newGame(terrain=None, state=None):
     # load the world chunks into activeWindow
     globals.activeKollid = world.activeSprites(globals.kollid)
     # have to initialize this, in principle we may have a few kolls pre-created
-    globals.activeWindow.draw(None, None, blocks.blocks)
+    globals.activeWindow.draw(None, None, blocks.blocks)  # arguments: dx, dy, blocks
     drawSprites(globals.activeMineralGold, spriteBuffer)
     ## set the game state first: we have to know the initial location
     reset()
