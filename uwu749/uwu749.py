@@ -125,7 +125,6 @@ mdown = False
 mleft = False
 mright = False
 timer = pg.time.Clock()
-lifes = 5
 punktid = 0
 pause = False
 gameover = False
@@ -168,16 +167,13 @@ def reset():
     reset lives, score etc to the original state
     leave the world geography untouched
     """
-    global gameState, gameover, lifes, aia, kuld, kollivaremed
+    global gameState, gameover, aia
     gameState = globals.GameState()
     print(gameState)
     gameover = False
-    lifes = 10
     aia = 0
     # counter for immunity: after a monster hits you, you will be immune
     # agains new hits for this many ticks.
-    kuld = 0
-    kollivaremed = 0
     globals.player.empty()
     globals.hullmyts = sprites.CrazyHat(gameState.homeX, gameState.homeY)
     globals.player.add(globals.hullmyts)
@@ -256,14 +252,14 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global gameState, kollin, kollivaremed
+    global gameState, kollin
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
             globals.kollid.remove([activeKoll])
             globals.activeKollid.remove(activeKoll)
             gameState.punktid += 100
             kollin -= 1
-            kollivaremed += 1
+            gameState.kollivaremed += 1
 
 def get(item, cost=blocks.NONE):
     try:
@@ -432,7 +428,7 @@ while do:
         screen.blit(text,text_rect)
         pg.display.update()
         timer.tick(10)
-    if lifes == 0:
+    if gameState.lifes == 0:
         uded = "SA SURID ÄRA"
         dtext = dfont.render(uded, True, (255,0,0))
         dtext_rect = dtext.get_rect()
@@ -468,10 +464,10 @@ while do:
         globals.activeMineralGold.remove(col)
         globals.mineralGold.remove(col)
         gameState.punktid += 100
-        kuld += 1
+        gameState.kuld += 1
     col = pg.sprite.spritecollide(globals.hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
-        lifes -= 1
+        gameState.lifes -= 1
         aia = 30
     if aia > 0:
         aia -= 1
@@ -479,11 +475,11 @@ while do:
         select = 9
     if select > 9:
         select = 0
-    if kuld >= 10 and empty != 10:
-        kuld -= 10
+    if gameState.kuld >= 10 and empty != 10:
+        gameState.kuld -= 10
         get(blocks.KULD)
-    if kollivaremed >= 10 and empty != 10:
-        kollivaremed -= 10
+    if gameState.kollivaremed >= 10 and empty != 10:
+        gameState.kollivaremed -= 10
         get(blocks.KOLLIV)
     
     for s in range(0,10):
@@ -499,8 +495,8 @@ while do:
     screen.blit(globals.screenBuffer, coordinates.blitShift)
     ## add score and other info
     pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
-    score = ("punktid: " + str(gameState.punktid) + " elud: " + str(lifes) +
-             " Kuld:" + str(kuld) + " Kolli varemed:" + str(kollivaremed))
+    score = ("punktid: " + str(gameState.punktid) + " elud: " + str(gameState.lifes) +
+             " Kuld:" + str(gameState.kuld) + " Kolli varemed:" + str(gameState.kollivaremed))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = screen.get_rect().centerx

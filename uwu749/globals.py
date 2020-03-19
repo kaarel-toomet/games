@@ -44,6 +44,9 @@ class GameState():
         ## inventory stuff
         self.inventory = [blocks.MQQK,-1,-1,-1,-1,-1,-1,-1,-1,-1, -1]
         self.amounts = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0]
+        self.lifes = 10
+        self.kuld = 0
+        self.kollivaremed = 0
     def __str__(self):
         s = "GameState object:\n" +\
         " punktid: " + str(self.punktid) + "\n" +\
