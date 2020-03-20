@@ -3,6 +3,8 @@ import pickle
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
+import globals
+import sprites
 
 def add_filters(dialog):
     filter_wrld = Gtk.FileFilter()
@@ -51,15 +53,27 @@ def loadWorld():
     response, fName = fileChooser(False)
     if response == Gtk.ResponseType.OK:
         file = open(fName, "rb")
+        ##
         world = pickle.load(file)
-        gameState = pickle.load(file)
+        ##
+        stateDict = pickle.load(file)
+        gameState = globals.GameState()
+        gameState.undictify(stateDict)
+        ##
+        crazyHat = sprites.CrazyHat(gameState.home)
+        try:
+            CHDict = pickle.load(file)
+            crazyHat.undictify(CHDict)
+        except:
+            print("cannot read Crazy Hat data")
+        ##
         file.close()
-        return world, gameState
+        return world, gameState, crazyHat
     else:
         # cancel pressed
         return None
         
-def saveWorld(world, gameState):
+def saveWorld(world, gameState, crazyHat):
     """
     worlds: should contain terrain and such
     gameState: points and such
@@ -69,7 +83,9 @@ def saveWorld(world, gameState):
         file = open(fName, "wb")
         pickler = pickle.Pickler(file)
         pickler.dump(world)
-        pickler.dump(gameState)
+        pickler.dump(gameState.dictify())
+        # save as dict for compatibility
+        pickler.dump(crazyHat.dictify())
         file.close()
 
 ## Global window
