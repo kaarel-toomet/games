@@ -104,14 +104,24 @@ class ChunkSprites():
 
 
 class CrazyHat(pg.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, loc):
+        """
+        loc: world coordinates
+        """
         pg.sprite.Sprite.__init__(self)
         self.image = crazyHatImage
         self.rect = self.image.get_rect()
         ## location in world coordinates
-        self.x, self.y = x, y
+        self.x, self.y = loc
         ## 'rect' will be drawn on screen buffer, hence must be in screenbuffer coords
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+
+    def dictify(self):
+        d = {
+            "loc" : (self.x, self.y)
+        }
+        return d
+        
     def update(self, mup, mdown, mleft, mright):
         """
         use relative movements (mup, mdown...) to update
@@ -148,22 +158,26 @@ class CrazyHat(pg.sprite.Sprite):
         """
         return(self.x, self.y)
 
-    def setxy(self,x,y):
+    def setxy(self, loc):
         """
         use world coordinates to set Crazy Hat's position
-        x, y: world coordinates
+        loc = (x, y): world coordinates
         """
-        self.x, self.y = x, y
+        self.x, self.y = loc
         chunkID = globals.activeWindow.getChunkID()
         chunkID1 = coordinates.chunkID((self.x, self.y))
         if chunkID1 != chunkID:
             ## chunk changed: update activeWindow and sprites
-            coordinates.moveWindow((x, y))
+            coordinates.moveWindow(loc)
         coordinates.coordinateShifts(chunkID, self.x, self.y)
         # update the coordinate system at every move, not just for chunk update
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
 
+    def undictify(self, d):
+        if "loc" in d:
+            self.x, self.y = d["loc"]
 
+            
 class Gold(pg.sprite.Sprite):
     def __init__(self, x, y, n=100):
         """

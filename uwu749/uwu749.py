@@ -134,7 +134,7 @@ gmod = 0
 gmods = {0:"creative",1:"survival"}
 gameState = globals.GameState()  # current running game data
 
-def newGame(terrain=None, state=None):
+def newGame(terrain=None, state=None, crazyHat=None):
     """
     Re-create everything, including terrain, monsters
     reset lives, score, inventory
@@ -150,7 +150,7 @@ def newGame(terrain=None, state=None):
     ## have the CH coordinates yet:
     chunkID = coordinates.chunkID((0, 0))
     globals.mineralGold = sprites.ChunkSprites()
-    coordinates.coordinateShifts(chunkID, gameState.homeX, gameState.homeY)
+    coordinates.coordinateShifts(chunkID, gameState.home[0], gameState.home[1])
     globals.activeWindow.update(globals.ground, chunkID)
     # load the world chunks into activeWindow
     globals.activeKollid = world.activeSprites(globals.kollid)
@@ -158,11 +158,11 @@ def newGame(terrain=None, state=None):
     globals.activeWindow.draw(None, None, blocks.blocks)  # arguments: dx, dy, blocks
     drawSprites(globals.activeMineralGold, spriteBuffer)
     ## set the game state first: we have to know the initial location
-    reset()
+    reset(crazyHat)
     if state is not None:
         gameState = state
 
-def reset():
+def reset(crazyHat=None):
     """
     reset lives, score etc to the original state
     leave the world geography untouched
@@ -174,9 +174,12 @@ def reset():
     # counter for immunity: after a monster hits you, you will be immune
     # agains new hits for this many ticks.
     globals.player.empty()
-    globals.hullmyts = sprites.CrazyHat(gameState.homeX, gameState.homeY)
+    if crazyHat is None:
+        globals.hullmyts = sprites.CrazyHat(gameState.home)
+        globals.hullmyts.setxy(gameState.home)
+    else:
+        globals.hullmyts = crazyHat
     globals.player.add(globals.hullmyts)
-    globals.hullmyts.setxy(gameState.homeX, gameState.homeY)
 
 kollin = 0  # how many mosters
 kutid = pg.sprite.Group()
@@ -287,14 +290,19 @@ while do:
                 do = False
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_l:
-                    terrain, gameState = files.loadWorld()
-                    newGame(terrain, gameState)
+                    ## load world
+                    l = files.loadWorld()
+                    if l is not None:
+                        ## did not cancel
+                        terrain, gameState, crazyHat = l
+                        newGame(terrain, gameState, crazyHat)
                     title = False
                 elif event.key == pg.K_s:
                     globals.activeWindow.update(globals.ground,
                                                 (coordinates.chunkID(globals.hullmyts.getxy())))
                     # sync data
-                    files.saveWorld(globals.ground, gameState)
+                    files.saveWorld(globals.ground, gameState,
+                                    globals.hullmyts)
                     title = False
                 elif event.key == pg.K_c:
                     newGame()
@@ -338,10 +346,9 @@ while do:
                 pause = True
             elif event.key == pg.K_r:
                 ## go home
-                globals.hullmyts.setxy(gameState.homeX, gameState.homeY)
+                globals.hullmyts.setxy(gameState.home)
             elif event.key == pg.K_h:
-                gameState.homeX = globals.hullmyts.getxy()[0]
-                gameState.homeY = globals.hullmyts.getxy()[1]
+                gameState.home = globals.hullmyts.getxy()
             elif event.key == pg.K_RIGHTBRACKET and bb < blocks.BLOCK_END:
                 bb += 1
             elif event.key == pg.K_LEFTBRACKET and bb > 0:
@@ -515,7 +522,7 @@ while do:
     # update crazy hat
     spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
-        screen.blit(home, coordinates.worldToScreen(gameState.homeX, gameState.homeY))
+        screen.blit(home, coordinates.worldToScreen(gameState.home[0], gameState.home[1]))
     ## draw sprites: static: no update need, dynamic: update
     drawSprites(globals.activeMineralGold, spriteBuffer)
     kutid.update()
