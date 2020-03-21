@@ -150,7 +150,8 @@ def newGame(terrain=None, underterrain = None, state=None, crazyHat=None):
     else:
         globals.underground = underterrain
     globals.activelayer = globals.ground
-    globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
+    globals.activeWindow = coordinates.ActiveWindow(globals.activelayer,
+                                                    windowWidth, windowHeight)
     ## create the active window, centered at 0,0 as we don't
     ## have the CH coordinates yet:
     chunkID = coordinates.chunkID((0, 0))
@@ -371,7 +372,7 @@ while do:
             elif event.key == pg.K_SLASH:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
                     globals.activelayer = globals.underground
-                    globals.activeWindow.update(globals.activelayer,globals.activeWindow.chunkID)
+                    globals.activeWindow.switchLayer(globals.activelayer)
             elif event.key == pg.K_RSHIFT:
                 speed = True
             elif event.key == pg.K_y:
