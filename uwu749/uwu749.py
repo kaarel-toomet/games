@@ -157,7 +157,7 @@ def newGame(terrain=None, underterrain = None, state=None, crazyHat=None):
     chunkID = coordinates.chunkID((0, 0))
     globals.mineralGold = sprites.ChunkSprites()
     coordinates.coordinateShifts(chunkID, gameState.home[0], gameState.home[1])
-    globals.activeWindow.update(globals.activelayer, chunkID)
+    globals.activeWindow.update(chunkID)
     # load the world chunks into activeWindow
     globals.activeKollid = world.activeSprites(globals.kollid)
     # have to initialize this, in principle we may have a few kolls pre-created
@@ -304,8 +304,7 @@ while do:
                         newGame(terrain, gameState, crazyHat)
                     title = False
                 elif event.key == pg.K_s:
-                    globals.activeWindow.update(globals.ground,
-                                                (coordinates.chunkID(globals.hullmyts.getxy())))
+                    globals.activeWindow.update(coordinates.chunkID(globals.hullmyts.getxy()))
                     # sync data
                     files.saveWorld(globals.ground, gameState,
                                     globals.hullmyts)
@@ -373,6 +372,7 @@ while do:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
                     globals.activelayer = globals.underground
                     globals.activeWindow.switchLayer(globals.activelayer)
+                    globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
             elif event.key == pg.K_RSHIFT:
                 speed = True
             elif event.key == pg.K_y:

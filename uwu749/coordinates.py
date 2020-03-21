@@ -137,7 +137,7 @@ class ActiveWindow():
 
     def switchLayer(self, newlayer):
         """
-        switch the world layer
+        switch the world layer, retain the location
         store back the old chunks to the current layer,
         and load in chunks from the new layer
         inputs:
@@ -148,15 +148,12 @@ class ActiveWindow():
         iChunk, jChunk = self.chunkID
         for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
             for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-                layer.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
+                self.layer.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
         ## read new chunks to the window
-        iChunk, jChunk = chunkID
         self.layer = newlayer
         for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
             for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-                self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = layer.get((jc, ic))
-        self.chunkID = chunkID
-        # set new chunkid after doing all updates
+                self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = self.layer.get((jc, ic))
    
     def update(self, chunkID):
         """
@@ -171,7 +168,7 @@ class ActiveWindow():
             iChunk, jChunk = self.chunkID
             for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
                 for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-                    layer.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
+                    self.layer.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
         else:
             self.chunkID = chunkID
             # set chunkID here if it is None at initialization
@@ -179,7 +176,7 @@ class ActiveWindow():
         iChunk, jChunk = chunkID
         for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
             for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-                self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = layer.get((jc, ic))
+                self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = self.layer.get((jc, ic))
         self.chunkID = chunkID
         # set new chunkid after doing all updates
     
@@ -240,7 +237,7 @@ def moveWindow(worldLoc):
     newChunk = chunkID(worldLoc)
     oldChunk = globals.activeWindow.getChunkID()
     ## draw the new missing pieces
-    globals.activeWindow.update(globals.activelayer, newChunk)
+    globals.activeWindow.update(newChunk)
     globals.activeWindow.draw(newChunk[0] - oldChunk[0],
                               newChunk[1] - oldChunk[1],
                               blocks.blocks)
@@ -253,8 +250,6 @@ def moveWindow(worldLoc):
     globals.activeKollid.empty()
     # have to empty the group here to tell sprites they do not belong to that group
     globals.activeKollid = world.activeSprites(globals.kollid)
-    # globals.player.update(False, False, False, False)
-
 
 
 def screenToWorld(screenx, screeny):
