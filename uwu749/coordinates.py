@@ -212,7 +212,7 @@ def moveWindow(worldLoc):
     newChunk = chunkID(worldLoc)
     oldChunk = globals.activeWindow.getChunkID()
     ## draw the new missing pieces
-    globals.activeWindow.update(globals.ground, newChunk)
+    globals.activeWindow.update(globals.activelayer, newChunk)
     globals.activeWindow.draw(newChunk[0] - oldChunk[0],
                               newChunk[1] - oldChunk[1],
                               blocks.blocks)

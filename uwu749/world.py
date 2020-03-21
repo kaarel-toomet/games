@@ -37,12 +37,13 @@ class World:
    You have to set up coordinates before you set up the world
    That initializes chunkWidth, chunkHeight and such
    """
-   def __init__(self, altitudeParam):
+   def __init__(self, dimension, altitudeParam):
       """
       read parameters and set up and empty world
       freqX, freqY: Perline noise frequency
       a,b,c,d,e,f: other noise params, please rename appropriately!
       """
+      self.dimension = dimension
       freqX, freqY, a, b, c, d, e, f = altitudeParam
       self.chunks = {}
       self.freqX, self.freqY = freqX, freqY
@@ -61,35 +62,49 @@ class World:
       jc, ic = chunkID
       for cx in range(chunk.shape[1]):
           for cy in range(chunk.shape[0]):
-              ## world coordinates for Perlin noise computation
-              x = ic*coordinates.chunkWidth + cx
-              y = jc*coordinates.chunkHeight + cy
-              noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
+               ## world coordinates for Perlin noise computation
+               x = ic*coordinates.chunkWidth + cx
+               y = jc*coordinates.chunkHeight + cy
+               noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
                                        self.a, self.b, self.c, self.d,
                                        self.e, self.f,) + 1*noise.snoise2(x/1500,y/1500,20,0.5,2,1024,1024,0)
-              noiseval2 = 0.7*noise.snoise2(x/(self.freqX*2) + 10, y/(self.freqY*2) + 10,
+               if self.dimension == "ground":
+                  noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
+                                       self.a, self.b, self.c, self.d,
+                                       self.e, self.f,) + 1*noise.snoise2(x/1500,y/1500,20,0.5,2,1024,1024,0)
+                  noiseval2 = 0.7*noise.snoise2(x/(self.freqX*2) + 10, y/(self.freqY*2) + 10,
                                        self.a, self.b, self.c, self.d,
                                        self.e, self.f,) + 0.7*noise.snoise2((x/3000)+10,(y/3000)+10,20,0.5,2,1024,1024,0)
-              biome1 = r.uniform(-0.1,0.5)
-              biome2 = r.uniform(-0.2,0)
-              if noiseval < -0.3:
-                 chunk[cy, cx] = blocks.SYGAVM
-              elif noiseval < 0:
-                 chunk[cy, cx] = blocks.SEA
-              elif noiseval < 0.07:
-                 chunk[cy, cx] = blocks.SAND
-              elif noiseval < 0.3:
-                  chunk[cy,cx] = blocks.MURU
-                  if biome1 < noiseval2:
-                      chunk[cy,cx] = blocks.PUU
-                  elif biome2 > noiseval2:
-                      chunk[cy,cx] = blocks.SAND
-                      if r.randint(0,100) == 0:
-                         chunk[cy,cx] = blocks.KAKTUS
-              elif noiseval < 0.4:
-                 chunk[cy, cx] = blocks.KIVI
-              elif noiseval < 11:
-                 chunk[cy, cx] = blocks.LUMI
+                  biome1 = r.uniform(-0.1,0.5)
+                  biome2 = r.uniform(-0.2,0)
+                  if noiseval < -0.3:
+                     chunk[cy, cx] = blocks.SYGAVM
+                  elif noiseval < 0:
+                     chunk[cy, cx] = blocks.SEA
+                  elif noiseval < 0.07:
+                     chunk[cy, cx] = blocks.SAND
+                  elif noiseval < 0.3:
+                        chunk[cy,cx] = blocks.MURU
+                        if biome1 < noiseval2:
+                           chunk[cy,cx] = blocks.PUU
+                        elif biome2 > noiseval2:
+                           chunk[cy,cx] = blocks.SAND
+                           if r.randint(0,100) == 0:
+                              chunk[cy,cx] = blocks.KAKTUS
+                  elif noiseval < 0.4:
+                     chunk[cy, cx] = blocks.KIVI
+                     if r.randint(0,1000) == 0:
+                        chunk[cy, cx] = blocks.AUK
+                  elif noiseval < 11:
+                     chunk[cy, cx] = blocks.LUMI
+               else:
+                  noiseval = np.abs(noise.snoise2(x/self.freqX, y/self.freqY,
+                                       self.a, self.b, self.c, self.d,
+                                       self.e, self.f,))
+                  if noiseval < 0.1:
+                     chunk[cy, cx] = blocks.KIVI
+                  else:
+                     chunk[cy, cx] = blocks.KSEIN
       self.chunks[chunkID] = chunk
       ## create minerals: sprites that do not move
       for i in range(1):

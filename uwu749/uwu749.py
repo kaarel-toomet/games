@@ -134,7 +134,7 @@ gmod = 0
 gmods = {0:"creative",1:"survival"}
 gameState = globals.GameState()  # current running game data
 
-def newGame(terrain=None, state=None, crazyHat=None):
+def newGame(terrain=None, underterrain = None, state=None, crazyHat=None):
     """
     Re-create everything, including terrain, monsters
     reset lives, score, inventory
@@ -142,16 +142,21 @@ def newGame(terrain=None, state=None, crazyHat=None):
     global gameState
     ## global params
     if terrain is None:
-        globals.ground = world.World(globals.groundNoiseParams)
+        globals.ground = world.World("ground", globals.groundNoiseParams)
     else:
         globals.ground = terrain
+    if underterrain is None:
+        globals.underground = world.World("underground",globals.undergroundNoiseParams)
+    else:
+        globals.underground = underterrain
+    globals.activelayer = globals.ground
     globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
     ## create the active window, centered at 0,0 as we don't
     ## have the CH coordinates yet:
     chunkID = coordinates.chunkID((0, 0))
     globals.mineralGold = sprites.ChunkSprites()
     coordinates.coordinateShifts(chunkID, gameState.home[0], gameState.home[1])
-    globals.activeWindow.update(globals.ground, chunkID)
+    globals.activeWindow.update(globals.activelayer, chunkID)
     # load the world chunks into activeWindow
     globals.activeKollid = world.activeSprites(globals.kollid)
     # have to initialize this, in principle we may have a few kolls pre-created
@@ -362,7 +367,11 @@ while do:
             elif event.key == pg.K_t:
                 title = True
             elif event.key == pg.K_o:
-                kutid.add(Tüüp(globals.hullmyts.getxy()[0], globals.hullmyts.getxy()[1]))
+                kutid.add(Tüüp(globals.hullmyts.getxy()[1], globals.hullmyts.getxy()[0]))
+            elif event.key == pg.K_SLASH:
+                if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
+                    globals.activelayer = globals.underground
+                    globals.activeWindow.update(globals.activelayer,globals.activeWindow.chunkID)
             elif event.key == pg.K_RSHIFT:
                 speed = True
             elif event.key == pg.K_y:
@@ -403,10 +412,10 @@ while do:
                     winx, winy = coordinates.worldToWindow(mxw, myw)
                     if globals.activeWindow[winy, winx] == blocks.KUKS:
                         globals.activeWindow[winy, winx] = blocks.LUKS
-                        globals.screenBuffer.blit(blocks.blocks[blocks.LUKS], coordinates.windowToScreenBuffer(winx, winy))  
+                        globals.screenBuffer.blit(blocks.blocks[blocks.LUKS], coordinates.windowToScreenBuffer((winx, winy)))  
                     elif globals.activeWindow[winy, winx] == blocks.LUKS:
                         globals.activeWindow[winy, winx] = blocks.KUKS
-                        globals.screenBuffer.blit(blocks.blocks[blocks.KUKS], coordinates.windowToScreenBuffer(winx, winy)) 
+                        globals.screenBuffer.blit(blocks.blocks[blocks.KUKS], coordinates.windowToScreenBuffer((winx, winy))) 
                 if gameState.inventory[select] == blocks.MQQK:
                     for x in range(-3,4):
                         for y in range(-3,4):
