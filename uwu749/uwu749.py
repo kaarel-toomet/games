@@ -150,13 +150,14 @@ def newGame(terrain=None, underterrain = None, state=None, crazyHat=None):
     else:
         globals.underground = underterrain
     globals.activelayer = globals.ground
-    globals.activeWindow = coordinates.activeWindow(windowWidth, windowHeight)
+    globals.activeWindow = coordinates.ActiveWindow(globals.activelayer,
+                                                    windowWidth, windowHeight)
     ## create the active window, centered at 0,0 as we don't
     ## have the CH coordinates yet:
     chunkID = coordinates.chunkID((0, 0))
     globals.mineralGold = sprites.ChunkSprites()
     coordinates.coordinateShifts(chunkID, gameState.home[0], gameState.home[1])
-    globals.activeWindow.update(globals.activelayer, chunkID)
+    globals.activeWindow.update(chunkID)
     # load the world chunks into activeWindow
     globals.activeKollid = world.activeSprites(globals.kollid)
     # have to initialize this, in principle we may have a few kolls pre-created
@@ -303,8 +304,7 @@ while do:
                         newGame(terrain, gameState, crazyHat)
                     title = False
                 elif event.key == pg.K_s:
-                    globals.activeWindow.update(globals.ground,
-                                                (coordinates.chunkID(globals.hullmyts.getxy())))
+                    globals.activeWindow.update(coordinates.chunkID(globals.hullmyts.getxy()))
                     # sync data
                     files.saveWorld(globals.ground, gameState,
                                     globals.hullmyts)
@@ -313,7 +313,7 @@ while do:
                     newGame()
                     title = False
         textrender("press C to create new world, L to load world from file, S to save",
-                   screenWidth/2, screenHeight/2)
+                   screenWidth/2 - 100, screenHeight/2)
         pg.display.update()
         timer.tick(5)  # low fps enough for the main menu
     for event in pg.event.get():
@@ -371,7 +371,8 @@ while do:
             elif event.key == pg.K_SLASH:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
                     globals.activelayer = globals.underground
-                    globals.activeWindow.update(globals.activelayer,globals.activeWindow.chunkID)
+                    globals.activeWindow.switchLayer(globals.activelayer)
+                    globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
             elif event.key == pg.K_RSHIFT:
                 speed = True
             elif event.key == pg.K_y:

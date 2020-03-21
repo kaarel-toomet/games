@@ -101,6 +101,22 @@ All of these take in two coordinates and return a tuple of translated
 coordinates. 
 
 
+### Data Structures
+
+#### Ground (and underground) layers
+
+The central data structure for ground layers is `World` in module
+`world`.  It is mainly a dict that contains chunkids (in tuple form)
+as keys and the corresponding tile matrices as values, but it also
+contains certain auxiliary information, such as noise parameters.
+The method
+`World.get(chunkID)` returns the chunk tile matrix (numpy matrix)
+given a chunkID.  If the matrix does not exist, it is created and
+added to the dict by retaining the same random seed and noise
+parameters, in this way ensuring that terrain in adjacent chunks lines
+up.  This allows to play on an essentially unlimited terrain.
+
+
 ### Code
 
 #### Module structure
@@ -113,8 +129,10 @@ For various reasons, the code is split into different modules:
   just by corresponding functions.  This includes different coordinate
   transformation-related variables.
 * **coordinates**: _activeWindow_ and coordinate translations
-* **uwu**: the main game
+* **files**: saving/loading and related functions
 * **sprites**: _chunkSprites_, and other sprites
-* **world**: _activeSprites_ and the world chunks related data
+* **uwu**: the main game
+* **world**: _World_-class, 
+  _activeSprites_ and the world chunks related data
   structures
   

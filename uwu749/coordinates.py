@@ -18,16 +18,22 @@ ssx = None  # screen
 ssy = None
 blitShift = None, None  # blit whole screen
 
-class activeWindow():
+class ActiveWindow():
     """
     data related to the activeWindow: a square of the 9 cunks, centered at Crazy Hat
     local variables:
     matrix: height x width, tile id-s inside of the window
+    chunkID: tuple of center chunk coordinates
+    layer: a world object, which layer to load/save tiles from
     """
-    def __init__(self, width, height):
-       self.matrix = np.empty((height, width), 'int8')
-       self.chunkID = None
-       # contains no chunks so far...
+    def __init__(self, layer, width, height):
+        """
+        create new activeWindow, related to the 'layer' layer
+        """
+        self.matrix = np.empty((height, width), 'int8')
+        self.chunkID = None
+        self.layer = layer
+        # contains no chunks so far...
     def __getitem__(self, key):
        """
        return the tile code in window
@@ -128,13 +134,32 @@ class activeWindow():
         return self.matrix.shape[1]
     def getHeight(self):
         return self.matrix.shape[0]
+
+    def switchLayer(self, newlayer):
+        """
+        switch the world layer, retain the location
+        store back the old chunks to the current layer,
+        and load in chunks from the new layer
+        inputs:
+        newlayer: a world object, such as ground or underground
+        """
+        ## save the chunks.  Maybe separate into a 'sync' method?
+        ## put back modified chunks
+        iChunk, jChunk = self.chunkID
+        for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+            for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
+                self.layer.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
+        ## read new chunks to the window
+        self.layer = newlayer
+        for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
+            for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
+                self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = self.layer.get((jc, ic))
    
-    def update(self, world, chunkID):
+    def update(self, chunkID):
         """
         load new chunks to the active window, store back the old chunks
         in case those have been changed
         inputs:
-        world: the World object
         chunkID: chunkID for the new center
         """
         ## save the chunks.  Maybe separate into a 'sync' method?
@@ -143,7 +168,7 @@ class activeWindow():
             iChunk, jChunk = self.chunkID
             for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
                 for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-                    world.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
+                    self.layer.put((jc, ic), self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth])
         else:
             self.chunkID = chunkID
             # set chunkID here if it is None at initialization
@@ -151,7 +176,7 @@ class activeWindow():
         iChunk, jChunk = chunkID
         for i, ic in enumerate([iChunk-1, iChunk, iChunk+1]):
             for j, jc in enumerate([jChunk-1, jChunk, jChunk+1]):
-                self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = world.get((jc, ic))
+                self.matrix[j*chunkHeight:(j+1)*chunkHeight, i*chunkWidth:(i+1)*chunkWidth] = self.layer.get((jc, ic))
         self.chunkID = chunkID
         # set new chunkid after doing all updates
     
@@ -212,7 +237,7 @@ def moveWindow(worldLoc):
     newChunk = chunkID(worldLoc)
     oldChunk = globals.activeWindow.getChunkID()
     ## draw the new missing pieces
-    globals.activeWindow.update(globals.activelayer, newChunk)
+    globals.activeWindow.update(newChunk)
     globals.activeWindow.draw(newChunk[0] - oldChunk[0],
                               newChunk[1] - oldChunk[1],
                               blocks.blocks)
@@ -225,8 +250,6 @@ def moveWindow(worldLoc):
     globals.activeKollid.empty()
     # have to empty the group here to tell sprites they do not belong to that group
     globals.activeKollid = world.activeSprites(globals.kollid)
-    # globals.player.update(False, False, False, False)
-
 
 
 def screenToWorld(screenx, screeny):
