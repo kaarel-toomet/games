@@ -65,7 +65,9 @@ class World:
                ## world coordinates for Perlin noise computation
                x = ic*coordinates.chunkWidth + cx
                y = jc*coordinates.chunkHeight + cy
-               noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
+               r.seed(1000*cx+cy)
+               holegen = r.randint(0,100)
+               gnoiseval = noise.snoise2(x/self.freqX, y/self.freqY,
                                        self.a, self.b, self.c, self.d,
                                        self.e, self.f,) + 1*noise.snoise2(x/1500,y/1500,20,0.5,2,1024,1024,0)
                if self.dimension == "ground":
@@ -93,18 +95,20 @@ class World:
                               chunk[cy,cx] = blocks.KAKTUS
                   elif noiseval < 0.4:
                      chunk[cy, cx] = blocks.KIVI
-                     if r.randint(0,1000) == 0:
+                     if holegen == 0:
                         chunk[cy, cx] = blocks.AUK
                   elif noiseval < 11:
                      chunk[cy, cx] = blocks.LUMI
                else:
-                  noiseval = np.abs(noise.snoise2(x/self.freqX, y/self.freqY,
+                  noiseval = noise.snoise2(x/self.freqX+10, y/self.freqY+10,
                                        self.a, self.b, self.c, self.d,
-                                       self.e, self.f,))
-                  if noiseval < 0.1:
+                                       self.e, self.f,)
+                  if np.abs(noiseval) < 0.1:
                      chunk[cy, cx] = blocks.KIVI
                   else:
                      chunk[cy, cx] = blocks.KSEIN
+                  if gnoiseval < 0.4 and gnoiseval > 0.3 and holegen == 0:
+                     chunk[cy,cx] = blocks.AUK
       self.chunks[chunkID] = chunk
       ## create minerals: sprites that do not move
       for i in range(1):

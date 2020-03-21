@@ -370,14 +370,17 @@ while do:
                 kutid.add(Tüüp(globals.hullmyts.getxy()[1], globals.hullmyts.getxy()[0]))
             elif event.key == pg.K_SLASH:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
-                    globals.activelayer = globals.underground
+                    if globals.activelayer == globals.ground:
+                        globals.activelayer = globals.underground
+                    else:
+                        globals.activelayer = globals.ground
                     globals.activeWindow.switchLayer(globals.activelayer)
                     globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
             elif event.key == pg.K_RSHIFT:
                 speed = True
             elif event.key == pg.K_y:
                 # go to the main menu
-                title = True;
+                title = True
             elif event.key == pg.K_PERIOD:
                 if gameState.inventory[select] == blocks.PUIT:
                     get(blocks.KAST,blocks.PUIT)
