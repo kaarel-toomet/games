@@ -313,7 +313,7 @@ while do:
                     newGame()
                     title = False
         textrender("press C to create new world, L to load world from file, S to save",
-                   screenWidth/2, screenHeight/2)
+                   screenWidth/2 - 100, screenHeight/2)
         pg.display.update()
         timer.tick(5)  # low fps enough for the main menu
     for event in pg.event.get():

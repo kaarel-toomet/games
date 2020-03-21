@@ -53,6 +53,6 @@ It is tested with python3 3.6 only but may run with python 2 too:
   directly handle it, the game relies on a short shellscript that
   revolves around 'xdotool' (X11-specific).  If xdotool is found and
   reports valid screen size, this is used as the size of the active
-  screen.  Otherwise pygam full screen size is used, which may be
+  screen.  Otherwise pygame full screen size is used, which may be
   wrong on multiple monitors.
   
