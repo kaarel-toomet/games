@@ -300,13 +300,15 @@ while do:
                     l = files.loadWorld()
                     if l is not None:
                         ## did not cancel
-                        terrain, gameState, crazyHat = l
-                        newGame(terrain, gameState, crazyHat)
+                        ground, underground, gameState, crazyHat = l
+                        newGame(ground, underground,
+                                gameState, crazyHat)
                     title = False
                 elif event.key == pg.K_s:
                     globals.activeWindow.update(coordinates.chunkID(globals.hullmyts.getxy()))
                     # sync data
-                    files.saveWorld(globals.ground, gameState,
+                    files.saveWorld(globals.ground, globals.underground,
+                                    gameState,
                                     globals.hullmyts)
                     title = False
                 elif event.key == pg.K_c:
