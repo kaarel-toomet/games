@@ -128,7 +128,9 @@ gmod = 0
 gmods = {0:"creative",1:"survival"}
 gameState = globals.GameState()  # current running game data
 
-def newGame(terrain=None, underterrain = None, state=None, crazyHat=None):
+def newGame(terrain=None, underterrain = None,
+            spriteData=None,
+            state=None, crazyHat=None):
     """
     Re-create everything, including terrain, monsters
     reset lives, score, inventory
@@ -153,12 +155,19 @@ def newGame(terrain=None, underterrain = None, state=None, crazyHat=None):
     coordinates.coordinateShifts(chunkID, gameState.home[0], gameState.home[1])
     globals.activeWindow.update(chunkID)
     # load the world chunks into activeWindow
-    globals.activeKollid = world.activeSprites(globals.kollid)
-    # have to initialize this, in principle we may have a few kolls pre-created
     globals.activeWindow.draw(None, None, blocks.blocks)  # arguments: dx, dy, blocks
     drawSprites(globals.activeMineralGold, spriteBuffer)
     ## set the game state first: we have to know the initial location
     reset(crazyHat)
+    ## sprites: 
+    if spriteData is not None:
+        ## walk through the sprites dict and see what's there
+        if "kollid" in spriteData:
+            globals.kollid = spriteData["kollid"]
+        else:
+            globals.kollid = sprites.ChunkSprites()
+    globals.activeKollid = world.activeSprites(globals.kollid)
+    # have to initialize this, in principle we may have a few kolls pre-created
     if state is not None:
         gameState = state
 
@@ -180,34 +189,16 @@ def reset(crazyHat=None):
     else:
         globals.hullmyts = crazyHat
     globals.player.add(globals.hullmyts)
+    ## remove existing monsters
+    globals.kollid = sprites.ChunkSprites()
 
-kollin = 0  # how many mosters
-kutid = pg.sprite.Group()
 sprites.setup(tileSize)
-globals.kollid = sprites.ChunkSprites()
 speed = False
 empty = 0
 select = 0
 ##
 
 newGame()
-
-
-class Tüüp(pg.sprite.Sprite):
-    def __init__(self,x,y):
-        global tileSize
-        pg.sprite.Sprite.__init__(self)
-        self.image = kutt
-        self.rect = self.image.get_rect()
-        self.x=x
-        self.y=y
-        self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-    def update(self):
-        global tileSize
-        if np.random.randint(0,30) == 0:
-            self.x += np.random.randint(-1,1)
-            self.y += np.random.randint(-1,1)
-            self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
     
 def build(x,y):
     """
@@ -255,13 +246,12 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global gameState, kollin
+    global gameState
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
             globals.kollid.remove([activeKoll])
             globals.activeKollid.remove(activeKoll)
             gameState.punktid += 100
-            kollin -= 1
             gameState.kollivaremed += 1
 
 def get(item, cost=blocks.NONE):
@@ -298,8 +288,8 @@ while do:
                         newGame()
                     if l is not None:
                         ## did not cancel
-                        ground, underground, gameState, crazyHat = l
-                        newGame(ground, underground,
+                        ground, underground, spriteData, gameState, crazyHat = l
+                        newGame(ground, underground, spriteData,
                                 gameState, crazyHat)
                         if gameState.dimension == "ground":
                             globals.activelayer = globals.ground
@@ -311,7 +301,12 @@ while do:
                 elif event.key == pg.K_s:
                     globals.activeWindow.update(coordinates.chunkID(globals.hullmyts.getxy()))
                     # sync data
+                    ## sprites
+                    spriteData = {
+                        "kollid" : globals.kollid
+                    }
                     files.saveWorld(globals.ground, globals.underground,
+                                    spriteData,
                                     gameState,
                                     globals.hullmyts)
                     title = False
@@ -371,8 +366,6 @@ while do:
                 gmod = 1-gmod
             elif event.key == pg.K_t:
                 title = True
-            elif event.key == pg.K_o:
-                kutid.add(Tüüp(globals.hullmyts.getxy()[1], globals.hullmyts.getxy()[0]))
             elif event.key == pg.K_SLASH:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
                     if globals.activelayer is globals.ground:
@@ -477,8 +470,7 @@ while do:
                     gameover = False
                     reset()
         timer.tick(10)
-    if np.random.uniform() < kollProbability and len(globals.activeKollid)<=12:
-        kollin += 1
+    if np.random.uniform() < kollProbability and len(globals.activeKollid) <= 12:
         # create a new monster at a random location inside activeWindow
         winx = np.random.randint(0, globals.activeWindow.getWidth())
         winy = np.random.randint(0, globals.activeWindow.getHeight())
@@ -544,8 +536,6 @@ while do:
         globals.screen.blit(home, coordinates.worldToScreen(gameState.home[0], gameState.home[1]))
     ## draw sprites: static: no update need, dynamic: update
     drawSprites(globals.activeMineralGold, spriteBuffer)
-    kutid.update()
-    kutid.draw(spriteBuffer)
     updateScreen()
     drawSprites(globals.activeKollid, spriteBuffer)
     globals.player.draw(spriteBuffer)

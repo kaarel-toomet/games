@@ -48,6 +48,7 @@ def loadWorld():
         components = pickle.load(file)
         ground = components.get("ground", None)
         underground = components.get("underground", None)
+        sprites = components.get("sprites", None)
         gameState = globals.GameState()
         if "gameState" in components:
             gameState.undictify(components["gameState"])
@@ -61,9 +62,12 @@ def loadWorld():
         # cancel pressed
         return None
         
-def saveWorld(ground, underground, gameState, crazyHat):
+def saveWorld(ground, underground, sprites,
+              gameState, crazyHat):
     """
-    worlds: should contain terrain and such
+    ground: ground layer
+    sprites: dict with components for "kollid" and
+               other sprites
     gameState: points and such
     """
     fName = fileChooser(True)
@@ -74,6 +78,7 @@ def saveWorld(ground, underground, gameState, crazyHat):
             # save as dict for compatibility
             "ground" : ground,
             "underground" : underground,
+            "sprites" : sprites,
             "gameState" : gameState.dictify(),
             "crazyHat" : crazyHat.dictify()
         }
