@@ -77,8 +77,3 @@ def saveWorld(world, gameState, crazyHat):
         # save as dict for compatibility
         pickler.dump(crazyHat.dictify())
         file.close()
-
-## Global window
-gtkRootWin = Gtk.Window(title="File chooser GTK parent")
-gtkRootWin.connect("destroy", Gtk.main_quit)
-gtkRootWin.hide()

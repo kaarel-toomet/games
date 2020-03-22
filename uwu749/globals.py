@@ -37,6 +37,14 @@ undergroundNoiseParams = (50, 50, 20, 0.5, 2, 1024, 1024, 0)
 # memory are where drawing is done, and part of which is showed on monitor
 screenBuffer = None
 
+pg.font.init()
+def textrender(text, x, y, font=pg.font.SysFont("Times",24)):
+    text = font.render(text, True, (255,255,255))
+    text_rect = text.get_rect()
+    text_rect.x = x
+    text_rect.y = y
+    screen.blit(text,text_rect)
+
 class GameState():
     """
     contains information on the current state of the game,
@@ -87,4 +95,5 @@ class GameState():
             self.kuld = d["kuld"]
         if "kollivaremed" in d:
             self.kollivaremed = d["kollivaremed"]
+
         

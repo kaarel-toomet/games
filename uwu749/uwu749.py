@@ -76,13 +76,6 @@ dfont = pg.font.SysFont("Times", 32)
 pfont = pg.font.SysFont("Times", 50)
 tfont = pg.font.SysFont("Times",100)
 
-def textrender(text, x, y, font=font):
-    text = font.render(text, True, (255,255,255))
-    text_rect = text.get_rect()
-    text_rect.x = x
-    text_rect.y = y
-    globals.screen.blit(text,text_rect)
-
 def drawSprites(sprites, spriteBuffer):
     """
     Just draw the sprites listed in the group on screen
@@ -317,7 +310,7 @@ while do:
                 elif event.key == pg.K_c:
                     newGame()
                     title = False
-        textrender("press C to create new world, L to load world from file, S to save",
+        globals.textrender("press C to create new world, L to load world from file, S to save",
                    globals.screenWidth/2 - 100, globals.screenHeight/2)
         pg.display.update()
         timer.tick(5)  # low fps enough for the main menu
@@ -410,11 +403,11 @@ while do:
             mxy = pg.mouse.get_pos()
             hxy = globals.hullmyts.getxy()
             tol = tileSize*6
-            if event.button == 1 and mxy[0]>globals.screenWidth/2-tol and mxy[0]<globals.screenWidth/2+tol and mxy[1]>globals.screeHeight/2-tol and mxy[1]<globals.screeHeight/2+tol:
+            if event.button == 1 and mxy[0]>globals.screenWidth/2-tol and mxy[0]<globals.screenWidth/2+tol and mxy[1]>globals.screenHeight/2-tol and mxy[1]<globals.screenHeight/2+tol:
                 destroy(coordinates.screenToWorld(mxy[0],mxy[1])[0],
                 coordinates.screenToWorld(mxy[0],mxy[1])[1])
             elif event.button == 3:
-                if mxy[0]>globals.screenWidth/2-tol and mxy[0]<globals.screenWidth/2+tol and mxy[1]>globals.screeHeight/2-tol and mxy[1]<globals.screeHeight/2+tol:
+                if mxy[0]>globals.screenWidth/2-tol and mxy[0]<globals.screenWidth/2+tol and mxy[1]>globals.screenHeight/2-tol and mxy[1]<globals.screenHeight/2+tol:
                     mxw = coordinates.screenToWorld(mxy[0],mxy[1])[0]
                     myw = coordinates.screenToWorld(mxy[0],mxy[1])[1]
                     build(mxw, myw)
@@ -534,7 +527,7 @@ while do:
     globals.screen.blit(selslot,(select*18*tileScale,0))
     for s in range(0,10):
         globals.screen.blit(blocks.blocks[gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
-        textrender(str(gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
+        globals.textrender(str(gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
     globals.player.update(mup, mdown, mleft, mright)
     # update crazy hat
