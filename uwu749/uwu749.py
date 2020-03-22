@@ -316,10 +316,9 @@ while do:
                                     globals.hullmyts)
                     title = False
                 elif event.key == pg.K_c:
-                    newGame()
                     title = False
-        globals.textrender("press C to create new world, L to load world from file, S to save",
-                   globals.screenWidth/2 - 100, globals.screenHeight/2)
+        globals.textrender("press C to cancel, L to load world from file, S to save",
+                   globals.screenWidth/2 - 200, globals.screenHeight/2)
         pg.display.update()
         timer.tick(5)  # low fps enough for the main menu
     for event in pg.event.get():
