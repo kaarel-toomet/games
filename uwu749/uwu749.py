@@ -47,18 +47,19 @@ if sys.platform == 'linux':
     if(res.returncode == 0):
         # success
         wh = res.stdout.split(b' ')
-        screenWidth = int(wh[0])
-        screenHeight = int(wh[1])
-        screen = pg.display.set_mode((screenWidth, screenHeight), pg.RESIZABLE)
+        globals.screenWidth = int(wh[0])
+        globals.screenHeight = int(wh[1])
+        globals.screen = pg.display.set_mode((globals.screenWidth, globals.screenHeight), pg.RESIZABLE)
         xdotool = True
 if not xdotool:
-    screen = pg.display.set_mode((0,0), pg.RESIZABLE)
-    screenWidth, screenHeight = pg.display.get_surface().get_size()
+    globals.screen = pg.display.set_mode((0,0), pg.RESIZABLE)
+    globals.screenWidth, globals.screenHeight = pg.display.get_surface().get_size()
     pg.display.set_caption(str(np.random.randint(0,9000)))
     pg.mixer.init()
-    screen = pg.display.set_mode((0,0), pg.RESIZABLE)
-    screenWidth = screen.get_width()
-    screenHeight = screen.get_height()
+    globals.screen = pg.display.set_mode((0,0), pg.RESIZABLE)
+    globals.screenWidth = globals.screen.get_width()
+    globals.screenHeight = globals.screen.get_height()
+
 
 ## load config and all that
 blocks.loadBlocks(tileSize)
@@ -80,7 +81,7 @@ def textrender(text, x, y, font=font):
     text_rect = text.get_rect()
     text_rect.x = x
     text_rect.y = y
-    screen.blit(text,text_rect)
+    globals.screen.blit(text,text_rect)
 
 def drawSprites(sprites, spriteBuffer):
     """
@@ -98,8 +99,8 @@ def updateScreen():
     globals.activeKollid.update(globals.kollid)
     
 ## Screen and active window
-chunkWidth = int(np.ceil(screenWidth/2/tileSize))
-chunkHeight = int(np.ceil(screenHeight/2/tileSize))
+chunkWidth = int(np.ceil(globals.screenWidth/2/tileSize))
+chunkHeight = int(np.ceil(globals.screenHeight/2/tileSize))
 chunkWidth = 32
 chunkHeight = 32
 
@@ -107,7 +108,7 @@ chunkHeight = 32
 windowWidth = 3*chunkWidth  # how many tiles loaded into the active window
 windowHeight = 3*chunkHeight
 
-coordinates.setup(screenWidth, screenHeight, chunkWidth, chunkHeight, tileSize)
+coordinates.setup(globals.screenWidth, globals.screenHeight, chunkWidth, chunkHeight, tileSize)
 globals.screenBuffer = pg.Surface(size=(windowWidth*tileSize, windowHeight*tileSize))
 globals.screenBuffer.fill(bgColor)
 spriteBuffer = pg.Surface([windowWidth*tileSize, windowHeight*tileSize], pg.SRCALPHA, 32)
@@ -297,7 +298,11 @@ while do:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_l:
                     ## load world
-                    l = files.loadWorld()
+                    try:
+                        l = files.loadWorld()
+                    except:
+                        l = None
+                        newGame()
                     if l is not None:
                         ## did not cancel
                         terrain, gameState, crazyHat = l
@@ -313,7 +318,7 @@ while do:
                     newGame()
                     title = False
         textrender("press C to create new world, L to load world from file, S to save",
-                   screenWidth/2 - 100, screenHeight/2)
+                   globals.screenWidth/2 - 100, globals.screenHeight/2)
         pg.display.update()
         timer.tick(5)  # low fps enough for the main menu
     for event in pg.event.get():
@@ -370,7 +375,7 @@ while do:
                 kutid.add(Tüüp(globals.hullmyts.getxy()[1], globals.hullmyts.getxy()[0]))
             elif event.key == pg.K_SLASH:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
-                    if globals.activelayer == globals.ground:
+                    if globals.activelayer is globals.ground:
                         globals.activelayer = globals.underground
                     else:
                         globals.activelayer = globals.ground
@@ -405,11 +410,11 @@ while do:
             mxy = pg.mouse.get_pos()
             hxy = globals.hullmyts.getxy()
             tol = tileSize*6
-            if event.button == 1 and mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
+            if event.button == 1 and mxy[0]>globals.screenWidth/2-tol and mxy[0]<globals.screenWidth/2+tol and mxy[1]>globals.screeHeight/2-tol and mxy[1]<globals.screeHeight/2+tol:
                 destroy(coordinates.screenToWorld(mxy[0],mxy[1])[0],
                 coordinates.screenToWorld(mxy[0],mxy[1])[1])
             elif event.button == 3:
-                if mxy[0]>screenWidth/2-tol and mxy[0]<screenWidth/2+tol and mxy[1]>screenHeight/2-tol and mxy[1]<screenHeight/2+tol:
+                if mxy[0]>globals.screenWidth/2-tol and mxy[0]<globals.screenWidth/2+tol and mxy[1]>globals.screeHeight/2-tol and mxy[1]<globals.screeHeight/2+tol:
                     mxw = coordinates.screenToWorld(mxy[0],mxy[1])[0]
                     myw = coordinates.screenToWorld(mxy[0],mxy[1])[1]
                     build(mxw, myw)
@@ -445,20 +450,20 @@ while do:
         pd = "PAUSIL"
         ptext = dfont.render(pd, True, (127,127,127))
         ptext_rect = ptext.get_rect()
-        ptext_rect.centerx = screen.get_rect().centerx
+        ptext_rect.centerx = globals.screen.get_rect().centerx
         ptext_rect.y = 50
-        screen.blit(ptext,ptext_rect)
-        screen.blit(text,text_rect)
+        globals.screen.blit(ptext,ptext_rect)
+        globals.screen.blit(text,text_rect)
         pg.display.update()
         timer.tick(10)
     if gameState.lifes == 0:
         uded = "SA SURID ÄRA"
         dtext = dfont.render(uded, True, (255,0,0))
         dtext_rect = dtext.get_rect()
-        dtext_rect.centerx = screen.get_rect().centerx
+        dtext_rect.centerx = globals.screen.get_rect().centerx
         dtext_rect.y = 30
-        screen.blit(dtext,dtext_rect)
-        screen.blit(text,text_rect)
+        globals.screen.blit(dtext,dtext_rect)
+        globals.screen.blit(text,text_rect)
         pg.display.update()
         gameover = True
     while gameover:
@@ -515,27 +520,27 @@ while do:
     except:
         empty = 10
     ## ---------- screen udpate ----------
-    screen.blit(globals.screenBuffer, coordinates.blitShift)
+    globals.screen.blit(globals.screenBuffer, coordinates.blitShift)
     ## add score and other info
-    pg.draw.rect(screen,(0,0,0),(0,18*tileScale,screenWidth,30))
+    pg.draw.rect(globals.screen,(0,0,0),(0,18*tileScale,globals.screenWidth,30))
     score = ("punktid: " + str(gameState.punktid) + " elud: " + str(gameState.lifes) +
              " Kuld:" + str(gameState.kuld) + " Kolli varemed:" + str(gameState.kollivaremed))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
-    text_rect.centerx = screen.get_rect().centerx
+    text_rect.centerx = globals.screen.get_rect().centerx
     text_rect.y = 18*tileScale
-    screen.blit(text,text_rect)
-    screen.blit(hotbar,(0,0))
-    screen.blit(selslot,(select*18*tileScale,0))
+    globals.screen.blit(text,text_rect)
+    globals.screen.blit(hotbar,(0,0))
+    globals.screen.blit(selslot,(select*18*tileScale,0))
     for s in range(0,10):
-        screen.blit(blocks.blocks[gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
+        globals.screen.blit(blocks.blocks[gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
         textrender(str(gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
     globals.player.update(mup, mdown, mleft, mright)
     # update crazy hat
     spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
-        screen.blit(home, coordinates.worldToScreen(gameState.home[0], gameState.home[1]))
+        globals.screen.blit(home, coordinates.worldToScreen(gameState.home[0], gameState.home[1]))
     ## draw sprites: static: no update need, dynamic: update
     drawSprites(globals.activeMineralGold, spriteBuffer)
     kutid.update()
@@ -545,7 +550,7 @@ while do:
     globals.player.draw(spriteBuffer)
     # add sprites to spritebuffer.  this will be blitted
     # to the screen in the next loop
-    screen.blit(spriteBuffer, coordinates.blitShift)
+    globals.screen.blit(spriteBuffer, coordinates.blitShift)
     ## if you are not speeding
     if not speed:
         mup = False

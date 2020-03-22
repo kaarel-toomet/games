@@ -23,6 +23,10 @@ kollid = None
 # monsters in the active window
 activeKollid = None
 
+screenWidth = None
+screenHeight = None
+screen = None
+
 # tiles for the ground
 ground = None
 underground = None
