@@ -11,7 +11,7 @@ selslot = pg.transform.scale(pg.image.load("selslot.png"),(18*3, 18*3))
 def fileChooser(save):
     pg.init()
     choose = True
-    select = False
+    select = 0
     timer = pg.time.Clock()
     while choose:
         for event in pg.event.get():
