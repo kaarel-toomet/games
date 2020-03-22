@@ -303,6 +303,12 @@ while do:
                         ground, underground, gameState, crazyHat = l
                         newGame(ground, underground,
                                 gameState, crazyHat)
+                        if gameState.dimension == "ground":
+                            globals.activelayer = globals.ground
+                        else:
+                            globals.activelayer = globals.underground
+                        globals.activeWindow.switchLayer(globals.activelayer)
+                        globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
                     title = False
                 elif event.key == pg.K_s:
                     globals.activeWindow.update(coordinates.chunkID(globals.hullmyts.getxy()))
@@ -376,6 +382,7 @@ while do:
                         globals.activelayer = globals.underground
                     else:
                         globals.activelayer = globals.ground
+                    gameState.dimension = globals.activelayer.dimension
                     globals.activeWindow.switchLayer(globals.activelayer)
                     globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
             elif event.key == pg.K_RSHIFT:
