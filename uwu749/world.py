@@ -40,8 +40,10 @@ class World:
    def __init__(self, dimension, altitudeParam):
       """
       read parameters and set up and empty world
-      freqX, freqY: Perline noise frequency
-      a,b,c,d,e,f: other noise params, please rename appropriately!
+      inputs:
+      dimension: name of the layer, such as "ground"
+      altitudeParam: Perline noise parameters for
+         biome altitude (freqX, freqY, a,b,c,d,e,f)
       """
       self.dimension = dimension
       freqX, freqY, a, b, c, d, e, f = altitudeParam

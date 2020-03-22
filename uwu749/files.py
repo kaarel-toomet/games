@@ -44,26 +44,23 @@ def loadWorld():
     if fName is not None:
         file = open(fName, "rb")
         ##
-        world = pickle.load(file)
-        ##
-        stateDict = pickle.load(file)
+        components = pickle.load(file)
+        ground = components.get("ground", None)
+        underground = components.get("underground", None)
         gameState = globals.GameState()
-        gameState.undictify(stateDict)
-        ##
+        if "gameState" in components:
+            gameState.undictify(components["gameState"])
         crazyHat = sprites.CrazyHat(gameState.home)
-        try:
-            CHDict = pickle.load(file)
-            crazyHat.undictify(CHDict)
-        except:
-            print("cannot read Crazy Hat data")
+        if "crazyHat" in components:
+            crazyHat.undictify(components["crazyHat"])
         ##
         file.close()
-        return world, gameState, crazyHat
+        return ground, underground, gameState, crazyHat
     else:
         # cancel pressed
         return None
         
-def saveWorld(world, gameState, crazyHat):
+def saveWorld(ground, underground, gameState, crazyHat):
     """
     worlds: should contain terrain and such
     gameState: points and such
@@ -72,8 +69,12 @@ def saveWorld(world, gameState, crazyHat):
     if fName is not None:
         file = open(fName, "wb")
         pickler = pickle.Pickler(file)
-        pickler.dump(world)
-        pickler.dump(gameState.dictify())
-        # save as dict for compatibility
-        pickler.dump(crazyHat.dictify())
+        components = {
+            # save as dict for compatibility
+            "ground" : ground,
+            "underground" : underground,
+            "gameState" : gameState.dictify(),
+            "crazyHat" : crazyHat.dictify()
+        }
+        pickler.dump(components)
         file.close()

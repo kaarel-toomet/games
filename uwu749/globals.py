@@ -60,6 +60,7 @@ class GameState():
         self.lifes = 10
         self.kuld = 0
         self.kollivaremed = 0
+        self.dimension = "ground"  # start on ground
 
     def dictify(self):
         d = {
@@ -70,6 +71,7 @@ class GameState():
             "lifes" : self.lifes,
             "kuld" : self.kuld,
             "kollivaremed" : self.kollivaremed,
+            "dimension" : self.dimension
         }
         return d
         
@@ -95,5 +97,5 @@ class GameState():
             self.kuld = d["kuld"]
         if "kollivaremed" in d:
             self.kollivaremed = d["kollivaremed"]
-
-        
+        if "dimension" in d:
+            self.dimension = d["dimension"]

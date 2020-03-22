@@ -298,13 +298,21 @@ while do:
                         newGame()
                     if l is not None:
                         ## did not cancel
-                        terrain, gameState, crazyHat = l
-                        newGame(terrain, gameState, crazyHat)
+                        ground, underground, gameState, crazyHat = l
+                        newGame(ground, underground,
+                                gameState, crazyHat)
+                        if gameState.dimension == "ground":
+                            globals.activelayer = globals.ground
+                        else:
+                            globals.activelayer = globals.underground
+                        globals.activeWindow.switchLayer(globals.activelayer)
+                        globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
                     title = False
                 elif event.key == pg.K_s:
                     globals.activeWindow.update(coordinates.chunkID(globals.hullmyts.getxy()))
                     # sync data
-                    files.saveWorld(globals.ground, gameState,
+                    files.saveWorld(globals.ground, globals.underground,
+                                    gameState,
                                     globals.hullmyts)
                     title = False
                 elif event.key == pg.K_c:
@@ -372,6 +380,7 @@ while do:
                         globals.activelayer = globals.underground
                     else:
                         globals.activelayer = globals.ground
+                    gameState.dimension = globals.activelayer.dimension
                     globals.activeWindow.switchLayer(globals.activelayer)
                     globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
             elif event.key == pg.K_RSHIFT:
