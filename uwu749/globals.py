@@ -23,6 +23,10 @@ kollid = None
 # monsters in the active window
 activeKollid = None
 
+screenWidth = None
+screenHeight = None
+screen = None
+
 # tiles for the ground
 ground = None
 underground = None
@@ -32,6 +36,14 @@ groundNoiseParams = (50, 50, 20, 0.5, 2, 1024, 1024, 0)
 undergroundNoiseParams = (50, 50, 20, 0.5, 2, 1024, 1024, 0)
 # memory are where drawing is done, and part of which is showed on monitor
 screenBuffer = None
+
+pg.font.init()
+def textrender(text, x, y, font=pg.font.SysFont("Times",24)):
+    text = font.render(text, True, (255,255,255))
+    text_rect = text.get_rect()
+    text_rect.x = x
+    text_rect.y = y
+    screen.blit(text,text_rect)
 
 class GameState():
     """
