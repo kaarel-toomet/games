@@ -3,7 +3,8 @@ import pickle
 
 import globals
 import sprites
-import pygame as pg                                                        
+import pygame as pg
+import bz2
 
 hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(180*3, 18*3))
 selslot = pg.transform.scale(pg.image.load("selslot.png"),(18*3, 18*3))
@@ -42,7 +43,7 @@ def fileChooser(save):
 def loadWorld():
     fName = fileChooser(False)
     if fName is not None:
-        file = open(fName, "rb")
+        file = bz2.open(fName, "rb")
         ##
         components = pickle.load(file)
         ground = components.get("ground", None)
@@ -67,7 +68,7 @@ def saveWorld(ground, underground, gameState, crazyHat):
     """
     fName = fileChooser(True)
     if fName is not None:
-        file = open(fName, "wb")
+        file = bz2.open(fName, "wb")
         pickler = pickle.Pickler(file)
         components = {
             # save as dict for compatibility
