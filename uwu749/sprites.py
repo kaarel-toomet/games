@@ -56,6 +56,14 @@ class ChunkSprites():
        # adding even a single sprite marks this list as initialized
        self.N += 1
 
+    def dictify(self):
+        spriteList = []
+        for chunkID in self.chunks.keys():
+            sprites = self.get(chunkID)
+            chunkList = [(s.x, s.y, s.species) for s in sprites]
+            spriteList += chunkList
+        return spriteList
+                
     def get(self, chunkID):
        """
        return the list of sprites at this chunkID
@@ -101,6 +109,11 @@ class ChunkSprites():
              print(len(chunkSprites), "chunkSprites:", chunkSprites)
              for cm in chunkSprites:
                 print("but there is chunk sprites id:", id(cm))
+
+    def undictify(self, spriteList):
+        for sprite in spriteList:
+            if sprite[2] == "monster":
+                self.add(Koll(sprite[0], sprite[1]))
 
 
 class CrazyHat(pg.sprite.Sprite):
@@ -211,6 +224,7 @@ class Koll(pg.sprite.Sprite):
         self.chunkID = coordinates.chunkID((self.x, self.y))
         self.tick = 0
         self.delay = 30
+        self.species = "monster"  # so we can query the type of the sprite
 
     def getxy(self):
        """
