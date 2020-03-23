@@ -86,13 +86,13 @@ class World:
                   elif noiseval < 0:
                      chunk[cy, cx] = blocks.SEA
                   elif noiseval < 0.07:
-                     chunk[cy, cx] = blocks.SAND
+                     chunk[cy, cx] = blocks.LIIV
                   elif noiseval < 0.3:
                         chunk[cy,cx] = blocks.MURU
                         if biome1 < noiseval2:
                            chunk[cy,cx] = blocks.PUU
                         elif biome2 > noiseval2:
-                           chunk[cy,cx] = blocks.SAND
+                           chunk[cy,cx] = blocks.LIIV
                            if r.randint(0,100) == 0:
                               chunk[cy,cx] = blocks.KAKTUS
                   elif noiseval < 0.4:
@@ -109,6 +109,12 @@ class World:
                      chunk[cy, cx] = blocks.KIVI
                   else:
                      chunk[cy, cx] = blocks.KSEIN
+                     if r.randint(0,100) == 0:
+                        chunk[cy, cx] = blocks.GORE
+                     if r.randint(0,100) == 0:
+                        chunk[cy, cx] = blocks.BORE
+                     if r.randint(0,100) == 0:
+                        chunk[cy, cx] = blocks.CORE
                   if gnoiseval < 0.4 and gnoiseval > 0.3 and holegen == 0:
                      chunk[cy,cx] = blocks.AUK
       self.chunks[chunkID] = chunk

@@ -27,7 +27,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- params ----------
-kollProbability = 0.005   #default is 0.005
+kollProbability = 0.002   #default is 0.002
 # kollProbability = 0.0
 
 ## ---------- blocks ----------
@@ -65,7 +65,7 @@ if not xdotool:
 blocks.loadBlocks(tileSize)
 kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
 home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
-hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(180*tileScale, 18*tileScale))
+hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(360*tileScale, 18*tileScale))
 selslot = pg.transform.scale(pg.image.load("selslot.png"),(18*tileScale, 18*tileScale))
 ##
 bgColor = (64,64,64)
@@ -226,11 +226,8 @@ def destroy(x,y):
     killKolls((x, y))
     if globals.activeWindow[(winy,winx)] in blocks.unbreakable:
         return
-    try:
-        gameState.amounts[gameState.inventory.index(material)] += 0
-    except:
-        if empty == 10:
-            return
+    if material not in gameState.inventory and empty == 20:
+        return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
         globals.activeMineralGold = world.activeSprites(globals.mineralGold)
@@ -254,24 +251,62 @@ def killKolls(location):
             gameState.punktid += 100
             gameState.kollivaremed += 1
 
-def get(item, cost=blocks.NONE):
+def activate(location, act = 0):
+    block = globals.activeWindow[location]
+    if block == blocks.KUKS and act > -1:
+        block = blocks.LUKS
+    elif block == blocks.LUKS and act < 1:
+        block = blocks.KUKS
+    elif block == blocks.ACT and act > -1:
+        block = blocks.AACT
+        globals.activeWindow[location] = block
+        for x in range(-1,2):
+            for y in range(-1,2):
+                if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.AACT:
+                    activate((location[0]+x,location[1]+y), 1)
+    elif block == blocks.AACT and act < 1:
+        block = blocks.ACT
+        globals.activeWindow[location] = block
+        for x in range(-1,2):
+                for y in range(-1,2):
+                    if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.ACT:
+                        activate((location[0]+x,location[1]+y),-1)
+    elif block == blocks.LAMMUTI and act > -1:
+        y,x = coordinates.windowToWorld(location[0], location[1])
+        destroy(x+1,y)
+        destroy(x-1,y)
+        destroy(x,y+1)
+        destroy(x,y-1)
+    globals.activeWindow[location] = block
+    globals.screenBuffer.blit(blocks.blocks[block], coordinates.windowToScreenBuffer((location[1],location[0])))
+
+def get(item, n = 1):
+    global inventory, amounts, empty
     try:
-        gameState.amounts[gameState.inventory.index(cost)] -= 1
-        if cost == blocks.NONE:
-            gameState.amounts[gameState.inventory.index(cost)] += 1
+        empty = gameState.inventory.index(-1)
     except:
-        if empty == 10:
-            return
-    try:
-        gameState.inventory[gameState.inventory.index(item)] = item
-        gameState.amounts[gameState.inventory.index(item)] += 1
-    except:
+        empty = 20
+    exists = item in gameState.inventory
+    if exists:
+        gameState.amounts[gameState.inventory.index(item)] += n
+    elif empty <= 20:
         gameState.inventory[empty] = item
-        gameState.amounts[empty] += 1
+        gameState.amounts[empty] = n
+    else:
+        return
+def lose(item, n = 1):
+    global inventory, amounts, empty
+    exists = item in gameState.inventory
+    if exists:
+        if gameState.amounts[gameState.inventory.index(item)] >= n:
+            gameState.amounts[gameState.inventory.index(item)] -= n
+    else:
+        return
 ## initialize player        
 reset()
 
 while do:
+    #get(blocks.AACT,2)
     while title:
         ## main menu
         for event in pg.event.get():
@@ -382,13 +417,29 @@ while do:
                 title = True
             elif event.key == pg.K_PERIOD:
                 if gameState.inventory[select] == blocks.PUIT:
-                    get(blocks.KAST,blocks.PUIT)
+                    get(blocks.KAST)
+                    lose(blocks.PUIT)
                 elif gameState.inventory[select] == blocks.KAST:
-                    get(blocks.KUKS,blocks.KAST)
+                    get(blocks.KUKS)
+                    lose(blocks.KAST)
                 elif gameState.inventory[select] == blocks.MURU:
-                    get(blocks.TEE,blocks.MURU)
+                    get(blocks.TEE)
+                    lose(blocks.MURU)
                 elif gameState.inventory[select] == blocks.PUU:
-                    get(blocks.PUIT,blocks.PUU)
+                    get(blocks.PUIT)
+                    lose(blocks.PUU)
+                elif gameState.inventory[select] == blocks.GORE:
+                    lose(blocks.GORE)
+                    gameState.kuld += 2
+                elif gameState.inventory[select] == blocks.BORE and gameState.amounts[select] >= 5:
+                    get(blocks.AACT)
+                    lose(blocks.BORE, 5)
+                elif gameState.inventory[select] == blocks.KUKS:
+                    get(blocks.AED)
+                    lose(blocks.KUKS)
+                elif gameState.inventory[select] == blocks.AACT:
+                    get(blocks.LAMMUTI)
+                    lose(blocks.AACT)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -413,12 +464,7 @@ while do:
                     myw = coordinates.screenToWorld(mxy[0],mxy[1])[1]
                     build(mxw, myw)
                     winx, winy = coordinates.worldToWindow(mxw, myw)
-                    if globals.activeWindow[winy, winx] == blocks.KUKS:
-                        globals.activeWindow[winy, winx] = blocks.LUKS
-                        globals.screenBuffer.blit(blocks.blocks[blocks.LUKS], coordinates.windowToScreenBuffer((winx, winy)))  
-                    elif globals.activeWindow[winy, winx] == blocks.LUKS:
-                        globals.activeWindow[winy, winx] = blocks.KUKS
-                        globals.screenBuffer.blit(blocks.blocks[blocks.KUKS], coordinates.windowToScreenBuffer((winx, winy))) 
+                    activate((winy,winx))
                 if gameState.inventory[select] == blocks.MQQK:
                     for x in range(-3,4):
                         for y in range(-3,4):
@@ -493,17 +539,17 @@ while do:
     if aia > 0:
         aia -= 1
     if select < 0:
-        select = 9
-    if select > 9:
+        select = 19
+    if select > 19:
         select = 0
-    if gameState.kuld >= 10 and empty != 10:
+    if gameState.kuld >= 10  and not (empty == 20 and not blocks.KULD in gameState.inventory):
         gameState.kuld -= 10
         get(blocks.KULD)
-    if gameState.kollivaremed >= 10 and empty != 10:
+    if gameState.kollivaremed >= 10 and not (empty == 20 and not blocks.KOLLIV in gameState.inventory):
         gameState.kollivaremed -= 10
         get(blocks.KOLLIV)
     
-    for s in range(0,10):
+    for s in range(0,20):
         if gameState.amounts[s] <= 0:
             gameState.inventory[s] = -1
         if gameState.inventory[s] == -1:
@@ -511,7 +557,7 @@ while do:
     try:
         empty = gameState.inventory.index(-1)
     except:
-        empty = 10
+        empty = 20
     ## ---------- screen udpate ----------
     globals.screen.blit(globals.screenBuffer, coordinates.blitShift)
     ## add score and other info
@@ -525,7 +571,7 @@ while do:
     globals.screen.blit(text,text_rect)
     globals.screen.blit(hotbar,(0,0))
     globals.screen.blit(selslot,(select*18*tileScale,0))
-    for s in range(0,10):
+    for s in range(0,20):
         globals.screen.blit(blocks.blocks[gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
         globals.textrender(str(gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
