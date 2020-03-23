@@ -27,7 +27,7 @@ parser.add_argument('-y', '--height', type=int, default=64,
 args = parser.parse_args()
 
 ## ---------- params ----------
-kollProbability = 0.005   #default is 0.005
+kollProbability = 0.002   #default is 0.002
 # kollProbability = 0.0
 
 ## ---------- blocks ----------

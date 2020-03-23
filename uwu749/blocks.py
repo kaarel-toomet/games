@@ -21,18 +21,26 @@ KULD = 15
 KIRKA = 16
 KSEIN = 17
 AUK = 18
-BLOCK_END = 18
+ACT = 19
+AACT = 20
+AED = 21
+GORE = 22
+CORE = 23
+BORE = 24
+BLOCK_END = 24
 
 unbreakable = set([SYGAVM])
 solid = set([KAST, KUKS, KOLLIV, KULD,KSEIN])
 breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:MURU, KAST:SAND,
             KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU,
            KUKS:SAND, LUKS:SAND, KAKTUS:SAND, KOLLIV:MURU, KULD:MURU, KIRKA:KIRKA,
-           KSEIN:KIVI, AUK:KIVI}
+           KSEIN:KIVI, AUK:KIVI, AED:MURU, ACT:LIIV, AACT:LIIV,BORE:KSEIN,
+           CORE:KSEIN, GORE:KSEIN}
 drops = {NONE:NONE, SEA:SEA, SAND:SAND, MURU:MURU, KIVI:KIVI, LUMI:LUMI,
          TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUU, MQQK:MQQK, PUIT:PUIT,
          KUKS:KUKS, LUKS:KUKS, KAKTUS:KAKTUS, KOLLIV:KOLLIV, KULD:KULD,
-         KIRKA:KIRKA, KSEIN:KSEIN, AUK:AUK}
+         KIRKA:KIRKA, KSEIN:KSEIN, AUK:AUK, ACT:ACT, AACT:ACT,
+         AED:AED, GORE:GORE, CORE:CORE, BORE:BORE}
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
 # as soon as we know the size
@@ -89,16 +97,29 @@ def loadBlocks(size):
                                 (size, size))
     auk = pg.transform.scale(pg.image.load("blocks/auk.png"),
                                 (size, size))
+    bore = pg.transform.scale(pg.image.load("blocks/blupebbl.png"),
+                                (size, size))
+    gore = pg.transform.scale(pg.image.load("blocks/goldore.png"),
+                                (size, size))
+    fence = pg.transform.scale(pg.image.load("blocks/fence.png"),
+                                (size, size))
+    act = pg.transform.scale(pg.image.load("blocks/act.png"),
+                                (size, size))
+    aact = pg.transform.scale(pg.image.load("blocks/actact.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, SAND:block, MURU:ground, TEE:tee,
                KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv,
                PUU:puu, NONE:none, MQQK:mqqk, PUIT:puit,
                KUKS:cdoor, LUKS:odoor, KAKTUS:kaktus, KOLLIV:kolliv,
-               KULD:kuld, KIRKA:kirka, KSEIN:pebbl, AUK:auk}
+               KULD:kuld, KIRKA:kirka, KSEIN:pebbl, AUK:auk,
+               AED:aed, ACT:act, AACT:aact, BORE:bore, CORE:core, GORE:gore}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
         KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi",
         PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit",
         KUKS:"kinnis uks", LUKS:"lahtis uks", KAKTUS:"kaktus",
         KOLLIV: "Kolli varemed", KULD: "kullaplokk", KIRKA:"kirka",
-         KSEIN:"koopasein", AUK:"auk (portaal maa alla)"}
+         KSEIN:"koopasein", AUK:"auk (portaal maa alla)", AED:"aed",
+        ACT:"aktivaator",AACT:"aktiveeritud aktivaator",
+        BORE:"sinivärgi maak", CORE:"söemaak", GORE:"kullamaak"}
 
