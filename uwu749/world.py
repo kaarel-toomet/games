@@ -109,6 +109,12 @@ class World:
                      chunk[cy, cx] = blocks.KIVI
                   else:
                      chunk[cy, cx] = blocks.KSEIN
+                     if r.randint(0,100) == 0:
+                        chunk[cy, cx] = blocks.GORE
+                     if r.randint(0,100) == 0:
+                        chunk[cy, cx] = blocks.BORE
+                     if r.randint(0,100) == 0:
+                        chunk[cy, cx] = blocks.CORE
                   if gnoiseval < 0.4 and gnoiseval > 0.3 and holegen == 0:
                      chunk[cy,cx] = blocks.AUK
       self.chunks[chunkID] = chunk

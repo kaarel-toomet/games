@@ -34,7 +34,7 @@ solid = set([KAST, KUKS, KOLLIV, KULD,KSEIN])
 breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, SAND:SEA, MURU:SAND, TEE:MURU, KAST:SAND,
             KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU,
            KUKS:SAND, LUKS:SAND, KAKTUS:SAND, KOLLIV:MURU, KULD:MURU, KIRKA:KIRKA,
-           KSEIN:KIVI, AUK:KIVI, AED:MURU, ACT:LIIV, AACT:LIIV,BORE:KSEIN,
+           KSEIN:KIVI, AUK:KIVI, AED:MURU, ACT:SAND, AACT:SAND,BORE:KSEIN,
            CORE:KSEIN, GORE:KSEIN}
 drops = {NONE:NONE, SEA:SEA, SAND:SAND, MURU:MURU, KIVI:KIVI, LUMI:LUMI,
          TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUU, MQQK:MQQK, PUIT:PUIT,
@@ -113,7 +113,7 @@ def loadBlocks(size):
                PUU:puu, NONE:none, MQQK:mqqk, PUIT:puit,
                KUKS:cdoor, LUKS:odoor, KAKTUS:kaktus, KOLLIV:kolliv,
                KULD:kuld, KIRKA:kirka, KSEIN:pebbl, AUK:auk,
-               AED:aed, ACT:act, AACT:aact, BORE:bore, CORE:core, GORE:gore}
+               AED:fence, ACT:act, AACT:aact, BORE:bore, CORE:core, GORE:gore}
     bn={SEA:"vesi",SAND:"liiv", MURU:"muru", TEE:"tee",
         KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi",
         PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit",

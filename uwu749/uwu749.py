@@ -405,6 +405,12 @@ while do:
                 elif gameState.inventory[select] == blocks.PUU:
                     get(blocks.PUIT)
                     lose(blocks.PUU)
+                elif gameState.inventory[select] == blocks.GORE:
+                    lose(blocks.GORE)
+                    gameState.kuld += 2
+                elif gameState.inventory[select] == blocks.BORE and gameState.amounts[select] >= 5:
+                    get(blocks.ACT)
+                    lose(blocks.BORE, 5)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -513,10 +519,10 @@ while do:
         select = 19
     if select > 19:
         select = 0
-    if gameState.kuld >= 10  and not (empty == 10 and not blocks.KULD in gameState.inventory):
+    if gameState.kuld >= 10  and not (empty == 20 and not blocks.KULD in gameState.inventory):
         gameState.kuld -= 10
         get(blocks.KULD)
-    if gameState.kollivaremed >= 10 and not (empty == 10 and not blocks.KOLLIV in gameState.inventory):
+    if gameState.kollivaremed >= 10 and not (empty == 20 and not blocks.KOLLIV in gameState.inventory):
         gameState.kollivaremed -= 10
         get(blocks.KOLLIV)
     
