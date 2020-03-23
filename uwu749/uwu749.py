@@ -269,12 +269,20 @@ def activate(location, rec = 0):
         block = blocks.KUKS
     elif block == blocks.ACT:
         block = blocks.AACT
-        if rec < 2:
-            for x in range(-1,2):
-                for y in range(-1,2):
-                    activate((location[0]+x,location[1]+y), rec+1)
+        globals.activeWindow[location] = block
+        print("activated")
+        for x in range(-1,2):
+            for y in range(-1,2):
+                if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.AACT and (x != 0 or y != 0):
+                    activate((location[0]+x,location[1]+y))
     elif block == blocks.AACT:
         block = blocks.ACT
+        globals.activeWindow[location] = block
+        print("deactivated")
+        for x in range(-1,2):
+                for y in range(-1,2):
+                    if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.ACT and (x != 0 or y != 0):
+                        activate((location[0]+x,location[1]+y))
     globals.activeWindow[location] = block
     globals.screenBuffer.blit(blocks.blocks[block], coordinates.windowToScreenBuffer((location[1],location[0])))
 
