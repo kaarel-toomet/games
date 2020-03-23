@@ -263,6 +263,10 @@ def killKolls(location):
 
 def get(item, n = 1):
     global inventory, amounts, empty
+    try:
+        empty = gameState.inventory.index(-1)
+    except:
+        empty = 20
     exists = item in gameState.inventory
     if exists:
         gameState.amounts[gameState.inventory.index(item)] += n
