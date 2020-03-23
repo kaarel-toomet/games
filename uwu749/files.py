@@ -6,7 +6,7 @@ import sprites
 import pygame as pg
 import bz2
 
-hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(180*3, 18*3))
+hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(360*3, 18*3))
 selslot = pg.transform.scale(pg.image.load("selslot.png"),(18*3, 18*3))
 
 def fileChooser(save):
@@ -33,6 +33,7 @@ def fileChooser(save):
         elif select >= 10:
             select = 0
         globals.screen.blit(hotbar, (globals.screenWidth/2,200))
+        pg.draw.rect(globals.screen,(0,0,0),((globals.screenWidth/2)+(180*3),190,100,100))
         globals.screen.blit(selslot, (globals.screenWidth/2+select*18*3,200))
         for x in range(0,10):
             globals.textrender(str(x),globals.screenWidth/2+x*18*3+27,200+27)
