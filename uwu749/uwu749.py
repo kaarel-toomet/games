@@ -261,28 +261,26 @@ def killKolls(location):
             kollin -= 1
             gameState.kollivaremed += 1
 
-def activate(location, rec = 0):
+def activate(location, act = 0):
     block = globals.activeWindow[location]
-    if block == blocks.KUKS:
+    if block == blocks.KUKS and act > -1:
         block = blocks.LUKS
-    elif block == blocks.LUKS:
+    elif block == blocks.LUKS and act < 1:
         block = blocks.KUKS
-    elif block == blocks.ACT:
+    elif block == blocks.ACT and act > -1:
         block = blocks.AACT
         globals.activeWindow[location] = block
-        print("activated")
         for x in range(-1,2):
             for y in range(-1,2):
-                if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.AACT and (x != 0 or y != 0):
-                    activate((location[0]+x,location[1]+y))
-    elif block == blocks.AACT:
+                if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.AACT:
+                    activate((location[0]+x,location[1]+y), 1)
+    elif block == blocks.AACT and act < 1:
         block = blocks.ACT
         globals.activeWindow[location] = block
-        print("deactivated")
         for x in range(-1,2):
                 for y in range(-1,2):
-                    if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.ACT and (x != 0 or y != 0):
-                        activate((location[0]+x,location[1]+y))
+                    if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.ACT:
+                        activate((location[0]+x,location[1]+y),-1)
     globals.activeWindow[location] = block
     globals.screenBuffer.blit(blocks.blocks[block], coordinates.windowToScreenBuffer((location[1],location[0])))
 
