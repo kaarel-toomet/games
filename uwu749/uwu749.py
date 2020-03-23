@@ -65,7 +65,7 @@ if not xdotool:
 blocks.loadBlocks(tileSize)
 kutt = pg.transform.scale(pg.image.load("person.png"),(tileSize, tileSize))
 home = pg.transform.scale(pg.image.load("home.png"),(tileSize, tileSize))
-hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(180*tileScale, 18*tileScale))
+hotbar = pg.transform.scale(pg.image.load("hotbar.png"),(360*tileScale, 18*tileScale))
 selslot = pg.transform.scale(pg.image.load("selslot.png"),(18*tileScale, 18*tileScale))
 ##
 bgColor = (64,64,64)
@@ -235,11 +235,8 @@ def destroy(x,y):
     killKolls((x, y))
     if globals.activeWindow[(winy,winx)] in blocks.unbreakable:
         return
-    try:
-        gameState.amounts[gameState.inventory.index(material)] += 0
-    except:
-        if empty == 10:
-            return
+    if material not in gameState.inventory and empty == 20:
+        return
     if np.random.randint(0,200) == 0 and material != breakto:
         globals.mineralGold.add(sprites.Gold(x,y))
         globals.activeMineralGold = world.activeSprites(globals.mineralGold)
@@ -264,20 +261,24 @@ def killKolls(location):
             kollin -= 1
             gameState.kollivaremed += 1
 
-def get(item, cost=blocks.NONE):
-    try:
-        gameState.amounts[gameState.inventory.index(cost)] -= 1
-        if cost == blocks.NONE:
-            gameState.amounts[gameState.inventory.index(cost)] += 1
-    except:
-        if empty == 10:
-            return
-    try:
-        gameState.inventory[gameState.inventory.index(item)] = item
-        gameState.amounts[gameState.inventory.index(item)] += 1
-    except:
+def get(item, n = 1):
+    global inventory, amounts, empty
+    exists = item in gameState.inventory
+    if exists:
+        gameState.amounts[gameState.inventory.index(item)] += n
+    elif empty <= 20:
         gameState.inventory[empty] = item
-        gameState.amounts[empty] += 1
+        gameState.amounts[empty] = n
+    else:
+        return
+def lose(item, n = 1):
+    global inventory, amounts, empty
+    exists = item in gameState.inventory
+    if exists:
+        if gameState.amounts[gameState.inventory.index(item)] >= n:
+            gameState.amounts[gameState.inventory.index(item)] -= n
+    else:
+        return
 ## initialize player        
 reset()
 
@@ -389,13 +390,17 @@ while do:
                 title = True
             elif event.key == pg.K_PERIOD:
                 if gameState.inventory[select] == blocks.PUIT:
-                    get(blocks.KAST,blocks.PUIT)
+                    get(blocks.KAST)
+                    lose(blocks.PUIT)
                 elif gameState.inventory[select] == blocks.KAST:
-                    get(blocks.KUKS,blocks.KAST)
+                    get(blocks.KUKS)
+                    lose(blocks.KAST)
                 elif gameState.inventory[select] == blocks.MURU:
-                    get(blocks.TEE,blocks.MURU)
+                    get(blocks.TEE)
+                    lose(blocks.MURU)
                 elif gameState.inventory[select] == blocks.PUU:
-                    get(blocks.PUIT,blocks.PUU)
+                    get(blocks.PUIT)
+                    lose(blocks.PUU)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -501,17 +506,17 @@ while do:
     if aia > 0:
         aia -= 1
     if select < 0:
-        select = 9
-    if select > 9:
+        select = 19
+    if select > 19:
         select = 0
-    if gameState.kuld >= 10 and empty != 10:
+    if gameState.kuld >= 10  and not (empty == 10 and not blocks.KULD in gameState.inventory):
         gameState.kuld -= 10
         get(blocks.KULD)
-    if gameState.kollivaremed >= 10 and empty != 10:
+    if gameState.kollivaremed >= 10 and not (empty == 10 and not blocks.KOLLIV in gameState.inventory):
         gameState.kollivaremed -= 10
         get(blocks.KOLLIV)
     
-    for s in range(0,10):
+    for s in range(0,20):
         if gameState.amounts[s] <= 0:
             gameState.inventory[s] = -1
         if gameState.inventory[s] == -1:
@@ -519,7 +524,7 @@ while do:
     try:
         empty = gameState.inventory.index(-1)
     except:
-        empty = 10
+        empty = 20
     ## ---------- screen udpate ----------
     globals.screen.blit(globals.screenBuffer, coordinates.blitShift)
     ## add score and other info
@@ -533,7 +538,7 @@ while do:
     globals.screen.blit(text,text_rect)
     globals.screen.blit(hotbar,(0,0))
     globals.screen.blit(selslot,(select*18*tileScale,0))
-    for s in range(0,10):
+    for s in range(0,20):
         globals.screen.blit(blocks.blocks[gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
         globals.textrender(str(gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
