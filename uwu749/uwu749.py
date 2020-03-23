@@ -303,7 +303,7 @@ while do:
                     # sync data
                     ## sprites
                     spriteData = {
-                        "kollid" : globals.kollid
+                        "kollid" : globals.kollid.dictify()
                     }
                     files.saveWorld(globals.ground, globals.underground,
                                     spriteData,

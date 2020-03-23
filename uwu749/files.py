@@ -48,7 +48,12 @@ def loadWorld():
         components = pickle.load(file)
         ground = components.get("ground", None)
         underground = components.get("underground", None)
-        sprites = components.get("sprites", None)
+        spriteData = {}
+        if "spriteData" in components:
+            for name, spriteList in components["spriteData"].items():
+                spriteSpecies = sprites.ChunkSprites()
+                spriteSpecies.undictify(spriteList)
+                spriteData[name] = spriteSpecies
         gameState = globals.GameState()
         if "gameState" in components:
             gameState.undictify(components["gameState"])
@@ -57,17 +62,17 @@ def loadWorld():
             crazyHat.undictify(components["crazyHat"])
         ##
         file.close()
-        return ground, underground, gameState, crazyHat
+        return ground, underground, spriteData, gameState, crazyHat
     else:
         # cancel pressed
         return None
         
-def saveWorld(ground, underground, sprites,
+def saveWorld(ground, underground, spriteData,
               gameState, crazyHat):
     """
     ground: ground layer
-    sprites: dict with components for "kollid" and
-               other sprites
+    spriteData: dict with components for "kollid" and
+               other sprites.  The components should be dictified
     gameState: points and such
     """
     fName = fileChooser(True)
@@ -78,7 +83,7 @@ def saveWorld(ground, underground, sprites,
             # save as dict for compatibility
             "ground" : ground,
             "underground" : underground,
-            "sprites" : sprites,
+            "spriteData" : spriteData,
             "gameState" : gameState.dictify(),
             "crazyHat" : crazyHat.dictify()
         }
