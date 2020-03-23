@@ -261,6 +261,19 @@ def killKolls(location):
             kollin -= 1
             gameState.kollivaremed += 1
 
+def activate(location):
+    block = globals.activeWindow[location]
+    if block == blocks.KUKS:
+        block = blocks.LUKS
+    elif block == blocks.LUKS:
+        block = blocks.KUKS
+    elif block == blocks.ACT:
+        block = blocks.AACT
+    elif block == blocks.AACT:
+        block = blocks.ACT
+    globals.activeWindow[location] = block
+    globals.screenBuffer.blit(blocks.blocks[block], coordinates.windowToScreenBuffer((location[1],location[0])))
+
 def get(item, n = 1):
     global inventory, amounts, empty
     try:
@@ -409,8 +422,11 @@ while do:
                     lose(blocks.GORE)
                     gameState.kuld += 2
                 elif gameState.inventory[select] == blocks.BORE and gameState.amounts[select] >= 5:
-                    get(blocks.ACT)
+                    get(blocks.AACT)
                     lose(blocks.BORE, 5)
+                elif gameState.inventory[select] == blocks.KUKS:
+                    get(blocks.AED)
+                    lose(blocks.KUKS)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
@@ -435,12 +451,7 @@ while do:
                     myw = coordinates.screenToWorld(mxy[0],mxy[1])[1]
                     build(mxw, myw)
                     winx, winy = coordinates.worldToWindow(mxw, myw)
-                    if globals.activeWindow[winy, winx] == blocks.KUKS:
-                        globals.activeWindow[winy, winx] = blocks.LUKS
-                        globals.screenBuffer.blit(blocks.blocks[blocks.LUKS], coordinates.windowToScreenBuffer((winx, winy)))  
-                    elif globals.activeWindow[winy, winx] == blocks.LUKS:
-                        globals.activeWindow[winy, winx] = blocks.KUKS
-                        globals.screenBuffer.blit(blocks.blocks[blocks.KUKS], coordinates.windowToScreenBuffer((winx, winy))) 
+                    activate((winy,winx))
                 if gameState.inventory[select] == blocks.MQQK:
                     for x in range(-3,4):
                         for y in range(-3,4):
