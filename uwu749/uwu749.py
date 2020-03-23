@@ -261,7 +261,7 @@ def killKolls(location):
             kollin -= 1
             gameState.kollivaremed += 1
 
-def activate(location):
+def activate(location, rec = 0):
     block = globals.activeWindow[location]
     if block == blocks.KUKS:
         block = blocks.LUKS
@@ -269,6 +269,10 @@ def activate(location):
         block = blocks.KUKS
     elif block == blocks.ACT:
         block = blocks.AACT
+        if rec < 2:
+            for x in range(-1,2):
+                for y in range(-1,2):
+                    activate((location[0]+x,location[1]+y), rec+1)
     elif block == blocks.AACT:
         block = blocks.ACT
     globals.activeWindow[location] = block
@@ -300,6 +304,7 @@ def lose(item, n = 1):
 reset()
 
 while do:
+    get(blocks.AACT,2)
     while title:
         ## main menu
         for event in pg.event.get():
