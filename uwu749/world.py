@@ -86,13 +86,13 @@ class World:
                   elif noiseval < 0:
                      chunk[cy, cx] = blocks.SEA
                   elif noiseval < 0.07:
-                     chunk[cy, cx] = blocks.SAND
+                     chunk[cy, cx] = blocks.LIIV
                   elif noiseval < 0.3:
                         chunk[cy,cx] = blocks.MURU
                         if biome1 < noiseval2:
                            chunk[cy,cx] = blocks.PUU
                         elif biome2 > noiseval2:
-                           chunk[cy,cx] = blocks.SAND
+                           chunk[cy,cx] = blocks.LIIV
                            if r.randint(0,100) == 0:
                               chunk[cy,cx] = blocks.KAKTUS
                   elif noiseval < 0.4:

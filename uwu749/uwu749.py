@@ -281,6 +281,12 @@ def activate(location, act = 0):
                 for y in range(-1,2):
                     if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.ACT:
                         activate((location[0]+x,location[1]+y),-1)
+    elif block == blocks.LAMMUTI and act > -1:
+        y,x = coordinates.windowToWorld(location[0], location[1])
+        destroy(x+1,y)
+        destroy(x-1,y)
+        destroy(x,y+1)
+        destroy(x,y-1)
     globals.activeWindow[location] = block
     globals.screenBuffer.blit(blocks.blocks[block], coordinates.windowToScreenBuffer((location[1],location[0])))
 
@@ -310,7 +316,7 @@ def lose(item, n = 1):
 reset()
 
 while do:
-    get(blocks.AACT,2)
+    #get(blocks.AACT,2)
     while title:
         ## main menu
         for event in pg.event.get():
@@ -438,6 +444,9 @@ while do:
                 elif gameState.inventory[select] == blocks.KUKS:
                     get(blocks.AED)
                     lose(blocks.KUKS)
+                elif gameState.inventory[select] == blocks.AACT:
+                    get(blocks.LAMMUTI)
+                    lose(blocks.AACT)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
