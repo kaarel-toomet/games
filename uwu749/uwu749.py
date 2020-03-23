@@ -316,11 +316,7 @@ while do:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_l:
                     ## load world
-                    try:
-                        l = files.loadWorld()
-                    except:
-                        l = None
-                        newGame()
+                    l = files.loadWorld()
                     if l is not None:
                         ## did not cancel
                         ground, underground, spriteData, gameState, crazyHat = l
@@ -332,6 +328,8 @@ while do:
                             globals.activelayer = globals.underground
                         globals.activeWindow.switchLayer(globals.activelayer)
                         globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
+                    else:
+                        newGame()
                     title = False
                 elif event.key == pg.K_s:
                     globals.activeWindow.update(coordinates.chunkID(globals.hullmyts.getxy()))

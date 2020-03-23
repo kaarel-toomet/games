@@ -88,9 +88,11 @@ class GameState():
         if "home" in d:
             self.home = d["home"]
         if "inventory" in d:
-            self.inventory = d["inventory"]
+            for i, object in enumerate(d["inventory"]):
+                self.inventory[i] = object
         if "amounts" in d:
-            self.amounts = d["amounts"]
+            for i, amount in enumerate(d["amounts"]):
+                self.amounts[i] = amount
         if "lifes" in d:
             self.lifes = d["lifes"]
         if "kuld" in d:
