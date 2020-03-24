@@ -272,7 +272,9 @@ def activate(location, act = 0):
                     if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.ACT:
                         activate((location[0]+x,location[1]+y),-1)
     elif block == blocks.LAMMUTI and act > -1:
-        y,x = coordinates.windowToWorld(location[0], location[1])
+        wxy = coordinates.windowToWorld(location[1], location[0])
+        x = wxy[0]
+        y = wxy[1]
         destroy(x+1,y)
         destroy(x-1,y)
         destroy(x,y+1)
