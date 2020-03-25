@@ -180,16 +180,15 @@ def reset(crazyHat=None):
     reset lives, score etc to the original state
     leave the world geography untouched
     """
-    global gameState, gameover, aia
-    gameState = globals.GameState()
+    global gameover, aia
     gameover = False
     aia = 0
     # counter for immunity: after a monster hits you, you will be immune
     # agains new hits for this many ticks.
     globals.player.empty()
     if crazyHat is None:
-        globals.hullmyts = sprites.CrazyHat(gameState.home)
-        globals.hullmyts.setxy(gameState.home)
+        globals.hullmyts = sprites.CrazyHat(globals.gameState.home)
+        globals.hullmyts.setxy(globals.gameState.home)
     else:
         globals.hullmyts = crazyHat
     globals.player.add(globals.hullmyts)
@@ -209,13 +208,13 @@ def build(x,y):
     add blocks to the position
     """
     winx, winy = coordinates.worldToWindow(x, y)
-    if gameState.inventory[select] == -1:
+    if globals.gameState.inventory[select] == -1:
         return
-    if blocks.breakto[gameState.inventory[select]] != globals.activeWindow[(winy,winx)]:
+    if blocks.breakto[globals.gameState.inventory[select]] != globals.activeWindow[(winy,winx)]:
         return
-    globals.activeWindow[(winy,winx)] = gameState.inventory[select]
-    globals.screenBuffer.blit( blocks.blocks[gameState.inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
-    gameState.amounts[select] -= 1
+    globals.activeWindow[(winy,winx)] = globals.gameState.inventory[select]
+    globals.screenBuffer.blit( blocks.blocks[globals.gameState.inventory[select]], coordinates.worldToScreenbuffer(x, y)) 
+    globals.gameState.amounts[select] -= 1
 
 def destroy(x,y):
     """
@@ -230,7 +229,7 @@ def destroy(x,y):
     killKolls((x, y))
     if globals.activeWindow[(winy,winx)] in blocks.unbreakable:
         return
-    if material not in gameState.inventory and empty == 20:
+    if material not in globals.gameState.inventory and empty == 20:
         return
     if np.random.randint(0,200) == 0 and material != breakto:
         # there was a gold hidden underneath this block
@@ -248,13 +247,12 @@ def killKolls(location):
     
     location = (x, y), world coordinates
     """
-    global gameState
     for activeKoll in globals.activeKollid:
         if(activeKoll.getxy() == location):
             globals.kollid.remove([activeKoll])
             globals.activeKollid.remove(activeKoll)
-            gameState.punktid += 100
-            gameState.kollivaremed += 1
+            globals.gameState.punktid += 100
+            globals.gameState.kollivaremed += 1
 
 def activate(location, act = 0):
     block = globals.activeWindow[location]
@@ -290,23 +288,23 @@ def activate(location, act = 0):
 def get(item, n = 1):
     global inventory, amounts, empty
     try:
-        empty = gameState.inventory.index(-1)
+        empty = globals.gameState.inventory.index(-1)
     except:
         empty = 20
-    exists = item in gameState.inventory
+    exists = item in globals.gameState.inventory
     if exists:
-        gameState.amounts[gameState.inventory.index(item)] += n
+        globals.gameState.amounts[gameState.inventory.index(item)] += n
     elif empty <= 20:
-        gameState.inventory[empty] = item
-        gameState.amounts[empty] = n
+        globals.gameState.inventory[empty] = item
+        globals.gameState.amounts[empty] = n
     else:
         return
 def lose(item, n = 1):
     global inventory, amounts, empty
-    exists = item in gameState.inventory
+    exists = item in globals.gameState.inventory
     if exists:
-        if gameState.amounts[gameState.inventory.index(item)] >= n:
-            gameState.amounts[gameState.inventory.index(item)] -= n
+        if globals.gameState.amounts[globals.gameState.inventory.index(item)] >= n:
+            globals.gameState.amounts[globals.gameState.inventory.index(item)] -= n
     else:
         return
 ## initialize player        
@@ -348,7 +346,7 @@ while do:
                     }
                     files.saveWorld(globals.ground, globals.underground,
                                     spriteData,
-                                    gameState,
+                                    globals.gameState,
                                     globals.hullmyts)
                     title = False
                 elif event.key == pg.K_c:
@@ -392,9 +390,9 @@ while do:
                 pause = True
             elif event.key == pg.K_r:
                 ## go home
-                globals.hullmyts.setxy(gameState.home)
+                globals.hullmyts.setxy(globals.gameState.home)
             elif event.key == pg.K_h:
-                gameState.home = globals.hullmyts.getxy()
+                globals.gameState.home = globals.hullmyts.getxy()
             elif event.key == pg.K_RIGHTBRACKET and bb < blocks.BLOCK_END:
                 bb += 1
             elif event.key == pg.K_LEFTBRACKET and bb > 0:
@@ -413,7 +411,7 @@ while do:
                         globals.activelayer = globals.underground
                     else:
                         globals.activelayer = globals.ground
-                    gameState.dimension = globals.activelayer.dimension
+                    globals.gameState.dimension = globals.activelayer.dimension
                     globals.activeWindow.switchLayer(globals.activelayer)
                     globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
             elif event.key == pg.K_RSHIFT:
@@ -422,34 +420,34 @@ while do:
                 # go to the main menu
                 title = True
             elif event.key == pg.K_PERIOD:
-                if gameState.inventory[select] == blocks.PUIT:
+                if globals.gameState.inventory[select] == blocks.PUIT:
                     get(blocks.KAST)
                     lose(blocks.PUIT)
-                elif gameState.inventory[select] == blocks.KAST:
+                elif globals.gameState.inventory[select] == blocks.KAST:
                     get(blocks.KUKS)
                     lose(blocks.KAST)
-                elif gameState.inventory[select] == blocks.MURU:
+                elif globals.gameState.inventory[select] == blocks.MURU:
                     get(blocks.TEE)
                     lose(blocks.MURU)
-                elif gameState.inventory[select] == blocks.PUU:
+                elif globals.gameState.inventory[select] == blocks.PUU:
                     get(blocks.PUIT)
                     lose(blocks.PUU)
-                elif gameState.inventory[select] == blocks.GORE:
+                elif globals.gameState.inventory[select] == blocks.GORE:
                     lose(blocks.GORE)
-                    gameState.kuld += 2
-                elif gameState.inventory[select] == blocks.BORE and gameState.amounts[select] >= 2:
+                    globals.gameState.kuld += 2
+                elif globals.gameState.inventory[select] == blocks.BORE and globals.gameState.amounts[select] >= 2:
                     get(blocks.AACT)
                     lose(blocks.BORE, 2)
-                elif gameState.inventory[select] == blocks.CORE and gameState.amounts[select] >= 5:
-                    gameState.lifes += 1
+                elif globals.gameState.inventory[select] == blocks.CORE and globals.gameState.amounts[select] >= 5:
+                    globals.gameState.lifes += 1
                     lose(blocks.CORE, 5)
-                elif gameState.inventory[select] == blocks.KUKS:
+                elif globals.gameState.inventory[select] == blocks.KUKS:
                     get(blocks.AED)
                     lose(blocks.KUKS)
-                elif gameState.inventory[select] == blocks.AACT:
+                elif globals.gameState.inventory[select] == blocks.AACT:
                     get(blocks.LAMMUTI)
                     lose(blocks.AACT)
-                elif gameState.inventory[select] == blocks.KULD:
+                elif globals.gameState.inventory[select] == blocks.KULD:
                     get(blocks.KPD)
                     lose(blocks.KULD)
         elif event.type == pg.KEYUP:
@@ -477,11 +475,11 @@ while do:
                     build(mxw, myw)
                     winx, winy = coordinates.worldToWindow(mxw, myw)
                     activate((winy,winx))
-                if gameState.inventory[select] == blocks.MQQK:
+                if globals.gameState.inventory[select] == blocks.MQQK:
                     for x in range(-3,4):
                         for y in range(-3,4):
                             killKolls((hxy[0]+x, hxy[1]+y))
-                if gameState.inventory[select] == blocks.KIRKA:
+                if globals.gameState.inventory[select] == blocks.KIRKA:
                     for x in range(-3,4):
                         for y in range(-3,4):
                             destroy(hxy[0]+x, hxy[1]+y)
@@ -508,7 +506,7 @@ while do:
         globals.screen.blit(text,text_rect)
         pg.display.update()
         timer.tick(10)
-    if gameState.lifes == 0:
+    if globals.gameState.lifes == 0:
         uded = "SA SURID ÄRA"
         dtext = dfont.render(uded, True, (255,0,0))
         dtext_rect = dtext.get_rect()
@@ -542,11 +540,11 @@ while do:
     if len(col) > 0:
         globals.activeMineralGold.remove(col)
         globals.mineralGold.remove(col)
-        gameState.punktid += 100
-        gameState.kuld += 1
+        globals.gameState.punktid += 100
+        globals.gameState.kuld += 1
     col = pg.sprite.spritecollide(globals.hullmyts, globals.activeKollid, False)
     if len(col) > 0 and aia == 0:
-        gameState.lifes -= 1
+        globals.gameState.lifes -= 1
         aia = 30
     if aia > 0:
         aia -= 1
@@ -554,28 +552,28 @@ while do:
         select = 19
     if select > 19:
         select = 0
-    if gameState.kuld >= 10  and not (empty == 20 and not blocks.KULD in gameState.inventory):
-        gameState.kuld -= 10
+    if globals.gameState.kuld >= 10  and not (empty == 20 and not blocks.KULD in globals.gameState.inventory):
+        globals.gameState.kuld -= 10
         get(blocks.KULD)
-    if gameState.kollivaremed >= 10 and not (empty == 20 and not blocks.KOLLIV in gameState.inventory):
-        gameState.kollivaremed -= 10
+    if globals.gameState.kollivaremed >= 10 and not (empty == 20 and not blocks.KOLLIV in globals.gameState.inventory):
+        globals.gameState.kollivaremed -= 10
         get(blocks.KOLLIV)
     
     for s in range(0,20):
-        if gameState.amounts[s] <= 0:
-            gameState.inventory[s] = -1
-        if gameState.inventory[s] == -1:
-            gameState.amounts[s] = 0
+        if globals.gameState.amounts[s] <= 0:
+            globals.gameState.inventory[s] = -1
+        if globals.gameState.inventory[s] == -1:
+            globals.gameState.amounts[s] = 0
     try:
-        empty = gameState.inventory.index(-1)
+        empty = globals.gameState.inventory.index(-1)
     except:
         empty = 20
     ## ---------- screen udpate ----------
     globals.screen.blit(globals.screenBuffer, coordinates.blitShift)
     ## add score and other info
     pg.draw.rect(globals.screen,(0,0,0),(0,18*tileScale,globals.screenWidth,30))
-    score = ("punktid: " + str(gameState.punktid) + " elud: " + str(gameState.lifes) +
-             " Kuld:" + str(gameState.kuld) + " Kolli varemed:" + str(gameState.kollivaremed))
+    score = ("punktid: " + str(globals.gameState.punktid) + " elud: " + str(globals.gameState.lifes) +
+             " Kuld:" + str(globals.gameState.kuld) + " Kolli varemed:" + str(globals.gameState.kollivaremed))
     text = font.render(score, True, (255,255,255))
     text_rect = text.get_rect()
     text_rect.centerx = globals.screen.get_rect().centerx
@@ -584,14 +582,14 @@ while do:
     globals.screen.blit(hotbar,(0,0))
     globals.screen.blit(selslot,(select*18*tileScale,0))
     for s in range(0,20):
-        globals.screen.blit(blocks.blocks[gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
-        globals.textrender(str(gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
+        globals.screen.blit(blocks.blocks[globals.gameState.inventory[s]],(18*tileScale*s+tileScale,tileScale))
+        globals.textrender(str(globals.gameState.amounts[s]),18*tileScale*s+tileScale, tileSize)
     ## sprite update
     globals.player.update(mup, mdown, mleft, mright)
     # update crazy hat
     spriteBuffer.fill((0,0,0,0))
     if seehome == 1:
-        globals.screen.blit(home, coordinates.worldToScreen(gameState.home[0], gameState.home[1]))
+        globals.screen.blit(home, coordinates.worldToScreen(globals.gameState.home[0], globals.gameState.home[1]))
     ## draw sprites: static: no update need, dynamic: update
     drawSprites(globals.activeMineralGold, spriteBuffer)
     updateScreen()
