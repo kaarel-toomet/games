@@ -82,7 +82,7 @@ class GameState():
         s = "GameState object:\n" +\
         " punktid: " + str(self.punktid) + "\n" +\
         " home: " + str(self.home) +\
-        " inventory: " + str(zip(self.inventory, self.amounts))
+        " inventory: " + str([(self.inventory[i], self.amounts[i]) for i in range(len(self.inventory))])
         return s
 
     def undictify(self, d):
