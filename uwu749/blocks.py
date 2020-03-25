@@ -111,7 +111,7 @@ def loadBlocks(size):
                                 (size, size))
     lammuti = pg.transform.scale(pg.image.load("blocks/lammuti.png"),
                                 (size, size))
-    kprnd = pg.transform.scale(pg.image.load("blocks/lammuti.png"),
+    kprnd = pg.transform.scale(pg.image.load("blocks/goldfloor.png"),
                                 (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, LIIV:block, MURU:ground, TEE:tee,
