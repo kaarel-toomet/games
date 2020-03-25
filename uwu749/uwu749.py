@@ -272,7 +272,9 @@ def activate(location, act = 0):
                     if globals.activeWindow[(location[0]+x,location[1]+y)] != blocks.ACT:
                         activate((location[0]+x,location[1]+y),-1)
     elif block == blocks.LAMMUTI and act > -1:
-        y,x = coordinates.windowToWorld(location[0], location[1])
+        wxy = coordinates.windowToWorld(location[1], location[0])
+        x = wxy[0]
+        y = wxy[1]
         destroy(x+1,y)
         destroy(x-1,y)
         destroy(x,y+1)
@@ -399,7 +401,7 @@ while do:
                 gmod = 1-gmod
             elif event.key == pg.K_t:
                 title = True
-            elif event.key == pg.K_SLASH:
+            elif event.key == 13:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
                     if globals.activelayer is globals.ground:
                         globals.activelayer = globals.underground
@@ -429,9 +431,12 @@ while do:
                 elif gameState.inventory[select] == blocks.GORE:
                     lose(blocks.GORE)
                     gameState.kuld += 2
-                elif gameState.inventory[select] == blocks.BORE and gameState.amounts[select] >= 5:
+                elif gameState.inventory[select] == blocks.BORE and gameState.amounts[select] >= 2:
                     get(blocks.AACT)
-                    lose(blocks.BORE, 5)
+                    lose(blocks.BORE, 2)
+                elif gameState.inventory[select] == blocks.CORE and gameState.amounts[select] >= 5:
+                    gameState.lifes += 1
+                    lose(blocks.CORE, 5)
                 elif gameState.inventory[select] == blocks.KUKS:
                     get(blocks.AED)
                     lose(blocks.KUKS)
