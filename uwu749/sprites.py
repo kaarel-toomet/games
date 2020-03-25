@@ -40,6 +40,11 @@ class ChunkSprites():
        self.chunks = {}  # dict: chunkID : list of sprites
        self.N = 0
        # total number of minerals across all chunks
+
+    def __str__(self):
+        s = "ChunkSprites object:\n" +\
+            str(self.N) + " sprites"
+       
     def add(self, sprite):
        """
        add new sprite at it's (world) coordinates:
