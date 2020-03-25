@@ -40,6 +40,11 @@ class ChunkSprites():
        self.chunks = {}  # dict: chunkID : list of sprites
        self.N = 0
        # total number of minerals across all chunks
+
+    def __str__(self):
+        s = "ChunkSprites object:\n" +\
+            str(self.N) + " sprites"
+       
     def add(self, sprite):
        """
        add new sprite at it's (world) coordinates:
@@ -60,7 +65,7 @@ class ChunkSprites():
         spriteList = []
         for chunkID in self.chunks.keys():
             sprites = self.get(chunkID)
-            chunkList = [(s.x, s.y, s.species) for s in sprites]
+            chunkList = [s.dictify() for s in sprites]
             spriteList += chunkList
         return spriteList
                 
@@ -114,6 +119,8 @@ class ChunkSprites():
         for sprite in spriteList:
             if sprite[2] == "monster":
                 self.add(Koll(sprite[0], sprite[1]))
+            if sprite[2] == "gold":
+                self.add(Gold(sprite[0:2]))
 
 
 class CrazyHat(pg.sprite.Sprite):
@@ -192,19 +199,27 @@ class CrazyHat(pg.sprite.Sprite):
 
             
 class Gold(pg.sprite.Sprite):
-    def __init__(self, x, y, n=100):
+    """
+    We define gold as sprite, then it can be on top of
+    all other things
+    """
+    def __init__(self, loc):
         """
-        x, y: world coordinates
+        loc = x, y: world coordinates
         """
         pg.sprite.Sprite.__init__(self)
         self.image = kuldImage
         self.rect = self.image.get_rect()
-        self.x, self.y = x, y
+        self.x, self.y = loc
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-        self.n = n
+
+    def dictify(self):
+        return (self.x, self.y, "gold")
+        
     def update(self):
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
 
+        
 class Koll(pg.sprite.Sprite):
     def __init__(self, x, y=None):
         """
@@ -226,6 +241,9 @@ class Koll(pg.sprite.Sprite):
         self.delay = 30
         self.species = "monster"  # so we can query the type of the sprite
 
+    def dictify(self):
+        return (self.x, self.y, self.species)
+        
     def getxy(self):
        """
        return world coordinates
@@ -255,7 +273,3 @@ class Koll(pg.sprite.Sprite):
                monsters.moveChunk(self, newChunkID)
                self.chunkID = newChunkID
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
-
-
-## Define globals
-globals.mineralGold = ChunkSprites()

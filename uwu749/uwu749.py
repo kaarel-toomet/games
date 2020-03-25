@@ -126,7 +126,7 @@ bb = 1
 seehome = 1
 gmod = 0
 gmods = {0:"creative",1:"survival"}
-gameState = globals.GameState()  # current running game data
+globals.gameState = globals.GameState()  # current running game data
 
 def newGame(terrain=None, underterrain = None,
             spriteData=None,
@@ -135,7 +135,7 @@ def newGame(terrain=None, underterrain = None,
     Re-create everything, including terrain, monsters
     reset lives, score, inventory
     """
-    global gameState
+    globals.mineralGold = sprites.ChunkSprites()
     ## global params
     if terrain is None:
         globals.ground = world.World("ground", globals.groundNoiseParams)
@@ -151,8 +151,7 @@ def newGame(terrain=None, underterrain = None,
     ## create the active window, centered at 0,0 as we don't
     ## have the CH coordinates yet:
     chunkID = coordinates.chunkID((0, 0))
-    globals.mineralGold = sprites.ChunkSprites()
-    coordinates.coordinateShifts(chunkID, gameState.home[0], gameState.home[1])
+    coordinates.coordinateShifts(chunkID, globals.gameState.home[0], globals.gameState.home[1])
     globals.activeWindow.update(chunkID)
     # load the world chunks into activeWindow
     globals.activeWindow.draw(None, None, blocks.blocks)  # arguments: dx, dy, blocks
@@ -166,10 +165,15 @@ def newGame(terrain=None, underterrain = None,
             globals.kollid = spriteData["kollid"]
         else:
             globals.kollid = sprites.ChunkSprites()
+        if "gold" in spriteData:
+            globals.mineralGold = spriteData["gold"]
+        else:
+            globals.kollid = sprites.ChunkSprites()
     globals.activeKollid = world.activeSprites(globals.kollid)
+    globals.activeMineralGold = world.activeSprites(globals.mineralGold)
     # have to initialize this, in principle we may have a few kolls pre-created
     if state is not None:
-        gameState = state
+        globals.gameState = state
 
 def reset(crazyHat=None):
     """
@@ -229,7 +233,8 @@ def destroy(x,y):
     if material not in gameState.inventory and empty == 20:
         return
     if np.random.randint(0,200) == 0 and material != breakto:
-        globals.mineralGold.add(sprites.Gold(x,y))
+        # there was a gold hidden underneath this block
+        globals.mineralGold.add(sprites.Gold((x,y)))
         globals.activeMineralGold = world.activeSprites(globals.mineralGold)
     get(blocks.drops[material])
     globals.screenBuffer.blit( blocks.blocks[breakto], coordinates.worldToScreenbuffer(x, y))
@@ -338,7 +343,8 @@ while do:
                     # sync data
                     ## sprites
                     spriteData = {
-                        "kollid" : globals.kollid.dictify()
+                        "kollid" : globals.kollid.dictify(),
+                        "gold" : globals.mineralGold.dictify()
                     }
                     files.saveWorld(globals.ground, globals.underground,
                                     spriteData,
