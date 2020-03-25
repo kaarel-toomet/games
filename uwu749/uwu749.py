@@ -438,6 +438,9 @@ while do:
                 elif gameState.inventory[select] == blocks.AACT:
                     get(blocks.LAMMUTI)
                     lose(blocks.AACT)
+                elif gameState.inventory[select] == blocks.KULD:
+                    get(blocks.KPD)
+                    lose(blocks.KULD)
         elif event.type == pg.KEYUP:
             if event.key == pg.K_UP:
                 mup = False
