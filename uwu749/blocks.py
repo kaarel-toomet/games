@@ -28,6 +28,7 @@ GORE = 22
 CORE = 23
 BORE = 24
 LAMMUTI = 25
+KPD = 26
 BLOCK_END = 25
 
 unbreakable = set([SYGAVM])
@@ -36,12 +37,12 @@ breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, LIIV:SEA, MURU:LIIV, TEE:MURU, KAST:LIIV,
             KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU,
            KUKS:LIIV, LUKS:LIIV, KAKTUS:LIIV, KOLLIV:MURU, KULD:MURU, KIRKA:KIRKA,
            KSEIN:KIVI, AUK:KIVI, AED:MURU, ACT:LIIV, AACT:LIIV,BORE:KSEIN,
-           CORE:KSEIN, GORE:KSEIN, LAMMUTI:LIIV}
+           CORE:KSEIN, GORE:KSEIN, LAMMUTI:LIIV, KPD:LIIV}
 drops = {NONE:NONE, SEA:SEA, LIIV:LIIV, MURU:MURU, KIVI:KIVI, LUMI:LUMI,
          TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUU, MQQK:MQQK, PUIT:PUIT,
          KUKS:KUKS, LUKS:KUKS, KAKTUS:KAKTUS, KOLLIV:KOLLIV, KULD:KULD,
          KIRKA:KIRKA, KSEIN:KSEIN, AUK:AUK, ACT:AACT, AACT:AACT,
-         AED:AED, GORE:GORE, CORE:CORE, BORE:BORE, LAMMUTI:LAMMUTI}
+         AED:AED, GORE:GORE, CORE:CORE, BORE:BORE, LAMMUTI:LAMMUTI, KPD:KPD}
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
 # as soon as we know the size
@@ -110,6 +111,8 @@ def loadBlocks(size):
                                 (size, size))
     lammuti = pg.transform.scale(pg.image.load("blocks/lammuti.png"),
                                 (size, size))
+    kprnd = pg.transform.scale(pg.image.load("blocks/goldfloor.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, LIIV:block, MURU:ground, TEE:tee,
                KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv,
@@ -117,7 +120,7 @@ def loadBlocks(size):
                KUKS:cdoor, LUKS:odoor, KAKTUS:kaktus, KOLLIV:kolliv,
                KULD:kuld, KIRKA:kirka, KSEIN:pebbl, AUK:auk,
                AED:fence, ACT:act, AACT:aact, BORE:bore, CORE:core,
-               GORE:gore, LAMMUTI:lammuti}
+               GORE:gore, LAMMUTI:lammuti, KPD:kprnd}
     bn={SEA:"vesi",LIIV:"liiv", MURU:"muru", TEE:"tee",
         KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi",
         PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit",
@@ -126,5 +129,5 @@ def loadBlocks(size):
          KSEIN:"koopasein", AUK:"auk (portaal maa alla)", AED:"aed",
         ACT:"aktivaator",AACT:"aktiveeritud aktivaator",
         BORE:"sinivärgi maak", CORE:"söemaak", GORE:"kullamaak",
-        LAMMUTI:"Lõhkumismasin"}
+        LAMMUTI:"Lõhkumismasin", KPD:"Kullast põrand"}
 
