@@ -323,7 +323,10 @@ while do:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_l:
                     ## load world
-                    l = files.loadWorld()
+                    try:
+                        l = files.loadWorld()
+                    except:
+                        l = None
                     if l is not None:
                         ## did not cancel
                         ground, underground, spriteData, gameState, crazyHat = l
