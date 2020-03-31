@@ -3,16 +3,19 @@ Custom sprite classes
 """
 import numpy as np
 import pygame as pg
-import random
+import random as r
 
 import blocks
 import coordinates
 import world
 import globals
 
+pg.mixer.init()
+
 crazyHatImage = None
 kollImage = None
 kuldImage = None
+kollSound1 = pg.mixer.Sound("noises/koll1.ogg")
 
 def setup(tileSize):
     global kuldImage, kollImage, crazyHatImage
@@ -256,6 +259,7 @@ class Koll(pg.sprite.Sprite):
         monsters: list of monsters (ChunkSprites), have to update monsters in this list
                   as self is 'activeKollid'
         """
+        global kollSound1
         self.tick += 1
         if self.tick == self.delay:
             self.tick = 0
@@ -273,3 +277,5 @@ class Koll(pg.sprite.Sprite):
                monsters.moveChunk(self, newChunkID)
                self.chunkID = newChunkID
         self.rect.x, self.rect.y = coordinates.worldToScreenbuffer(self.x, self.y)
+        if r.randint(0,100) == 0:
+           kollSound1.play()

@@ -293,7 +293,7 @@ def get(item, n = 1):
         empty = 20
     exists = item in globals.gameState.inventory
     if exists:
-        globals.gameState.amounts[gameState.inventory.index(item)] += n
+        globals.gameState.amounts[globals.gameState.inventory.index(item)] += n
     elif empty <= 20:
         globals.gameState.inventory[empty] = item
         globals.gameState.amounts[empty] = n
