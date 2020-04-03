@@ -138,11 +138,11 @@ def newGame(terrain=None, underterrain = None,
     globals.mineralGold = sprites.ChunkSprites()
     ## global params
     if terrain is None:
-        globals.ground = world.World("ground", globals.groundNoiseParams)
+        globals.ground = world.World("ground", globals.groundNoiseParams, globals.groundMaterial, globals.groundThreshold)
     else:
         globals.ground = terrain
     if underterrain is None:
-        globals.underground = world.World("underground",globals.undergroundNoiseParams)
+        globals.underground = world.World("underground",globals.undergroundNoiseParams, globals.underMaterial, globals.underThreshold)
     else:
         globals.underground = underterrain
     globals.activelayer = globals.ground

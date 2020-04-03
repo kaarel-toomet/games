@@ -37,7 +37,7 @@ class World:
    You have to set up coordinates before you set up the world
    That initializes chunkWidth, chunkHeight and such
    """
-   def __init__(self, dimension, altitudeParam):
+   def __init__(self, dimension, altitudeParam, materials, thresholds):
       """
       read parameters and set up and empty world
       inputs:
@@ -50,6 +50,8 @@ class World:
       self.chunks = {}
       self.freqX, self.freqY = freqX, freqY
       self.a, self.b, self.c, self.d, self.e, self.f = a, b, c, d, e, f
+      self.materials = materials
+      self.thresholds = thresholds
    def get(self, chunkID):
       """
       return the chunk data
@@ -68,61 +70,24 @@ class World:
                x = ic*coordinates.chunkWidth + cx
                y = jc*coordinates.chunkHeight + cy
                r.seed(1000*cx+cy)
+               n = 0
                holegen = r.randint(0,100)
-               gnoiseval = noise.snoise2(x/self.freqX, y/self.freqY,
+               noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
                                        self.a, self.b, self.c, self.d,
                                        self.e, self.f,) + 1*noise.snoise2(x/1500,y/1500,20,0.5,2,1024,1024,0)
-               if self.dimension == "ground":
-                  noiseval = noise.snoise2(x/self.freqX, y/self.freqY,
-                                       self.a, self.b, self.c, self.d,
-                                       self.e, self.f,) + 1*noise.snoise2(x/1500,y/1500,20,0.5,2,1024,1024,0)
-                  noiseval2 = 0.7*noise.snoise2(x/(self.freqX*2) + 10, y/(self.freqY*2) + 10,
+               noiseval2 = 0.7*noise.snoise2(x/(self.freqX*2) + 10, y/(self.freqY*2) + 10,
                                        self.a, self.b, self.c, self.d,
                                        self.e, self.f,) + 0.7*noise.snoise2((x/3000)+10,(y/3000)+10,20,0.5,2,1024,1024,0)
-                  biome1 = r.uniform(-0.1,0.5)
-                  biome2 = r.uniform(-0.2,0)
-                  if noiseval < -0.3:
-                     chunk[cy, cx] = blocks.SYGAVM
-                  elif noiseval < 0:
-                     chunk[cy, cx] = blocks.SEA
-                  elif noiseval < 0.07:
-                     chunk[cy, cx] = blocks.LIIV
-                  elif noiseval < 0.3:
-                        chunk[cy,cx] = blocks.MURU
-                        if biome1 < noiseval2:
-                           chunk[cy,cx] = blocks.PUU
-                        elif biome2 > noiseval2:
-                           chunk[cy,cx] = blocks.LIIV
-                           if r.randint(0,100) == 0:
-                              chunk[cy,cx] = blocks.KAKTUS
-                  elif noiseval < 0.4:
-                     chunk[cy, cx] = blocks.KIVI
-                     if holegen == 0:
-                        chunk[cy, cx] = blocks.AUK
-                  elif noiseval < 11:
-                     chunk[cy, cx] = blocks.LUMI
-               else:
-                  noiseval = noise.snoise2(x/self.freqX+10, y/self.freqY+10,
-                                       self.a, self.b, self.c, self.d,
-                                       self.e, self.f,)
-                  if np.abs(noiseval) < 0.1:
-                     chunk[cy, cx] = blocks.KIVI
-                  else:
-                     chunk[cy, cx] = blocks.KSEIN
-                     if r.randint(0,100) == 0:
-                        chunk[cy, cx] = blocks.GORE
-                     if r.randint(0,100) == 0:
-                        chunk[cy, cx] = blocks.BORE
-                     if r.randint(0,100) == 0:
-                        chunk[cy, cx] = blocks.CORE
-                  if gnoiseval < 0.4 and gnoiseval > 0.3 and holegen == 0:
-                     chunk[cy,cx] = blocks.AUK
+               
+               while noiseval > self.thresholds[n]:
+                  n += 1
+               chunk[cy,cx] = self.materials[n]
+               n=0
       self.chunks[chunkID] = chunk
       ## create minerals: sprites that do not move
       for i in range(1):
           chunkx, chunky = (np.random.randint(0, chunk.shape[1]),
-                            np.random.randint(0, chunk.shape[0])
-          )
+                            np.random.randint(0, chunk.shape[0]))
           x, y = coordinates.inchunkToWorld(chunkID, (chunkx, chunky))
           globals.mineralGold.add(sprites.Gold((x, y)))
       globals.activeMineralGold = activeSprites(globals.mineralGold)

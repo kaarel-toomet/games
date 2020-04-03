@@ -35,6 +35,12 @@ activelayer = None
 groundNoiseParams = (50, 50, 20, 0.5, 2, 1024, 1024, 0)
 undergroundNoiseParams = (50, 50, 20, 0.5, 2, 1024, 1024, 0)
 
+groundMaterial = (blocks.SYGAVM, blocks.SEA, blocks.LIIV, blocks.MURU, blocks.KIVI, blocks.LUMI)
+groundThreshold = (-0.3, 0, 0.07, 0.3, 0.4, 11)
+
+underMaterial = (blocks.KSEIN, blocks.KIVI, blocks.KSEIN)
+underThreshold = (-0.1, 0.1, 44525)
+
 gameState = None
 
 # memory are where drawing is done, and part of which is showed on monitor
