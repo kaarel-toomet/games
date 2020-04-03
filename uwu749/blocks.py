@@ -29,7 +29,8 @@ CORE = 23
 BORE = 24
 LAMMUTI = 25
 KPD = 26
-BLOCK_END = 25
+PORTAL = 27
+BLOCK_END = 27
 
 unbreakable = set([SYGAVM])
 solid = set([KAST, KUKS, KOLLIV, KULD, KSEIN, AED, BORE, CORE, GORE])
@@ -37,12 +38,13 @@ breakto = {SYGAVM:SYGAVM, SEA:SYGAVM, LIIV:SEA, MURU:LIIV, TEE:MURU, KAST:LIIV,
             KIVI:MURU, LUMI:KIVI, PUU:MURU, NONE:NONE, MQQK:MQQK, PUIT:MURU,
            KUKS:LIIV, LUKS:LIIV, KAKTUS:LIIV, KOLLIV:MURU, KULD:MURU, KIRKA:KIRKA,
            KSEIN:KIVI, AUK:KIVI, AED:MURU, ACT:LIIV, AACT:LIIV,BORE:KSEIN,
-           CORE:KSEIN, GORE:KSEIN, LAMMUTI:LIIV, KPD:LIIV}
+           CORE:KSEIN, GORE:KSEIN, LAMMUTI:LIIV, KPD:LIIV, PORTAL:SYGAVM}
 drops = {NONE:NONE, SEA:SEA, LIIV:LIIV, MURU:MURU, KIVI:KIVI, LUMI:LUMI,
          TEE:TEE, KAST:KAST, SYGAVM:NONE, PUU:PUU, MQQK:MQQK, PUIT:PUIT,
          KUKS:KUKS, LUKS:KUKS, KAKTUS:KAKTUS, KOLLIV:KOLLIV, KULD:KULD,
          KIRKA:KIRKA, KSEIN:KSEIN, AUK:AUK, ACT:AACT, AACT:AACT,
-         AED:AED, GORE:GORE, CORE:CORE, BORE:BORE, LAMMUTI:LAMMUTI, KPD:KPD}
+         AED:AED, GORE:GORE, CORE:CORE, BORE:BORE, LAMMUTI:LAMMUTI,
+         KPD:KPD, PORTAL:PORTAL}
 blocks = {}
 # initialize empty dictionary, to be filled with loadBlocks
 # as soon as we know the size
@@ -113,6 +115,8 @@ def loadBlocks(size):
                                 (size, size))
     kprnd = pg.transform.scale(pg.image.load("blocks/goldfloor.png"),
                                 (size, size))
+    oprt = pg.transform.scale(pg.image.load("blocks/omniportal.png"),
+                                (size, size))
     ## set up the blocks dictionary
     blocks = { SEA:sky, LIIV:block, MURU:ground, TEE:tee,
                KAST:kast, KIVI:kivi, LUMI:lumi, SYGAVM:sygavv,
@@ -120,14 +124,15 @@ def loadBlocks(size):
                KUKS:cdoor, LUKS:odoor, KAKTUS:kaktus, KOLLIV:kolliv,
                KULD:kuld, KIRKA:kirka, KSEIN:pebbl, AUK:auk,
                AED:fence, ACT:act, AACT:aact, BORE:bore, CORE:core,
-               GORE:gore, LAMMUTI:lammuti, KPD:kprnd}
+               GORE:gore, LAMMUTI:lammuti, KPD:kprnd, PORTAL:oprt}
     bn={SEA:"vesi",LIIV:"liiv", MURU:"muru", TEE:"tee",
         KAST:"kast", KIVI:"kivi", LUMI:"lumi",SYGAVM:"sügav vesi",
         PUU:"puu", NONE:"eimiski", MQQK:"mõõk", PUIT:"puit",
         KUKS:"kinnis uks", LUKS:"lahtis uks", KAKTUS:"kaktus",
         KOLLIV: "Kolli varemed", KULD: "kullaplokk", KIRKA:"kirka",
-         KSEIN:"koopasein", AUK:"auk (portaal maa alla)", AED:"aed",
+        KSEIN:"koopasein", AUK:"auk (portaal maa alla)", AED:"aed",
         ACT:"aktivaator",AACT:"aktiveeritud aktivaator",
         BORE:"sinivärgi maak", CORE:"söemaak", GORE:"kullamaak",
-        LAMMUTI:"Lõhkumismasin", KPD:"Kullast põrand"}
+        LAMMUTI:"Lõhkumismasin", KPD:"Kullast põrand",
+        PORTAL:"Portaal lampidesse dimensioonidesse"}
 

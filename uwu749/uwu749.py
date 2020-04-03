@@ -417,6 +417,14 @@ while do:
                     globals.gameState.dimension = globals.activelayer.dimension
                     globals.activeWindow.switchLayer(globals.activelayer)
                     globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
+                elif globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.PORTAL:
+                    if globals.activelayer is globals.ground:
+                        globals.activelayer = globals.underground
+                    else:
+                        globals.activelayer = globals.ground
+                    globals.gameState.dimension = globals.activelayer.dimension
+                    globals.activeWindow.switchLayer(globals.activelayer)
+                    globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
             elif event.key == pg.K_RSHIFT:
                 speed = True
             elif event.key == pg.K_y:
