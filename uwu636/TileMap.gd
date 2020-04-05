@@ -9,8 +9,8 @@ var mainnoise = OpenSimplexNoise.new()
 var offsetnoise = OpenSimplexNoise.new()
 var chunkW = 15 #then changing these, change the numbers in hullmyts's script, that are used in the changechunk signal
 var chunkH = 10
-var wOffsetx = 0 # activewindow offset, top-left chunk in tiles
-var wOffsety = 0
+var wOffsetx = -1 # activewindow offset, top-left chunk in tiles
+var wOffsety = -1
 var breakto = {0:1, 1:6, 2:0, 3:0, 4:2, 5:4, 6:6, 7:2, 8:0}
 #0:sand, 1:sea, 2:grass, 3:box, 4:stone, 5:snow, 6:deep sea
 #7:tree, 8:cactus
@@ -37,7 +37,13 @@ func generate(cx,cy):
 				set_cell(x,y,4)
 			else:
 				set_cell(x,y,5)
-
+				
+func lammuta(x,y):
+	if get_cell(x,y) == -1:
+		return
+	set_cell(x,y,breakto[get_cell(x,y)])
+func ehita(x,y):
+	set_cell(x,y,3)
 
 
 
@@ -77,8 +83,14 @@ func scroll(sx,sy):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if Input.is_action_pressed("LCLICK"):
-		scroll(1,0)
+	if Input.is_action_just_pressed("LCLICK"):
+		var parent = get_parent()
+		var xy = parent.get_global_mouse_position()/32
+		lammuta(xy[0],xy[1])
+	if Input.is_action_just_pressed("RCLICK"):
+		var parent = get_parent()
+		var xy = parent.get_global_mouse_position()/32
+		ehita(xy[0],xy[1])
 
 
 func _on_hullmyts_changechunk(changex, changey):
