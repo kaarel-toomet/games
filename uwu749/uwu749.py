@@ -293,7 +293,7 @@ def get(item, n = 1):
         empty = 20
     exists = item in globals.gameState.inventory
     if exists:
-        globals.gameState.amounts[gameState.inventory.index(item)] += n
+        globals.gameState.amounts[globals.gameState.inventory.index(item)] += n
     elif empty <= 20:
         globals.gameState.inventory[empty] = item
         globals.gameState.amounts[empty] = n
@@ -410,6 +410,14 @@ while do:
                 title = True
             elif event.key == 13:
                 if globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.AUK:
+                    if globals.activelayer is globals.ground:
+                        globals.activelayer = globals.underground
+                    else:
+                        globals.activelayer = globals.ground
+                    globals.gameState.dimension = globals.activelayer.dimension
+                    globals.activeWindow.switchLayer(globals.activelayer)
+                    globals.activeWindow.draw(0, 0, blocks.blocks)  # arguments: dx, dy, blocks
+                elif globals.activeWindow[coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[1],coordinates.worldToWindow(globals.hullmyts.getxy()[0],globals.hullmyts.getxy()[1])[0]] == blocks.PORTAL:
                     if globals.activelayer is globals.ground:
                         globals.activelayer = globals.underground
                     else:
