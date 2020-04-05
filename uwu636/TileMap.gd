@@ -18,32 +18,34 @@ var breakto = {0:1, 1:6, 2:0, 3:0, 4:2, 5:4, 6:6, 7:2, 8:0}
 func generate(cx,cy):
 	for x in range(chunkW*cx,chunkW*(cx+1)):
 		for y in range(chunkH*cy,chunkH*(cy+1)):
+			var gencell = -1
 			noise.seed = 32
 			mainnoise.octaves = 5
 			mainnoise.period = 40
-			mainnoise.persistence = abs(noise.get_noise_2d(x+1000,y)/2)+0.4
-			mainnoise.lacunarity = (noise.get_noise_2d(x,y-1000)/2)+2
+			mainnoise.persistence = abs(noise.get_noise_2d(x+1000,y))+0.4
+			mainnoise.lacunarity = 2#(noise.get_noise_2d(x,y-1000)/2)+2
 			var noiseval = mainnoise.get_noise_2d(x+43,y)+offsetnoise.get_noise_2d(x,y)
 			#print(mainnoise.period, " ",mainnoise.persistence," ",mainnoise.lacunarity, " ", noiseval)
 			if noiseval < -0.3:
-				set_cell(x,y,6)
+				gencell = 6
 			elif noiseval < 0:
-				set_cell(x,y,1)
+				gencell = 1
 			elif noiseval < 0.1:
-				set_cell(x,y,0)
+				gencell = 0
 			elif noiseval < 0.3:
-				set_cell(x,y,2)
+				gencell = 2
 			elif noiseval < 0.45:
-				set_cell(x,y,4)
+				gencell = 4
 			else:
-				set_cell(x,y,5)
-				
+				gencell = 5
+			if get_cell(x,y) == -1:
+				set_cell(x,y,gencell)
 func lammuta(x,y):
-	if get_cell(x,y) == -1:
+	if get_cell(int(x),int(y)) == -1:
 		return
 	set_cell(x,y,breakto[get_cell(x,y)])
 func ehita(x,y):
-	set_cell(x,y,3)
+	set_cell(int(x),int(y),3)
 
 
 
@@ -64,17 +66,15 @@ func _ready():
 	offsetnoise.persistence = 0.5
 	offsetnoise.lacunarity = 2
 	randomize()
-	for x in range(3):
-		for y in range (3):
-			generate(x,y)
+	scroll(0,0)
 
 func scroll(sx,sy):
 	for cx in range(3):
 		for cy in range(3):
 			for x in range(chunkW*(cx+wOffsetx),chunkW*(cx+wOffsetx+1)):
 				for y in range(chunkH*(cy+wOffsety),chunkH*(cy+wOffsety+1)):
-					set_cell(x,y,-1)
-					fix_invalid_tiles()
+					pass#set_cell(x,y,-1)
+					#fix_invalid_tiles()
 	for cx in range(3):
 		for cy in range(3):
 			generate(cx + wOffsetx + sx, cy + wOffsety + sy)
@@ -86,10 +86,18 @@ func _process(delta):
 	if Input.is_action_just_pressed("LCLICK"):
 		var parent = get_parent()
 		var xy = parent.get_global_mouse_position()/32
+		if sign(xy[0]) == -1:
+			xy[0] -= 1
+		if sign(xy[1]) == -1:
+			xy[1] -= 1
 		lammuta(xy[0],xy[1])
 	if Input.is_action_just_pressed("RCLICK"):
 		var parent = get_parent()
 		var xy = parent.get_global_mouse_position()/32
+		if sign(xy[0]) == -1:
+			xy[0] -= 1
+		if sign(xy[1]) == -1:
+			xy[1] -= 1
 		ehita(xy[0],xy[1])
 
 
