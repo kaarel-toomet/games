@@ -31,18 +31,22 @@ func _ready():
 		for y in range (3):
 			generate(x,y)
 
+func scroll(sx,sy):
+	for cx in range(3):
+		for cy in range(3):
+			for x in range(chunkW*(cx+wOffsetx),chunkW*(cx+wOffsetx+1)):
+				for y in range(chunkH*(cy+wOffsety),chunkH*(cy+wOffsety+1)):
+					set_cell(x,y,-1)
+					fix_invalid_tiles()
+	for cx in range(3):
+		for cy in range(3):
+			generate(cx + wOffsetx + sx, cy + wOffsety + sy)
+	wOffsetx += sx
+	wOffsety += sy
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if Input.is_action_just_pressed("G"):
 		generate(1,2)
 	if Input.is_action_just_pressed("X"):
-		for cx in range(4):
-			for cy in range(3):
-				if cx == 0:
-					for x in range(chunkW*(cx+wOffsetx),chunkW*(cx+1+wOffsetx)):
-						for y in range(chunkH*(cy+wOffsety),chunkH*(cy+wOffsety+1)):
-							set_cell(x,y,-1)
-				if cx == 3:
-					generate(cx+wOffsetx,cy+wOffsety)
-		wOffsetx += 1
-					
+		scroll(1,0)
