@@ -5,10 +5,12 @@ extends TileMap
 # var a = 2
 # var b = "text"
 var noise = OpenSimplexNoise.new()
-var chunkW = 5 #then changing these, change the numbers in hullmyts's script, that are used in the changechunk signal
-var chunkH = 5
+var chunkW = 20 #then changing these, change the numbers in hullmyts's script, that are used in the changechunk signal
+var chunkH = 20
 var wOffsetx = 0 # activewindow offset, top-left chunk in tiles
 var wOffsety = 0
+
+
 func generate(cx,cy):
 	for x in range(chunkW*cx,chunkW*(cx+1)):
 		for y in range(chunkH*cy,chunkH*(cy+1)):

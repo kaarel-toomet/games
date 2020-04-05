@@ -7,8 +7,8 @@ var screen_size  # Size of the game window.
 var speed = 4
 var pause = false
 
-var chunkx = 5 # change these with the chunk sizes in tilemap.gd
-var chunky = 5
+var chunkx = 20 # change these with the chunk sizes in tilemap.gd
+var chunky = 20
 
 var oldpos = position
 
@@ -21,6 +21,7 @@ func _ready():
 	screen_size = get_viewport_rect().size
 	position.x = chunkx*48
 	position.y = chunky*48
+	print(floor(2.555))
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -38,12 +39,13 @@ func _process(delta):
 		if Input.is_action_just_pressed("R"):
 			position.x = 0
 			position.y = 0
-		var cx = int((position.x/32)/chunkx)
-		var cy = int((position.y/32)/chunky)
-		var ocx = int((oldpos.x/32)/chunkx)
-		var ocy = int((oldpos.y/32)/chunky)
+		var cx = floor((position.x / 32) / chunkx)
+		var cy = floor((position.y / 32) / chunky)
+		var ocx = floor((oldpos.x / 32) / chunkx)
+		var ocy = floor((oldpos.y / 32) / chunky)
 		var changex = cx-ocx
 		var changey = cy-ocy
+		#print(cx, " ", ocx, " ", changex)
 		if changex != 0 or changey != 0:
 			emit_signal("changechunk",changex,changey)
 
