@@ -16,6 +16,9 @@ var breakto = {0:1, 1:6, 2:0, 3:0, 4:2, 5:4, 6:6, 7:2, 8:0}
 #7:tree, 8:cactus
 
 func generate(cx,cy):
+	if $generated.ger_cell(cx,cy) != -1:
+		return
+	$generated.set_cell(cx,cy,0)
 	for x in range(chunkW*cx,chunkW*(cx+1)):
 		for y in range(chunkH*cy,chunkH*(cy+1)):
 			var gencell = -1
@@ -41,11 +44,13 @@ func generate(cx,cy):
 			if get_cell(x,y) == -1:
 				set_cell(x,y,gencell)
 func lammuta(x,y):
-	if get_cell(int(x),int(y)) == -1:
+	x = floor(x)
+	y = floor(y)
+	if get_cell(x,y) == -1:
 		return
 	set_cell(x,y,breakto[get_cell(x,y)])
 func ehita(x,y):
-	set_cell(int(x),int(y),3)
+	set_cell(floor(x),floor(y),3)
 
 
 
@@ -86,18 +91,10 @@ func _process(delta):
 	if Input.is_action_just_pressed("LCLICK"):
 		var parent = get_parent()
 		var xy = parent.get_global_mouse_position()/32
-		if sign(xy[0]) == -1:
-			xy[0] -= 1
-		if sign(xy[1]) == -1:
-			xy[1] -= 1
 		lammuta(xy[0],xy[1])
 	if Input.is_action_just_pressed("RCLICK"):
 		var parent = get_parent()
 		var xy = parent.get_global_mouse_position()/32
-		if sign(xy[0]) == -1:
-			xy[0] -= 1
-		if sign(xy[1]) == -1:
-			xy[1] -= 1
 		ehita(xy[0],xy[1])
 
 
