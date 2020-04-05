@@ -12,7 +12,7 @@ var wOffsety = 0
 func generate(cx,cy):
 	for x in range(chunkW*cx,chunkW*(cx+1)):
 		for y in range(chunkH*cy,chunkH*(cy+1)):
-			set_cell(x,y,int(noise.get_noise_2d(x+chunkW*wOffsetx,y+chunkH*wOffsety)+2))
+			set_cell(x,y,int(noise.get_noise_2d(x,y)+2))
 
 
 
@@ -31,24 +31,18 @@ func _ready():
 		for y in range (3):
 			generate(x,y)
 
-func scroll(sx,sy):
-	# sx/sy are in chunks
-	# wOffset x/y are in tiles
-	wOffsetx += sx*chunkW 
-	wOffsety += sy*chunkH 
-	for cx in range(3):
-			for cy in range(3):
-				for x in range(chunkW):
-					for y in range(chunkH):
-						set_cell(cx*chunkW+x,cy*chunkH+y,
-								get_cell(cx*(chunkW+sx)+x,cy*(chunkH+sy)+y))
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if Input.is_action_just_pressed("G"):
 		generate(1,2)
 	if Input.is_action_just_pressed("X"):
-		for cx in range(3):
+		for cx in range(4):
 			for cy in range(3):
-				scroll(1,0)
+				if cx == 0:
+					for x in range(chunkW*(cx+wOffsetx),chunkW*(cx+1+wOffsetx)):
+						for y in range(chunkH*(cy+wOffsety),chunkH*(cy+wOffsety+1)):
+							set_cell(x,y,-1)
+				if cx == 3:
+					generate(cx+wOffsetx,cy+wOffsety)
+		wOffsetx += 1
 					

@@ -6,7 +6,7 @@
 [ext_resource path="res://tilemap.png" type="Texture" id=4]
 [ext_resource path="res://TileMap.gd" type="Script" id=5]
 
-[sub_resource type="ConvexPolygonShape2D" id=3]
+[sub_resource type="ConvexPolygonShape2D" id=1]
 points = PoolVector2Array( 15, 15, 1, 15, 1, 1, 15, 1 )
 
 [sub_resource type="TileSet" id=2]
@@ -62,14 +62,14 @@ points = PoolVector2Array( 15, 15, 1, 15, 1, 1, 15, 1 )
 3/navigation_offset = Vector2( 0, 0 )
 3/shape_offset = Vector2( 0, 0 )
 3/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
-3/shape = SubResource( 3 )
+3/shape = SubResource( 1 )
 3/shape_one_way = false
 3/shape_one_way_margin = 1.0
 3/shapes = [ {
 "autotile_coord": Vector2( 0, 0 ),
 "one_way": false,
 "one_way_margin": 1.0,
-"shape": SubResource( 3 ),
+"shape": SubResource( 1 ),
 "shape_transform": Transform2D( 1, 0, 0, 1, 0, 0 )
 } ]
 3/z_index = 0
