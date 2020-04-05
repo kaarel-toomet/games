@@ -11,7 +11,9 @@ var chunkW = 15 #then changing these, change the numbers in hullmyts's script, t
 var chunkH = 10
 var wOffsetx = 0 # activewindow offset, top-left chunk in tiles
 var wOffsety = 0
-
+var breakto = {0:1, 1:6, 2:0, 3:0, 4:2, 5:4, 6:6, 7:2, 8:0}
+#0:sand, 1:sea, 2:grass, 3:box, 4:stone, 5:snow, 6:deep sea
+#7:tree, 8:cactus
 
 func generate(cx,cy):
 	for x in range(chunkW*cx,chunkW*(cx+1)):
@@ -75,9 +77,7 @@ func scroll(sx,sy):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if Input.is_action_just_pressed("G"):
-		generate(1,2)
-	if Input.is_action_just_pressed("X"):
+	if Input.is_action_pressed("LCLICK"):
 		scroll(1,0)
 
 
