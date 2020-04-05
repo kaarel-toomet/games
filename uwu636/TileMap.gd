@@ -5,7 +5,7 @@ extends TileMap
 # var a = 2
 # var b = "text"
 var noise = OpenSimplexNoise.new()
-var chunkW = 7
+var chunkW = 5 #then changing these, change the numbers in hullmyts's script, that are used in the changechunk signal
 var chunkH = 5
 var wOffsetx = 0 # activewindow offset, top-left chunk in tiles
 var wOffsety = 0
@@ -50,3 +50,7 @@ func _process(delta):
 		generate(1,2)
 	if Input.is_action_just_pressed("X"):
 		scroll(1,0)
+
+
+func _on_hullmyts_changechunk(changex, changey):
+	scroll(changex, changey)

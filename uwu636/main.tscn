@@ -118,3 +118,4 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 [connection signal="pause" from="." to="hullmyts" method="_on_main_pause"]
+[connection signal="changechunk" from="hullmyts" to="TileMap" method="_on_hullmyts_changechunk"]
